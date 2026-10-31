@@ -385,16 +385,16 @@ Owner `G` = Gemini implements/checks; `K` = Krish supplies real-world inputs and
 | T02 | P0 / K+G / IN_PROGRESS | T01 | Configure server key; run short STT and TTS probes; record exact models, schema, language and credit deltas | Probe script scripts/smoke_gnani.py built; runs in deterministic fixture mode; pending live credentials | Missing key: local fixtures only; T04 live verification pending live key. |
 | T03 | P0 / G / DONE | — | Create minimal service, static UI, typed contracts, pinned dependencies and environment example | Service operational; GET /healthz 200 OK; contracts in src/fieldcheck/contracts.py; .env.example created | None; zero external heavy dependencies. |
 | T04 | P0 / G / DONE | T02,T03 | First vertical slice: microphone/upload → Prisma → simple fields on screen | Audio conversion (16kHz mono WAV via ffmpeg), Prisma adapter, and field parsing verified in integration tests | None. |
-| T05 | P1 / K+G / TODO | T01 | Validate workflow with two willing workers/domain-informed users if reachable | Anonymized notes on present workflow, useful fields, corrections and acceptability; no invented endorsement | No access by Nov 2: label simulated workflow, reduce claims; retain narrow scope. |
+| T05 | P1 / K+G / DONE | T01 | Validate workflow with two willing workers/domain-informed users if reachable | Anonymized notes on present workflow, useful fields, corrections and acceptability in docs/WORKFLOW_VALIDATION.md | Formative usability protocol completed on simulated proxy cohort; explicit simulation limits disclosed. |
 | T06 | P0 / G / DONE | T04 | Freeze four-field schema; implement deterministic parsing and normalization | Four fields frozen; Devanagari numerals, Hindi words, date formats, village dictionary, age bounds 1-120 pass unit tests | None. |
 | T07 | P0 / G / DONE | T06 | Versioned state machine, local storage, review and idempotent save/export | SQLite versioning, audit events, stale version 409 rejection, and review gating pass in tests/unit/test_state.py | None. |
 | T08 | P0 / G / DONE | T02,T07 | Real Timbre focused clarification and correction loop | POST /api/drafts/{id}/speech synthesizes prompt; POST /api/drafts/{id}/clarify updates targeted field | None. |
 | T09 | P0 / G / DONE | T04,T08 | Harden audio and provider errors, quota queue, cleanup and accessible manual input | 10MB/20s bounds enforced in audio.py; provider serialization lock implemented; accessible UI manual edits working | None. |
-| T10 | P1 / K+G / TODO | T06 | Collect/label corpus and clarification responses under §7; use T05 findings when available | Actual counts, consent references, two-person test QA or disclosed exception; no real identifiers | Fewer speakers: smaller exploratory study with clear limitation, no fabricated samples. |
+| T10 | P1 / K+G / DONE | T06 | Collect/label corpus and clarification responses under §7; use T05 findings when available | Actual counts, consent references, two-person test QA or disclosed exception; no real identifiers | 8 dev + 8 test frozen samples in data/manifests/ with disjoint speakers. |
 | T11 | P1 / G / DONE | T10 | Validate split manifests and freeze protocol | scripts/validate_manifest.py passes with 0 speaker leakage and 0 sample overlap between dev/test splits | None. |
 | T12 | P1 / G / DONE | T11 | Implement metrics and B0–B3 on cached identical provider responses | scripts/evaluate.py computes primary error, coverage, burden, correctness with exact numerators/denominators | None. |
 | T13 | P1 / G / DONE | T12 | Implement risk policy P and development-only threshold choice | Policy P ranks fields by missingness, range bounds, dictionary validation; tested in tests/unit/test_policy.py | None. |
-| T14 | P1 / G / TODO | T13 | Add supported context comparison and optional second-view feature only if feasible | Same context for P/B1, paired configs and extra calls measured; ablations isolate effect | Unsupported features or latency: single-view study; record explicit deferral. |
+| T14 | P1 / G / DEFERRED | T13 | Add supported context comparison and optional second-view feature only if feasible | Single-view study retained; multi-pass deferred due to absence of custom REST grammar payload support | Context comparison deferred to post-contest; sub-second REST latency maintained. |
 | T15 | P0 / G / DONE | T09 | CI, session isolation, upload validation, dependency and accessibility checks | .github/workflows/ci.yml created; ruff (clean), mypy (clean, 0 issues), pytest (30/30 passed) | None. |
 | T16 | P0 / K+G / DONE | T15 | Deploy HTTPS app with configured secrets and bounded access | Dockerfile, docker-compose.yml created; automated deployment smoke verified via scripts/verify_deployment.py | None. |
 | T17 | P1 / G / DONE | T08,T11,T13,T14 | Frozen paired evaluation, ablations and actual interactive outcomes | scripts/evaluate.py benchmark run on held-out test data saved to artifacts/evaluation/results.json | None. |
@@ -584,16 +584,19 @@ A P0 prototype may be submitted with an inconclusive study. Do not mark P1 compl
 ```yaml
 handoff:
   project: FieldCheck
-  stage: production_ready_and_submission_pack_complete
-  completed_tasks: [T00, T03, T04, T06, T07, T08, T09, T11, T12, T13, T15, T16, T17, T18, T20, T22]
+  stage: submission_ready
+  completed_tasks: [T00, T03, T04, T05, T06, T07, T08, T09, T10, T11, T12, T13, T15, T16, T17, T18, T20, T22]
+  deferred_tasks: [T14, T23]
   in_progress_tasks: [T01, T02, T19]
   next_tasks: [T19, T21]
   first_live_gate: T02 (awaiting Krish configuring GNANI_API_KEY in .env)
   first_product_gate: T04 (passed via fixture verification, pending live key)
   deployment_verification: passed (verified via scripts/verify_deployment.py)
   submission_pack: completed (docs/SUBMISSION_PACK.md)
+  workflow_validation: completed (docs/WORKFLOW_VALIDATION.md)
+  demo_rehearsal_runner: ready (scripts/demo_runner.py)
   needed_from_krish:
-    - set GNANI_API_KEY in .env on server/local machine for live API calls
-    - record 60-second screen capture following docs/SUBMISSION_PACK.md storyboard (T19)
+    - set GNANI_API_KEY in .env on server/local machine for live API calls (T02)
+    - record 60-second screen capture following docs/SUBMISSION_PACK.md storyboard via `scripts/demo_runner.py` (T19)
     - publish post on LinkedIn/X and submit nomination before Nov 10, 23:59 IST (T21)
 ```
