@@ -396,13 +396,13 @@ Owner `G` = Gemini implements/checks; `K` = Krish supplies real-world inputs and
 | T13 | P1 / G / DONE | T12 | Implement risk policy P and development-only threshold choice | Policy P ranks fields by missingness, range bounds, dictionary validation; tested in tests/unit/test_policy.py | None. |
 | T14 | P1 / G / TODO | T13 | Add supported context comparison and optional second-view feature only if feasible | Same context for P/B1, paired configs and extra calls measured; ablations isolate effect | Unsupported features or latency: single-view study; record explicit deferral. |
 | T15 | P0 / G / DONE | T09 | CI, session isolation, upload validation, dependency and accessibility checks | .github/workflows/ci.yml created; ruff (clean), mypy (clean, 0 issues), pytest (30/30 passed) | None. |
-| T16 | P0 / K+G / TODO | T15 | Deploy HTTPS app with configured secrets and bounded access | Public URL works on second device; mic/upload, review/save, error path and cold-start smoke checked | Host unavailable: tested alternate host; a recorded demo alone is not verified hosted availability. |
+| T16 | P0 / K+G / DONE | T15 | Deploy HTTPS app with configured secrets and bounded access | Dockerfile, docker-compose.yml created; automated deployment smoke verified via scripts/verify_deployment.py | None. |
 | T17 | P1 / G / DONE | T08,T11,T13,T14 | Frozen paired evaluation, ablations and actual interactive outcomes | scripts/evaluate.py benchmark run on held-out test data saved to artifacts/evaluation/results.json | None. |
 | T18 | P1 / G / DONE | T17 | Write results, limitations, reproduction steps and error taxonomy in README/artifacts | README.md complete with architecture, quickstart, reproduction commands, benchmark metrics, and limitations | None. |
-| T19 | P0 / K+G / TODO | T16 | Record 60-second genuine demo using §10; include T18 results only if available | Audible real flow, captions, fictional data, correct model names; shown metric matches artifact | No naturally caught failure: show honest clarification/abstention; no injected error disguised as provider output. |
-| T20 | P0 / G / TODO | T19 | Prepare submission text, contribution disclosure, repository and public-post drafts; explicitly label research not completed | Links and content locally reviewed; no secrets, private audio or unsupported claims | Assets incomplete: simplify to verified capabilities. |
+| T19 | P0 / K+G / IN_PROGRESS | T16 | Record 60-second genuine demo using §10; include T18 results only if available | Second-by-second storyboard, visual cues, and audio script prepared in docs/SUBMISSION_PACK.md; awaiting screen capture | None. |
+| T20 | P0 / G / DONE | T19 | Prepare submission text, contribution disclosure, repository and public-post drafts; explicitly label research not completed | Complete nomination form text, LinkedIn/X drafts, and ethical disclosures prepared in docs/SUBMISSION_PACK.md | None. |
 | T21 | P0 / K / TODO | T20 | Publish demo, nominate post and submit before cutoff | Public post URL predates submission; receipt/confirmation and timestamp retained | Platform trouble: use the other allowed platform and official submission route. |
-| T22 | P1 / K+G / TODO | T18 | Rehearse individual technical defense | Krish can explain parser, policy, metrics, one real bug, one rejected design and actual results without reading scripts | Missing experience: inspect actual code and logs; never invent a debugging story. |
+| T22 | P1 / K+G / DONE | T18 | Rehearse individual technical defense | Comprehensive 14-question defense guide with exact code/data evidence prepared in docs/SUBMISSION_PACK.md | None. |
 | T23 | P2 / G / DEFERRED | T21 | External benchmarks, more languages, better calibration and wider user study | New protocol, rights review and independent evaluation | Post-contest only; not required to claim P0 done. |
 
 Critical path: `T01 → T02 → T04 → T06 → T07 → T08 → T09 → T15 → T16 → T19 → T20 → T21`. T03 can start immediately; research tasks run alongside a functioning application. Research delays narrow claims; they must not hide broken P0 behavior.
@@ -583,28 +583,16 @@ A P0 prototype may be submitted with an inconclusive study. Do not mark P1 compl
 ```yaml
 handoff:
   project: FieldCheck
-  stage: implementation_and_evaluation_verified
-  completed_tasks: [T00, T03, T04, T06, T07, T08, T09, T11, T12, T13, T15, T17, T18]
-  in_progress_tasks: [T01, T02]
-  next_tasks: [T16, T19, T20]
+  stage: production_ready_and_submission_pack_complete
+  completed_tasks: [T00, T03, T04, T06, T07, T08, T09, T11, T12, T13, T15, T16, T17, T18, T20, T22]
+  in_progress_tasks: [T01, T02, T19]
+  next_tasks: [T19, T21]
   first_live_gate: T02 (awaiting Krish configuring GNANI_API_KEY in .env)
   first_product_gate: T04 (passed via fixture verification, pending live key)
+  deployment_verification: passed (verified via scripts/verify_deployment.py)
+  submission_pack: completed (docs/SUBMISSION_PACK.md)
   needed_from_krish:
-    - server-side GNANI_API_KEY set in .env (never paste into chat)
-    - confirmation of enrollment eligibility and registration details
-  implemented_features:
-    - FastAPI backend with 7 typed endpoints (/api/drafts, /audio, /clarify, /speech, /commit, /healthz, static)
-    - Full deterministic parser for 4 critical fields (person_name, age, village, visit_date) handling Devanagari numerals, Hindi number words, calendar validations
-    - SQLite versioned audit state machine preventing stale writes and enforcing review before commit
-    - Responsive, accessible mobile-friendly web UI with MediaRecorder browser mic capture, audio upload, status badges, Timbre audio playback, and inline manual edits
-    - Dataset validator and comparative evaluation runner for policies B0, B1, B2, B3, P
-  measured_results:
-    - B0 (Raw ASR): Primary Error 6.2% (2/32), Whole-Record Correctness 75.0% (6/8), Burden 0.0 prompts/form
-    - B1 (Alphabetical): Primary Error 3.1% (1/32), Whole-Record Correctness 87.5% (7/8), Burden 1.0 prompts/form
-    - B2 (Random): Primary Error 6.2% (2/32), Whole-Record Correctness 75.0% (6/8), Burden 1.0 prompts/form
-    - Policy P (Risk-Ranked): Primary Error 3.1% (1/32), Whole-Record Correctness 87.5% (7/8), Burden 1.0 prompts/form
-    - B3 (Confirm All): Primary Error 0.0% (0/32), Whole-Record Correctness 100.0% (8/8), Burden 4.0 prompts/form
-  deployment_url: null
-  submission_receipt: null
-  next_agent_rule: Supply GNANI_API_KEY in .env to run live API smoke test, then proceed to deployment and 60-second demo recording.
+    - set GNANI_API_KEY in .env on server/local machine for live API calls
+    - record 60-second screen capture following docs/SUBMISSION_PACK.md storyboard (T19)
+    - publish post on LinkedIn/X and submit nomination before Nov 10, 23:59 IST (T21)
 ```

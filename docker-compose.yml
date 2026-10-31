@@ -1,0 +1,23 @@
+services:
+  fieldcheck:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fieldcheck-app
+    ports:
+      - "8000:8000"
+    environment:
+      - GNANI_API_KEY=${GNANI_API_KEY:-}
+      - GNANI_STT_URL=${GNANI_STT_URL:-https://api.vachana.ai/stt/v3}
+      - GNANI_TTS_URL=${GNANI_TTS_URL:-https://api.vachana.ai/api/v1/tts/inference}
+      - GNANI_STT_MODEL=${GNANI_STT_MODEL:-prisma-v3}
+      - GNANI_TTS_MODEL=${GNANI_TTS_MODEL:-timbre-2.5}
+      - GNANI_LANGUAGE=${GNANI_LANGUAGE:-hi-IN}
+      - ALLOW_FIXTURE_FALLBACK=${ALLOW_FIXTURE_FALLBACK:-true}
+      - DATABASE_PATH=/app/data/fieldcheck.db
+    volumes:
+      - fieldcheck-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  fieldcheck-data:
