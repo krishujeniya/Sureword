@@ -1,0 +1,268 @@
+"""FastAPI application for FieldCheck."""
+
+from __future__ import annotations
+
+import os
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile, status
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
+from fieldcheck.audio import AudioValidationError, convert_and_normalize_audio
+from fieldcheck.contracts import (
+    AudioProcessResponse,
+    CommitRequest,
+    CommitResponse,
+    Draft,
+    DraftCreateResponse,
+    DraftState,
+    FieldKey,
+    FieldStatus,
+    FieldValue,
+)
+from fieldcheck.parser import (
+    parse_age,
+    parse_date,
+    parse_person_name,
+    parse_village,
+    parse_visit_form,
+)
+from fieldcheck.providers.gnani import GnaniClient, GnaniProviderError
+from fieldcheck.state import DraftStateMachine, StateTransitionError
+from fieldcheck.storage import Storage
+
+# Paths
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+DB_PATH = os.getenv("DATABASE_PATH", "fieldcheck.db")
+
+# Components
+storage = Storage(db_path=DB_PATH)
+state_machine = DraftStateMachine(storage=storage)
+gnani_client = GnaniClient()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Initialize database tables on startup."""
+    await storage.init_db()
+    yield
+
+
+app = FastAPI(
+    title="FieldCheck API",
+    description="Selective voice-to-form clarification for frontline healthcare visit entry",
+    version="0.1.0",
+    lifespan=lifespan,
+)
+
+
+@app.get("/healthz")
+async def health_check() -> dict[str, str | bool]:
+    """Health check endpoint without expensive third-party calls."""
+    return {
+        "status": "healthy",
+        "database": "sqlite_ready",
+        "gnani_configured": gnani_client.has_credentials(),
+        "allow_fixture_fallback": gnani_client.allow_fixture_fallback,
+    }
+
+
+@app.post("/api/drafts", response_model=DraftCreateResponse)
+async def create_draft(language: str = "hi-IN") -> DraftCreateResponse:
+    """Create a new visit draft session."""
+    draft = await state_machine.create_draft(language=language)
+    return DraftCreateResponse(
+        draft_id=draft.draft_id,
+        version=draft.version,
+        state=draft.state,
+    )
+
+
+@app.get("/api/drafts/{draft_id}", response_model=Draft)
+async def get_draft(draft_id: str) -> Draft:
+    """Get current draft state and fields."""
+    draft = await storage.get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+    return draft
+
+
+@app.post("/api/drafts/{draft_id}/audio", response_model=AudioProcessResponse)
+async def process_draft_audio(
+    draft_id: str,
+    expected_version: int = Form(...),
+    audio_file: UploadFile = File(...),
+) -> AudioProcessResponse:
+    """Process dictated speech: normalize audio -> Prisma STT -> parse fields -> update state."""
+    raw_bytes = await audio_file.read()
+    try:
+        audio_info = convert_and_normalize_audio(raw_bytes)
+    except AudioValidationError as ave:
+        raise HTTPException(status_code=400, detail=str(ave)) from ave
+
+    try:
+        transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
+    except GnaniProviderError as gpe:
+        status_code = gpe.status_code if gpe.status_code and gpe.status_code >= 400 else 502
+        raise HTTPException(status_code=status_code, detail=f"Speech-to-text error: {gpe}") from gpe
+
+    # Deterministic extraction of the 4 fields
+    parsed_fields = parse_visit_form(transcript.text)
+
+    try:
+        updated_draft = await state_machine.apply_audio_parse(
+            draft_id=draft_id,
+            expected_version=expected_version,
+            transcript=transcript,
+            parsed_fields=parsed_fields,
+        )
+    except StateTransitionError as ste:
+        if ste.code == "STALE_VERSION":
+            raise HTTPException(status_code=409, detail=str(ste)) from ste
+        raise HTTPException(status_code=400, detail=str(ste)) from ste
+
+    next_act = (
+        "CLARIFY"
+        if updated_draft.state == DraftState.NEEDS_CLARIFICATION
+        else "REVIEW"
+    )
+
+    return AudioProcessResponse(
+        draft=updated_draft,
+        transcript=transcript,
+        next_action=next_act,
+    )
+
+
+@app.post("/api/drafts/{draft_id}/clarify", response_model=Draft)
+async def clarify_field(
+    draft_id: str,
+    target_field: str = Form(...),
+    expected_version: int = Form(...),
+    manual_value: str | None = Form(None),
+    audio_file: UploadFile | None = File(None),
+) -> Draft:
+    """Apply targeted clarification via typed manual edit or repeated voice."""
+    if not manual_value and not audio_file:
+        raise HTTPException(status_code=400, detail="Must provide either manual_value or audio_file")
+
+    if manual_value is not None and manual_value.strip():
+        # Manual edit takes precedence
+        updated_field = FieldValue(
+            key=target_field,
+            raw_span=manual_value.strip(),
+            canonical_value=manual_value.strip(),
+            status=FieldStatus.MANUALLY_EDITED,
+            reasons=["Manually edited and verified by user"],
+        )
+    else:
+        # Audio repeat of single field
+        assert audio_file is not None
+        raw_bytes = await audio_file.read()
+        try:
+            audio_info = convert_and_normalize_audio(raw_bytes)
+        except AudioValidationError as ave:
+            raise HTTPException(status_code=400, detail=str(ave)) from ave
+
+        try:
+            transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
+        except GnaniProviderError as gpe:
+            raise HTTPException(status_code=502, detail=f"Speech clarification error: {gpe}") from gpe
+
+        # Targeted parser for specific field
+        if target_field == FieldKey.PERSON_NAME.value:
+            updated_field = parse_person_name(transcript.text)
+        elif target_field == FieldKey.AGE.value:
+            updated_field = parse_age(transcript.text)
+        elif target_field == FieldKey.VILLAGE.value:
+            updated_field = parse_village(transcript.text)
+        elif target_field == FieldKey.VISIT_DATE.value:
+            updated_field = parse_date(transcript.text)
+        else:
+            raise HTTPException(status_code=400, detail=f"Unknown target field: {target_field}")
+
+        if updated_field.status == FieldStatus.PROPOSED:
+            updated_field.status = FieldStatus.USER_CONFIRMED
+            updated_field.reasons.append("Clarified and confirmed via spoken repeat")
+
+    try:
+        updated_draft = await state_machine.apply_clarification(
+            draft_id=draft_id,
+            expected_version=expected_version,
+            target_field=target_field,
+            updated_field=updated_field,
+        )
+    except StateTransitionError as ste:
+        if ste.code == "STALE_VERSION":
+            raise HTTPException(status_code=409, detail=str(ste)) from ste
+        raise HTTPException(status_code=400, detail=str(ste)) from ste
+
+    return updated_draft
+
+
+@app.post("/api/drafts/{draft_id}/speech")
+async def get_clarification_speech(draft_id: str) -> Response:
+    """Return synthesized Timbre TTS audio for the draft's active clarification prompt."""
+    draft = await storage.get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+    if not draft.active_prompt:
+        raise HTTPException(status_code=400, detail="Draft has no active clarification prompt")
+
+    try:
+        audio_bytes = await gnani_client.synthesize_speech(
+            text=draft.active_prompt.prompt_text,
+            language=draft.language,
+        )
+    except GnaniProviderError as gpe:
+        raise HTTPException(status_code=502, detail=f"Text-to-speech error: {gpe}") from gpe
+
+    return Response(content=audio_bytes, media_type="audio/wav")
+
+
+@app.post("/api/drafts/{draft_id}/commit", response_model=CommitResponse)
+async def commit_draft(
+    draft_id: str,
+    req: CommitRequest,
+) -> CommitResponse:
+    """Explicit whole-form review and idempotent commit."""
+    try:
+        record_id, draft = await state_machine.commit_draft(
+            draft_id=draft_id,
+            expected_version=req.expected_version,
+            idempotency_key=req.idempotency_key,
+        )
+    except StateTransitionError as ste:
+        if ste.code == "STALE_VERSION":
+            raise HTTPException(status_code=409, detail=str(ste)) from ste
+        raise HTTPException(status_code=400, detail=str(ste)) from ste
+
+    return CommitResponse(
+        record_id=record_id,
+        status="COMMITTED",
+        draft=draft,
+    )
+
+
+@app.delete("/api/drafts/{draft_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_draft(draft_id: str) -> None:
+    """Delete draft session."""
+    await storage.delete_draft(draft_id)
+
+
+# Mount static assets
+if os.path.isdir(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/")
+async def serve_index() -> FileResponse:
+    """Serve the single-page application UI."""
+    index_file = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    raise HTTPException(status_code=404, detail="UI index.html not found")

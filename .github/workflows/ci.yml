@@ -1,0 +1,53 @@
+name: FieldCheck CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install uv and dependencies
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          export PATH="$HOME/.local/bin:$PATH"
+          uv venv
+          uv pip install -e ".[dev]"
+
+      - name: Static linting (Ruff)
+        run: |
+          source .venv/bin/activate
+          ruff check src tests scripts
+
+      - name: Type checking (Mypy)
+        run: |
+          source .venv/bin/activate
+          mypy src/fieldcheck
+
+      - name: Unit and Integration Tests
+        run: |
+          source .venv/bin/activate
+          pytest tests/ -v
+
+      - name: Dataset Manifest Integrity Check
+        run: |
+          source .venv/bin/activate
+          python scripts/validate_manifest.py --dev data/manifests/dev.jsonl --test data/manifests/test.jsonl
+
+      - name: Deterministic Benchmark Evaluation
+        run: |
+          source .venv/bin/activate
+          python scripts/evaluate.py --config configs/experiment.json --manifest data/manifests/test.jsonl --output artifacts/ci_eval

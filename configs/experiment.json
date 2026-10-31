@@ -1,0 +1,29 @@
+{
+  "experiment_version": "1.0.0",
+  "created_at": "2026-10-31T12:00:00+05:30",
+  "hypothesis": "H1: Compared with baseline B1, Policy P reduces accepted critical-field error by >=20% relative at <=1 prompt/form on average with <=5% coverage loss",
+  "target_prompt_budget": 1.0,
+  "random_seed": 42,
+  "max_turn_limit": 3,
+  "timeout_seconds": 20.0,
+  "critical_fields": ["person_name", "age", "village", "visit_date"],
+  "error_codes": {
+    "E01": "Invalid/silent/clipped audio",
+    "E02": "Provider auth/timeout/quota error",
+    "E03": "Recognition substitution/deletion/insertion",
+    "E04": "Number/date/normalization error",
+    "E05": "Extraction omission or wrong field assignment",
+    "E06": "Context bias or candidate ambiguity",
+    "E07": "Wrong field auto-accepted or unnecessary prompt",
+    "E08": "Clarification misunderstood / user nonresponse",
+    "E09": "Stale version / state conflict",
+    "E10": "Connectivity or abandonment failure"
+  },
+  "metrics": [
+    "primary_accepted_field_error",
+    "automatic_coverage",
+    "uncaught_error_rate",
+    "whole_record_correctness",
+    "clarification_burden"
+  ]
+}

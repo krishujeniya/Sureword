@@ -1,0 +1,29 @@
+{
+  "version": "1.0.0",
+  "active_policy": "P",
+  "risk_threshold": 0.3,
+  "max_clarification_attempts_per_field": 2,
+  "budget_matched_max_prompts": 1,
+  "policies": {
+    "B0": {
+      "name": "No Clarification (Raw ASR)",
+      "description": "Commit raw Prisma predictions without asking user repeats"
+    },
+    "B1": {
+      "name": "Schema-First Alphabetical",
+      "description": "Prioritize structural errors/missing, then fixed alphabetical field order"
+    },
+    "B2": {
+      "name": "Seeded Random Selection",
+      "description": "Select random eligible field needing clarification using fixed seed"
+    },
+    "B3": {
+      "name": "Full Confirmation (Upper Bound)",
+      "description": "Prompt every field for confirmation, unconstrained by budget"
+    },
+    "P": {
+      "name": "Selective Risk Ranking",
+      "description": "Prioritize fields with highest estimated risk (missingness, out-of-range, ambiguity)"
+    }
+  }
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FieldCheck — Frontline Voice Visit Entry</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-badge">FC</div>
+        <div>
+          <h1>FieldCheck</h1>
+          <p class="subtitle">Voice-to-Form Frontline Visit Entry • Powered by Gnani Prisma & Timbre</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span id="provider-badge" class="badge badge-neutral">Checking Provider...</span>
+        <span id="state-badge" class="badge badge-neutral">EMPTY</span>
+        <span id="version-badge" class="badge badge-neutral">v1</span>
+      </div>
+    </header>
+
+    <!-- Main Workflow Grid -->
+    <main class="grid-layout">
+      <!-- Left Column: Dictation & Controls -->
+      <section class="card dictation-card">
+        <h2>1. Dictate Visit Record</h2>
+        <p class="instruction">Speak Hindi-English visit details (e.g. <em>"मरीज का नाम कमला देवी, उम्र 45 साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026"</em>).</p>
+
+        <div class="mic-controls">
+          <button id="record-btn" class="btn btn-primary btn-large">
+            <span class="mic-icon">🎙️</span>
+            <span id="record-text">Start Recording</span>
+          </button>
+          <div id="recording-timer" class="timer hidden">00:00 / 00:20</div>
+        </div>
+
+        <div class="divider"><span>OR UPLOAD AUDIO</span></div>
+
+        <div class="upload-container">
+          <input type="file" id="audio-file-input" accept="audio/*" class="file-input">
+          <button id="upload-btn" class="btn btn-secondary">Upload Audio File</button>
+        </div>
+
+        <div id="status-message" class="status-box hidden"></div>
+
+        <div class="transcript-box">
+          <h3>Latest Transcript</h3>
+          <div id="transcript-content" class="transcript-text">No audio transcribed yet.</div>
+          <div id="transcript-meta" class="transcript-meta"></div>
+        </div>
+      </section>
+
+      <!-- Right Column: Structured Visit Form -->
+      <section class="card form-card">
+        <div class="form-header">
+          <h2>2. Structured Visit Fields</h2>
+          <button id="new-draft-btn" class="btn btn-sm btn-ghost">New Session</button>
+        </div>
+
+        <!-- Clarification Banner -->
+        <div id="clarification-banner" class="clarification-box hidden">
+          <div class="clarification-header">
+            <span class="alert-icon">⚠️</span>
+            <div>
+              <strong id="clarify-field-title">Clarification Needed</strong>
+              <p id="clarify-prompt-text"></p>
+            </div>
+            <button id="play-tts-btn" class="btn btn-sm btn-speech" title="Hear spoken prompt">🔊 Speak</button>
+          </div>
+          <div class="clarification-action">
+            <button id="clarify-mic-btn" class="btn btn-sm btn-accent">🎙️ Speak This Field</button>
+            <div class="manual-input-inline">
+              <input type="text" id="clarify-manual-input" placeholder="Or type correct value">
+              <button id="clarify-save-btn" class="btn btn-sm btn-primary">Save</button>
+            </div>
+          </div>
+        </div>
+
+        <form id="visit-form" class="fields-form">
+          <!-- Person Name -->
+          <div class="form-group" id="group-person_name">
+            <div class="field-label-row">
+              <label for="field-person_name">Patient / Person Name</label>
+              <span class="status-tag" id="tag-person_name">Missing</span>
+            </div>
+            <div class="input-with-reasons">
+              <input type="text" id="field-person_name" name="person_name" placeholder="Full name of person">
+              <div class="reasons-list" id="reasons-person_name"></div>
+            </div>
+          </div>
+
+          <!-- Age -->
+          <div class="form-group" id="group-age">
+            <div class="field-label-row">
+              <label for="field-age">Age (Completed Years)</label>
+              <span class="status-tag" id="tag-age">Missing</span>
+            </div>
+            <div class="input-with-reasons">
+              <input type="number" id="field-age" name="age" min="1" max="120" placeholder="e.g. 45">
+              <div class="reasons-list" id="reasons-age"></div>
+            </div>
+          </div>
+
+          <!-- Village -->
+          <div class="form-group" id="group-village">
+            <div class="field-label-row">
+              <label for="field-village">Village / Hamlet</label>
+              <span class="status-tag" id="tag-village">Missing</span>
+            </div>
+            <div class="input-with-reasons">
+              <input type="text" id="field-village" name="village" placeholder="e.g. Rampur">
+              <div class="reasons-list" id="reasons-village"></div>
+            </div>
+          </div>
+
+          <!-- Visit Date -->
+          <div class="form-group" id="group-visit_date">
+            <div class="field-label-row">
+              <label for="field-visit_date">Visit Date (YYYY-MM-DD)</label>
+              <span class="status-tag" id="tag-visit_date">Missing</span>
+            </div>
+            <div class="input-with-reasons">
+              <input type="date" id="field-visit_date" name="visit_date">
+              <div class="reasons-list" id="reasons-visit_date"></div>
+            </div>
+          </div>
+
+          <!-- Commit Action Bar -->
+          <div class="commit-bar">
+            <div class="commit-info" id="commit-validation-info">
+              Form incomplete. Fill or dictate all 4 fields to save.
+            </div>
+            <button type="button" id="commit-btn" class="btn btn-success" disabled>
+              ✓ Verify & Commit Record
+            </button>
+          </div>
+        </form>
+
+        <div id="committed-result" class="committed-box hidden">
+          <div class="committed-header">
+            <span class="check-icon">✓</span>
+            <div>
+              <h3>Visit Record Saved Locally</h3>
+              <p>Record ID: <strong id="saved-record-id"></strong></p>
+            </div>
+          </div>
+          <pre id="saved-json" class="json-preview"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>FieldCheck is an empirical reliability prototype for the Great Indian AI Internship Challenge 2026. All data is fictional.</p>
+    </footer>
+  </div>
+
+  <audio id="tts-audio-player" class="hidden"></audio>
+  <script src="/static/app.js"></script>
+</body>
+</html>
