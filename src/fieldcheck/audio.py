@@ -57,6 +57,7 @@ def convert_and_normalize_audio(
         # Run ffmpeg to convert to 16kHz mono PCM 16-bit
         cmd = [
             "ffmpeg",
+            "-nostdin",
             "-y",
             "-i",
             in_path,
@@ -70,6 +71,7 @@ def convert_and_normalize_audio(
         ]
         result = subprocess.run(
             cmd,
+            stdin=subprocess.DEVNULL,
             capture_output=True,
             timeout=15,
             check=False,
@@ -94,6 +96,7 @@ def convert_and_normalize_audio(
         ]
         probe_res = subprocess.run(
             probe_cmd,
+            stdin=subprocess.DEVNULL,
             capture_output=True,
             timeout=10,
             check=False,
