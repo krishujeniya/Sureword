@@ -46,6 +46,7 @@ private/
 *.db
 *.log
 temp_audio/
+graphify-out/
 
 # OS artifacts
 .DS_Store
