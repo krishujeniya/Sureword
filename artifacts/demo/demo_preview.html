@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FieldCheck — 60-Second Demo Storyboard Walkthrough</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { color: #38bdf8; margin-bottom: 0.5rem; }
+    p.lead { color: #94a3b8; font-size: 1.1rem; margin-bottom: 2rem; }
+    .step-card { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 2.5rem; border: 1px solid #334155; }
+    .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .step-title { font-size: 1.25rem; font-weight: 600; color: #f1f5f9; }
+    .step-time { background: #0369a1; color: white; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.85rem; font-weight: bold; }
+    .step-desc { color: #cbd5e1; margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.5; }
+    .step-narration { background: #0f172a; border-left: 4px solid #38bdf8; padding: 0.75rem 1rem; border-radius: 4px; font-style: italic; color: #e2e8f0; margin-bottom: 1rem; }
+    .step-img-wrap { border: 1px solid #475569; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+    .step-img-wrap img { width: 100%; height: auto; display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FieldCheck: 60-Second Video Demo Walkthrough</h1>
+    <p class="lead">Storyboard sequence matching official nomination guidelines and docs/SUBMISSION_PACK.md §3</p>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title">Step 1: Blank Frontline Visit Form</div>
+        <div class="step-time">0:00 – 0:08</div>
+      </div>
+      <div class="step-desc"><strong>Visual Action:</strong> Open FieldCheck web application. Blank visit form with 4 core fields: Person Name, Age, Village, Visit Date.</div>
+      <div class="step-narration"><strong>Narration:</strong> "Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records."</div>
+      <div class="step-img-wrap">
+        <img src="step1_blank_form.png" alt="Step 1: Blank Frontline Visit Form">
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title">Step 2: Dictation Transcribed & Age Flagged (Needs Repeat)</div>
+        <div class="step-time">0:08 – 0:32</div>
+      </div>
+      <div class="step-desc"><strong>Visual Action:</strong> Prisma transcript streams in. Name, Village, and Date show valid; Age 150 is flagged out of physiological bounds (1-120) with a red Needs Repeat badge.</div>
+      <div class="step-narration"><strong>Narration:</strong> "Gnani Prisma transcribes the audio. Our deterministic parser flags that age 150 is out of valid physiological bounds."</div>
+      <div class="step-img-wrap">
+        <img src="step2_dictation_flagged.png" alt="Step 2: Dictation Transcribed & Age Flagged (Needs Repeat)">
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title">Step 3: Timbre Spoken Clarification Audio & Banner</div>
+        <div class="step-time">0:32 – 0:46</div>
+      </div>
+      <div class="step-desc"><strong>Visual Action:</strong> Gnani Timbre speaks prompt: 'कृपया मरीज़ की सही उम्र दोबारा बोलिए।' System asks user to repeat only the uncertain field.</div>
+      <div class="step-narration"><strong>Narration:</strong> "Gnani Timbre speaks up to clarify only the uncertain field. We repeat just the age, and the record updates with full provenance."</div>
+      <div class="step-img-wrap">
+        <img src="step3_clarification_banner.png" alt="Step 3: Timbre Spoken Clarification Audio & Banner">
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title">Step 4: Age Corrected & State Transitions to READY_FOR_REVIEW</div>
+        <div class="step-time">0:46 – 0:54</div>
+      </div>
+      <div class="step-desc"><strong>Visual Action:</strong> Age updates to 45 with Confirmed badge. All 4 fields verified. Verify & Commit Record button becomes active.</div>
+      <div class="step-narration"><strong>Narration:</strong> "The record cannot commit until all fields are verified. Review is explicit, and save is idempotent."</div>
+      <div class="step-img-wrap">
+        <img src="step4_ready_for_review.png" alt="Step 4: Age Corrected & State Transitions to READY_FOR_REVIEW">
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-title">Step 5: Record Committed with Local ID & Full JSON Audit</div>
+        <div class="step-time">0:54 – 1:00</div>
+      </div>
+      <div class="step-desc"><strong>Visual Action:</strong> Record ID generated (REC-20261031-XXXX). Complete JSON provenance audit log displayed locally.</div>
+      <div class="step-narration"><strong>Narration:</strong> "FieldCheck: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub."</div>
+      <div class="step-img-wrap">
+        <img src="step5_committed_record.png" alt="Step 5: Record Committed with Local ID & Full JSON Audit">
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

@@ -42,9 +42,33 @@ const FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
 // Initialize
 window.addEventListener("DOMContentLoaded", async () => {
   await checkHealth();
-  await initNewDraft();
+  const urlParams = new URLSearchParams(window.location.search);
+  const existingDraftId = urlParams.get("draft_id");
+  if (existingDraftId) {
+    await loadExistingDraft(existingDraftId);
+  } else {
+    await initNewDraft();
+  }
   setupEventListeners();
 });
+
+async function loadExistingDraft(draftId) {
+  showStatus(`Loading visit draft ${draftId}...`, "info");
+  try {
+    const res = await fetch(`/api/drafts/${draftId}`);
+    if (res.ok) {
+      const data = await res.json();
+      currentDraftId = data.draft_id;
+      currentVersion = data.version;
+      renderDraft(data);
+      hideStatus();
+    } else {
+      await initNewDraft();
+    }
+  } catch (err) {
+    await initNewDraft();
+  }
+}
 
 async function checkHealth() {
   try {
