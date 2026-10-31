@@ -399,7 +399,7 @@ Owner `G` = Gemini implements/checks; `K` = Krish supplies real-world inputs and
 | T16 | P0 / K+G / DONE | T15 | Deploy HTTPS app with configured secrets and bounded access | Dockerfile, docker-compose.yml created; automated deployment smoke verified via scripts/verify_deployment.py | None. |
 | T17 | P1 / G / DONE | T08,T11,T13,T14 | Frozen paired evaluation, ablations and actual interactive outcomes | scripts/evaluate.py benchmark run on held-out test data saved to artifacts/evaluation/results.json | None. |
 | T18 | P1 / G / DONE | T17 | Write results, limitations, reproduction steps and error taxonomy in README/artifacts | README.md complete with architecture, quickstart, reproduction commands, benchmark metrics, and limitations | None. |
-| T19 | P0 / K+G / IN_PROGRESS | T16 | Record 60-second genuine demo using §10; include T18 results only if available | Second-by-second storyboard, visual cues, and audio script prepared in docs/SUBMISSION_PACK.md; awaiting screen capture | None. |
+| T19 | P0 / K+G / IN_PROGRESS | T16 | Record 60-second genuine demo using §10; include T18 results only if available | Second-by-second storyboard in docs/SUBMISSION_PACK.md; rehearsal runner in scripts/demo_runner.py; snapshots & HTML preview in artifacts/demo/ | Awaiting live screen recording by user. |
 | T20 | P0 / G / DONE | T19 | Prepare submission text, contribution disclosure, repository and public-post drafts; explicitly label research not completed | Complete nomination form text, LinkedIn/X drafts, and ethical disclosures prepared in docs/SUBMISSION_PACK.md | None. |
 | T21 | P0 / K / TODO | T20 | Publish demo, nominate post and submit before cutoff | Public post URL predates submission; receipt/confirmation and timestamp retained | Platform trouble: use the other allowed platform and official submission route. |
 | T22 | P1 / K+G / DONE | T18 | Rehearse individual technical defense | Comprehensive 14-question defense guide with exact code/data evidence prepared in docs/SUBMISSION_PACK.md | None. |
@@ -595,6 +595,7 @@ handoff:
   submission_pack: completed (docs/SUBMISSION_PACK.md)
   workflow_validation: completed (docs/WORKFLOW_VALIDATION.md)
   demo_rehearsal_runner: ready (scripts/demo_runner.py)
+  demo_walkthrough_snapshots: generated (artifacts/demo/demo_preview.html)
   needed_from_krish:
     - set GNANI_API_KEY in .env on server/local machine for live API calls (T02)
     - record 60-second screen capture following docs/SUBMISSION_PACK.md storyboard via `scripts/demo_runner.py` (T19)
