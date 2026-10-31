@@ -6,6 +6,9 @@ import asyncio
 import base64
 import logging
 import os
+import shutil
+import subprocess
+import tempfile
 import time
 
 import httpx
@@ -69,8 +72,12 @@ class GnaniClient:
         if not self.has_credentials():
             if self.allow_fixture_fallback:
                 logger.info("No Gnani API key configured. Using deterministic fixture transcription.")
+                fixture_text = os.getenv(
+                    "FIXTURE_TRANSCRIPT",
+                    "मरीज का नाम कमला देवी है, उम्र 150 साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026",
+                )
                 return Transcript(
-                    text="मरीज का नाम कमला देवी है, उम्र पैंतालीस साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026",
+                    text=fixture_text,
                     provider="gnani_prisma",
                     requested_model=self.stt_model,
                     effective_model=f"{self.stt_model}-fixture",
@@ -179,7 +186,32 @@ class GnaniClient:
 
         if not self.has_credentials():
             if self.allow_fixture_fallback:
-                logger.info("No Gnani API key configured. Returning mock WAV audio bytes for TTS.")
+                logger.info("No Gnani API key configured. Generating speech synthesis fallback.")
+                espeak_bin = shutil.which("espeak") or shutil.which("espeak-ng")
+                if espeak_bin:
+                    tmp_wav = ""
+                    try:
+                        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
+                            tmp_wav = f.name
+                        res = subprocess.run(
+                            [espeak_bin, "-w", tmp_wav, "-v", "hi", text],
+                            capture_output=True,
+                            stdin=subprocess.DEVNULL,
+                            timeout=5,
+                            check=False,
+                        )
+                        if res.returncode == 0 and os.path.exists(tmp_wav) and os.path.getsize(tmp_wav) > 44:
+                            with open(tmp_wav, "rb") as out_f:
+                                return out_f.read()
+                    except Exception as ex:
+                        logger.warning("Local espeak fallback failed: %s; using minimal WAV header", ex)
+                    finally:
+                        if tmp_wav and os.path.exists(tmp_wav):
+                            try:
+                                os.remove(tmp_wav)
+                            except OSError:
+                                pass
+
                 # Minimal valid 44-byte mono 8kHz PCM WAV header
                 return (
                     b"RIFF$\x00\x00\x00WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00"
