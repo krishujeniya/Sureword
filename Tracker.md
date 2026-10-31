@@ -570,6 +570,7 @@ A P0 prototype may be submitted with an inconclusive study. Do not mark P1 compl
 | 2026-10-31 | T11 Split Manifest Freeze | Built `scripts/validate_manifest.py`, verified 0 speaker leakage and 0 sample collision between `data/manifests/dev.jsonl` and `test.jsonl` | Frozen dataset protocol ready. |
 | 2026-10-31 | T12/T13/T17 Policy & Benchmark | Built `src/fieldcheck/policy.py` and `scripts/evaluate.py`; evaluated B0, B1, B2, B3, P | Results saved to `artifacts/evaluation/results.json`. Policy P reduces error from 6.2% to 3.1% at 1 prompt/form. |
 | 2026-10-31 | T15 Quality & CI | Configured `.github/workflows/ci.yml`, ruff (clean), mypy (clean, 0 errors), pytest (30/30 passing) | Local verification commands verified. |
+| 2026-10-31 | Codebase Audit & Hardening | Audited whole codebase; hardened FFmpeg subprocess calls (`-nostdin`, `stdin=subprocess.DEVNULL`), pinned `uv.lock`, verified deployment smoke test | 30/30 pytest passing; deployment smoke test passing 100%. |
 
 ### Revision 2 change record
 
