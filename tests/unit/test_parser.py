@@ -222,3 +222,61 @@ def test_multilingual_visit_form_extraction() -> None:
     assert res_gu[FieldKey.AGE].canonical_value == "52"
     assert res_gu[FieldKey.VILLAGE].canonical_value == "Sonpur"
     assert res_gu[FieldKey.VISIT_DATE].canonical_value == "2026-08-15"
+
+
+def test_parse_gender() -> None:
+    from sureword.parser import parse_gender
+
+    assert parse_gender("मरीज महिला है").canonical_value == "Female"
+    assert parse_gender("patient is a 45 year old woman").canonical_value == "Female"
+    assert parse_gender("मरीज पुरुष है").canonical_value == "Male"
+    assert parse_gender("patient is male").canonical_value == "Male"
+    assert parse_gender("gender other").canonical_value == "Other"
+    assert parse_gender("केवल नाम कमला देवी").status == FieldStatus.MISSING
+
+
+def test_parse_symptoms() -> None:
+    from sureword.parser import parse_symptoms
+
+    res_fever_cough = parse_symptoms("मरीज को दो दिन से तेज बुखार और खांसी है")
+    assert res_fever_cough.canonical_value is not None
+    assert "Fever" in res_fever_cough.canonical_value
+    assert "Cough" in res_fever_cough.canonical_value
+    assert res_fever_cough.status == FieldStatus.PROPOSED
+
+    res_headache = parse_symptoms("complaining of severe headache and weakness")
+    assert res_headache.canonical_value is not None
+    assert "Headache" in res_headache.canonical_value
+    assert "Weakness" in res_headache.canonical_value
+
+    assert parse_symptoms("मरीज का नाम कमला देवी उम्र 45").status == FieldStatus.MISSING
+
+
+def test_parse_village_suffix_marker() -> None:
+    # In-dictionary suffix
+    res = parse_village("मरीज रामपुर गाँव में रहती है")
+    assert res.canonical_value == "Rampur"
+    assert res.status == FieldStatus.PROPOSED
+
+    # Out-of-dictionary suffix marker
+    res_ood = parse_village("मरीज चंदनपुर गाँव में रहती है")
+    assert res_ood.canonical_value == "चंदनपुर"
+    assert res_ood.status == FieldStatus.PROPOSED
+    assert "suffix marker" in " ".join(res_ood.reasons)
+
+    res_en = parse_village("patient lives in Bilaspur village")
+    assert res_en.canonical_value == "Bilaspur"
+    assert res_en.status == FieldStatus.PROPOSED
+
+
+def test_parse_visit_form_with_clinical_expansion() -> None:
+    transcript = "मरीज का नाम कमला देवी, महिला, उम्र 45 साल, तेज बुखार और खांसी, रामपुर गाँव, विजिट डेट 30 अक्टूबर 2026"
+    fields = parse_visit_form(transcript)
+    assert fields[FieldKey.PERSON_NAME].canonical_value == "Kamla Devi"
+    assert fields[FieldKey.AGE].canonical_value == "45"
+    assert fields[FieldKey.VILLAGE].canonical_value == "Rampur"
+    assert fields[FieldKey.VISIT_DATE].canonical_value == "2026-10-30"
+    assert fields[FieldKey.GENDER].canonical_value == "Female"
+    symptoms_val = fields[FieldKey.SYMPTOMS].canonical_value
+    assert symptoms_val is not None
+    assert "Fever" in symptoms_val

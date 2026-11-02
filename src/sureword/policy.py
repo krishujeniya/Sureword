@@ -20,6 +20,8 @@ PROMPT_TEMPLATES: dict[str, str] = {
     FieldKey.AGE.value: "कृपया मरीज़ की सही उम्र दोबारा बोलिए। (Please repeat the person's age in completed years)",
     FieldKey.VILLAGE.value: "कृपया गाँव का नाम दोबारा बोलिए। (Please repeat the village name)",
     FieldKey.VISIT_DATE.value: "कृपया विज़िट की सही तारीख दोबारा बोलिए। (Please repeat the visit date)",
+    FieldKey.GENDER.value: "कृपया मरीज़ का लिंग दोबारा बोलिए। (Please repeat the gender)",
+    FieldKey.SYMPTOMS.value: "कृपया मुख्य लक्षण या बीमारी दोबारा बोलिए। (Please repeat symptoms)",
 }
 
 
@@ -27,8 +29,14 @@ def compute_field_risk(field: FieldValue) -> FieldRiskAssessment:
     """Compute deterministic risk score for a field.
 
     Scores range from 0.0 (safe/confirmed) to 1.0 (missing/invalid).
+    Optional fields (gender, symptoms) have risk 0.0 to reserve clarification budget.
     """
     reasons = list(field.reasons)
+
+    if field.key in {FieldKey.GENDER.value, FieldKey.SYMPTOMS.value}:
+        return FieldRiskAssessment(
+            field.key, 0.0, ["Optional field; exempt from clarification budget"]
+        )
 
     if field.status in {FieldStatus.USER_CONFIRMED, FieldStatus.MANUALLY_EDITED}:
         return FieldRiskAssessment(field.key, 0.0, ["Field explicitly confirmed by user"])

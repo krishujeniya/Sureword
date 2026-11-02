@@ -218,8 +218,16 @@
                 <strong class="summary-v" id="summary-age-v">—</strong>
               </div>
               <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_gender_k">Gender</span>
+                <strong class="summary-v" id="summary-gender-v">—</strong>
+              </div>
+              <div class="summary-col">
                 <span class="summary-k" data-i18n="summary_village_k">Village</span>
                 <strong class="summary-v" id="summary-village-v">—</strong>
+              </div>
+              <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_symptoms_k">Symptoms</span>
+                <strong class="summary-v" id="summary-symptoms-v">—</strong>
               </div>
               <div class="summary-col">
                 <span class="summary-k" data-i18n="summary_date_k">Visit Date</span>
@@ -240,20 +248,15 @@
                 </button>
               </div>
 
-              <!-- Clarification Response Actions -->
+              <!-- Clarification Response Actions (Pure Voice Repeat) -->
               <div class="clarification-action">
                 <button id="clarify-mic-btn" class="btn btn-sm btn-accent" title="Record single-field spoken repeat">
                   🎙️ <span data-i18n="btn_speak_field">Speak Answer</span>
                 </button>
-                <div class="manual-input-inline">
-                  <label for="clarify-manual-input" class="visually-hidden">Manually enter corrected field value</label>
-                  <input type="text" id="clarify-manual-input" placeholder="Or type corrected value" aria-describedby="clarify-prompt-text">
-                  <button id="clarify-save-btn" class="btn btn-sm btn-primary" data-i18n="btn_save_edit">Save</button>
-                </div>
               </div>
             </div>
 
-            <!-- Interactive Clinical Form with Explicit ARIA -->
+            <!-- Voice-Recognized Clinical Form -->
             <form id="visit-form" class="fields-form" onsubmit="return false;">
               <!-- 1. Person Name -->
               <div class="form-group" id="group-person_name">
@@ -264,7 +267,7 @@
                   <span class="status-tag tag-missing" id="tag-person_name">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="text" id="field-person_name" name="person_name" placeholder="Full name of person" autocomplete="off" aria-required="true" aria-describedby="reasons-person_name">
+                  <input type="text" id="field-person_name" name="person_name" placeholder="Waiting for voice dictation…" autocomplete="off" readonly class="input-readonly-voice" aria-required="true" aria-describedby="reasons-person_name">
                   <div class="reasons-list" id="reasons-person_name" role="alert" aria-live="polite"></div>
                 </div>
               </div>
@@ -278,12 +281,26 @@
                   <span class="status-tag tag-missing" id="tag-age">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="number" id="field-age" name="age" min="1" max="120" placeholder="e.g. 45" autocomplete="off" aria-required="true" aria-describedby="reasons-age">
+                  <input type="text" id="field-age" name="age" placeholder="Waiting for voice dictation…" autocomplete="off" readonly class="input-readonly-voice" aria-required="true" aria-describedby="reasons-age">
                   <div class="reasons-list" id="reasons-age" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
-              <!-- 3. Village -->
+              <!-- 3. Gender (Optional) -->
+              <div class="form-group" id="group-gender">
+                <div class="field-label-row">
+                  <label for="field-gender">
+                    <span data-i18n="label_gender">Gender</span> <span class="opt-tag" data-i18n="opt_label">(Optional)</span>
+                  </label>
+                  <span class="status-tag tag-missing" id="tag-gender">Not Specified</span>
+                </div>
+                <div class="input-with-reasons">
+                  <input type="text" id="field-gender" name="gender" placeholder="e.g. Female / Male" readonly class="input-readonly-voice" aria-describedby="reasons-gender">
+                  <div class="reasons-list" id="reasons-gender" role="alert" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- 4. Village -->
               <div class="form-group" id="group-village">
                 <div class="field-label-row">
                   <label for="field-village">
@@ -292,12 +309,26 @@
                   <span class="status-tag tag-missing" id="tag-village">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="text" id="field-village" name="village" placeholder="e.g. Rampur" autocomplete="off" aria-required="true" aria-describedby="reasons-village">
+                  <input type="text" id="field-village" name="village" placeholder="Waiting for voice dictation…" autocomplete="off" readonly class="input-readonly-voice" aria-required="true" aria-describedby="reasons-village">
                   <div class="reasons-list" id="reasons-village" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
-              <!-- 4. Visit Date -->
+              <!-- 5. Chief Complaints / Symptoms (Optional) -->
+              <div class="form-group" id="group-symptoms">
+                <div class="field-label-row">
+                  <label for="field-symptoms">
+                    <span data-i18n="label_symptoms">Chief Complaints / Symptoms</span> <span class="opt-tag" data-i18n="opt_label">(Optional)</span>
+                  </label>
+                  <span class="status-tag tag-missing" id="tag-symptoms">Not Specified</span>
+                </div>
+                <div class="input-with-reasons">
+                  <input type="text" id="field-symptoms" name="symptoms" placeholder="e.g. Fever, Cough" readonly class="input-readonly-voice" aria-describedby="reasons-symptoms">
+                  <div class="reasons-list" id="reasons-symptoms" role="alert" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- 6. Visit Date -->
               <div class="form-group" id="group-visit_date">
                 <div class="field-label-row">
                   <label for="field-visit_date">
@@ -306,7 +337,7 @@
                   <span class="status-tag tag-missing" id="tag-visit_date">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="date" id="field-visit_date" name="visit_date" aria-required="true" aria-describedby="reasons-visit_date">
+                  <input type="text" id="field-visit_date" name="visit_date" placeholder="Waiting for voice dictation…" readonly class="input-readonly-voice" aria-required="true" aria-describedby="reasons-visit_date">
                   <div class="reasons-list" id="reasons-visit_date" role="alert" aria-live="polite"></div>
                 </div>
               </div>
@@ -365,7 +396,9 @@
                   <th scope="col">Record ID</th>
                   <th scope="col">Patient Name</th>
                   <th scope="col">Age</th>
+                  <th scope="col">Gender</th>
                   <th scope="col">Village</th>
+                  <th scope="col">Symptoms</th>
                   <th scope="col">Visit Date</th>
                   <th scope="col">Saved At</th>
                   <th scope="col">Status</th>
@@ -373,7 +406,7 @@
               </thead>
               <tbody id="registry-table-body">
                 <tr>
-                  <td colspan="7" class="table-empty" data-i18n="registry_empty">No saved visit records yet. Complete a form to save.</td>
+                  <td colspan="9" class="table-empty" data-i18n="registry_empty">No saved visit records yet. Complete a form to save.</td>
                 </tr>
               </tbody>
             </table>

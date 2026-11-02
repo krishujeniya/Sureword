@@ -667,7 +667,7 @@ def parse_village(transcript: str) -> FieldValue:
                 status=FieldStatus.PROPOSED,
             )
 
-    # Explicit village marker across Indian languages
+    # Explicit village marker across Indian languages (prefix)
     pat_marker = r"(?:गाँव|गांव|ग्राम|गाव|গ্রাম|ગામ|ਪਿੰਡ|கிராமம்|గ్రామం|ಗ್ರಾಮ|ഗ്രാമം|ଗ୍ରାମ|village|place|location)\s*[:\-]?\s*([A-Za-z\u0900-\u0D7F]+)"
     m = re.search(pat_marker, text, re.IGNORECASE)
     if m:
@@ -681,6 +681,34 @@ def parse_village(transcript: str) -> FieldValue:
                 canonical_value=canonical,
                 status=FieldStatus.PROPOSED,
                 reasons=["Out-of-dictionary village name extracted via marker"]
+                if canonical == v_name.title()
+                else [],
+            )
+
+    # Suffix village marker (e.g. "रामपुर गाँव", "बिलासपुर गाव", "Rampur village")
+    pat_suffix = r"([A-Za-z\u0900-\u0D7F]{3,25})\s+(?:गाँव|गांव|ग्राम|गाव|গ্রাম|ગામ|ਪਿੰਡ|கிராமம்|గ్రామం|ಗ್ರಾಮ|ഗ്രാമം|ଗ୍ରାମ|village)\b"
+    m_suf = re.search(pat_suffix, text, re.IGNORECASE)
+    if m_suf:
+        v_name = m_suf.group(1).strip()
+        if v_name.lower() not in {
+            "is",
+            "mein",
+            "में",
+            "ka",
+            "का",
+            "visit",
+            "date",
+            "patient",
+            "name",
+            "naam",
+        }:
+            canonical = VILLAGE_MAP.get(v_name.lower(), v_name.title())
+            return FieldValue(
+                key=FieldKey.VILLAGE.value,
+                raw_span=m_suf.group(0),
+                canonical_value=canonical,
+                status=FieldStatus.PROPOSED,
+                reasons=["Village name extracted via suffix marker"]
                 if canonical == v_name.title()
                 else [],
             )
@@ -761,11 +789,107 @@ def parse_person_name(transcript: str) -> FieldValue:
     )
 
 
+def parse_gender(transcript: str) -> FieldValue:
+    """Extract patient gender if mentioned in transcript."""
+    text = transcript.strip()
+
+    female_pats = [
+        r"\b(?:female|woman|girl|lady|smt|mrs)\b",
+        r"(?:महिला|स्त्री|औरत|लड़की|बेटी|माताजी|माता|पत्नी|महिलाएं|स्त्रीलिंग)",
+        r"(?:మహిళ|స్త్రీ|பெண்|மங்கை|ಮಹಿಳೆ|സ്ത്രീ|মহিলা|ସ୍ତ୍ରୀ|ਔਰਤ|સ્ત્રી)",
+    ]
+    male_pats = [
+        r"\b(?:male|man|boy|mr|gentleman)\b",
+        r"(?:पुरुष|आदमी|लड़का|बेटा|पिताजी|पिता|पति|पुल्लिंग)",
+        r"(?:పురుషుడు|ஆண்|ಪುರುಷ|പുരുഷൻ|পুরুষ|ପୁରୁଷ|ਪੁਰਸ਼|પુરુષ)",
+    ]
+    other_pats = [
+        r"\b(?:other|transgender|non-binary)\b",
+        r"(?:अन्य|तीसरा लिंग|किन्नर)",
+    ]
+
+    for pat in female_pats:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            return FieldValue(
+                key=FieldKey.GENDER.value,
+                raw_span=m.group(0),
+                canonical_value="Female",
+                status=FieldStatus.PROPOSED,
+            )
+
+    for pat in male_pats:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            return FieldValue(
+                key=FieldKey.GENDER.value,
+                raw_span=m.group(0),
+                canonical_value="Male",
+                status=FieldStatus.PROPOSED,
+            )
+
+    for pat in other_pats:
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            return FieldValue(
+                key=FieldKey.GENDER.value,
+                raw_span=m.group(0),
+                canonical_value="Other",
+                status=FieldStatus.PROPOSED,
+            )
+
+    return FieldValue(
+        key=FieldKey.GENDER.value,
+        status=FieldStatus.MISSING,
+        reasons=["Gender not mentioned in visit dictation"],
+    )
+
+
+def parse_symptoms(transcript: str) -> FieldValue:
+    """Extract chief complaints and clinical symptoms if mentioned in transcript."""
+    text = transcript.strip()
+
+    symptom_catalog = {
+        "Fever": r"(?:fever|pyrexia|बुखार|ताप|ताव|તાવ|ಜ್ವರ|காய்ச்சல்|జ్వరం|പനി|ଜ୍ୱର)",
+        "Cough": r"(?:cough|खांसी|खोकला|কাশির|কাশি|ઉધરસ|இருமல்|దగ్గు|ಕೆಮ್ಮು|ചുമ|କାଶ)",
+        "Cold": r"(?:cold|flu|जुकाम|सर्दी|थंडी|ശീത|ଜଲଦୋଷ|ଶର୍ଦ୍ଦି|छींक|कफ)",
+        "Headache": r"(?:headache|सिरदर्द|डोकेदुखी|মাথাব্যথা|માથાનો દુખાવો|தலைவலி|తలనొప్పి|ತಲೆನೋವು|തലവേദന|ମୁଣ୍ଡବିନ୍ଦା)",
+        "Body Pain": r"(?:body pain|body ache|बदन दर्द|दर्द|अंगदुखी|വേദന|നొప్పి|வலி|ನೋವು|ଯନ୍ତ୍ରଣା)",
+        "Diarrhea": r"(?:diarrhea|loose motions|vomiting|दस्त|उल्टी|ઝાડા|பேதி|విరేచనాలు|ಭೇದಿ|ഛർദ്ദി|ଝାଡ଼ା)",
+        "Weakness": r"(?:weakness|fatigue|कमजोरी|अशक्तपणा|দুর্বলতা|నలివు|బలహీనత|ದೌರ್ಬಲ್ಯ|ക്ഷീണം|ଦୁର୍ବଳତା|थकान)",
+    }
+
+    matched: list[str] = []
+    spans: list[str] = []
+
+    for name, pat in symptom_catalog.items():
+        m = re.search(pat, text, re.IGNORECASE)
+        if m:
+            matched.append(name)
+            spans.append(m.group(0))
+
+    if matched:
+        return FieldValue(
+            key=FieldKey.SYMPTOMS.value,
+            raw_span=", ".join(spans),
+            canonical_value=", ".join(matched),
+            status=FieldStatus.PROPOSED,
+        )
+
+    return FieldValue(
+        key=FieldKey.SYMPTOMS.value,
+        status=FieldStatus.MISSING,
+        reasons=["No symptoms mentioned in visit dictation"],
+    )
+
+
 def parse_visit_form(transcript: str, reference_date: date | None = None) -> dict[str, FieldValue]:
-    """Parse all four core fields deterministically from transcript."""
+    """Parse core and optional clinical fields deterministically from transcript."""
     return {
         FieldKey.PERSON_NAME.value: parse_person_name(transcript),
         FieldKey.AGE.value: parse_age(transcript),
         FieldKey.VILLAGE.value: parse_village(transcript),
         FieldKey.VISIT_DATE.value: parse_date(transcript, reference_date),
+        FieldKey.GENDER.value: parse_gender(transcript),
+        FieldKey.SYMPTOMS.value: parse_symptoms(transcript),
     }

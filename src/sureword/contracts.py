@@ -32,6 +32,8 @@ class FieldKey(StrEnum):
     AGE = "age"
     VILLAGE = "village"
     VISIT_DATE = "visit_date"
+    GENDER = "gender"
+    SYMPTOMS = "symptoms"
 
 
 class FieldValue(BaseModel):

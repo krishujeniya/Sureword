@@ -55,7 +55,12 @@ const I18N = {
     status_processing: 'Processing speech with Gnani Prisma STT…',
     status_init: 'Initializing frontline visit session…',
     mic_denied: 'Microphone access denied or unsupported.',
-    status_clarify_processing: 'Processing spoken clarification…'
+    status_clarify_processing: 'Processing spoken clarification…',
+    label_gender: 'Gender',
+    label_symptoms: 'Chief Complaints / Symptoms',
+    summary_gender_k: 'Gender',
+    summary_symptoms_k: 'Symptoms',
+    opt_label: '(Optional)'
   },
   "hi-IN": {
     context_pill: "सामुदायिक स्वास्थ्य",
@@ -96,7 +101,12 @@ const I18N = {
     status_processing: 'वाक् प्रसंस्करण चल रहा है…',
     status_init: 'भेंट सत्र प्रारंभ हो रहा है…',
     mic_denied: 'माइक्रोफ़ोन अनुमति अस्वीकृत या असमर्थित।',
-    status_clarify_processing: 'स्पष्टीकरण प्रसंस्करण चल रहा है…'
+    status_clarify_processing: 'स्पष्टीकरण प्रसंस्करण चल रहा है…',
+    label_gender: 'मरीज का लिंग',
+    label_symptoms: 'मुख्य लक्षण / बीमारी',
+    summary_gender_k: 'लिंग',
+    summary_symptoms_k: 'लक्षण',
+    opt_label: '(वैकल्पिक)'
   },
   "mr-IN": {
     context_pill: "आरोग्य केंद्र",
@@ -137,7 +147,12 @@ const I18N = {
     status_processing: 'वाक् प्रक्रिया सुरू आहे…',
     status_init: 'भेट सत्र सुरू होत आहे…',
     mic_denied: 'मायक्रोफोन परवानगी नाकारली.',
-    status_clarify_processing: 'स्पष्टीकरण प्रक्रिया सुरू आहे…'
+    status_clarify_processing: 'स्पष्टीकरण प्रक्रिया सुरू आहे…',
+    label_gender: 'लिंग',
+    label_symptoms: 'प्रमुख लक्षणे / तक्रारी',
+    summary_gender_k: 'लिंग',
+    summary_symptoms_k: 'लक्षणे',
+    opt_label: '(ऐच्छिक)'
   },
   "bn-IN": {
     context_pill: "স্বাস্থ্য কেন্দ্র",
@@ -178,7 +193,12 @@ const I18N = {
     status_processing: 'বাক্ প্রক্রিয়াকরণ চলছে…',
     status_init: 'সাক্ষাৎ সেশন শুরু হচ্ছে…',
     mic_denied: 'মাইক্রোফোন অনুমতি প্রত্যাখ্যাত।',
-    status_clarify_processing: 'স্পষ্টীকরণ প্রক্রিয়াকরণ…'
+    status_clarify_processing: 'স্পষ্টীকরণ প্রক্রিয়াকরণ…',
+    label_gender: 'লিঙ্গ',
+    label_symptoms: 'প্রধান উপসর্গ / অভিযোগ',
+    summary_gender_k: 'লিঙ্গ',
+    summary_symptoms_k: 'উপসর্গ',
+    opt_label: '(ঐচ্ছিক)'
   },
   "gu-IN": {
     context_pill: "આરોગ્ય કેન્દ્ર",
@@ -219,7 +239,12 @@ const I18N = {
     status_processing: 'વાણી પ્રક્રિયા ચાલુ છે…',
     status_init: 'મુલાકાત સત્ર શરૂ થઈ રહ્યું છે…',
     mic_denied: 'માઇક્રોફોન પરવાનગી નકારાઈ.',
-    status_clarify_processing: 'સ્પષ્ટીકરણ પ્રક્રિયા ચાલુ…'
+    status_clarify_processing: 'સ્પષ્ટીકરણ પ્રક્રિયા ચાલુ…',
+    label_gender: 'જાતિ / લિંગ',
+    label_symptoms: 'મુખ્ય લક્ષણો / ફરિયાદો',
+    summary_gender_k: 'લિંગ',
+    summary_symptoms_k: 'લક્ષણો',
+    opt_label: '(વૈકલ્પિક)'
   },
   "pa-IN": {
     context_pill: "ਸਿਹਤ ਕੇਂਦਰ",
@@ -260,7 +285,12 @@ const I18N = {
     status_processing: 'ਬੋਲੀ ਪ੍ਰਕਿਰਿਆ ਚੱਲ ਰਹੀ ਹੈ…',
     status_init: 'ਮੁਲਾਕਾਤ ਸੈਸ਼ਨ ਸ਼ੁਰੂ ਹੋ ਰਿਹਾ ਹੈ…',
     mic_denied: 'ਮਾਈਕ੍ਰੋਫੋਨ ਇਜਾਜ਼ਤ ਨਕਾਰੀ ਗਈ।',
-    status_clarify_processing: 'ਸਪੱਸ਼ਟੀਕਰਨ ਪ੍ਰਕਿਰਿਆ…'
+    status_clarify_processing: 'ਸਪੱਸ਼ਟੀਕਰਨ ਪ੍ਰਕਿਰਿਆ…',
+    label_gender: 'ਲਿੰਗ',
+    label_symptoms: 'ਮੁੱਖ ਲੱਛਣ / ਸ਼ਿਕਾਇਤਾਂ',
+    summary_gender_k: 'ਲਿੰਗ',
+    summary_symptoms_k: 'ਲੱਛਣ',
+    opt_label: '(ਵਿਕਲਪਿਕ)'
   },
   "ta-IN": {
     context_pill: "சுகாதார மையம்",
@@ -301,7 +331,12 @@ const I18N = {
     status_processing: 'பேச்சு செயலாக்கம் நடைபெறுகிறது…',
     status_init: 'வருகை அமர்வு தொடங்குகிறது…',
     mic_denied: 'மைக்ரோஃபோன் அனுமதி மறுக்கப்பட்டது.',
-    status_clarify_processing: 'விளக்க செயலாக்கம்…'
+    status_clarify_processing: 'விளக்க செயலாக்கம்…',
+    label_gender: 'பாலினம்',
+    label_symptoms: 'முக்கிய அறிகுறிகள்',
+    summary_gender_k: 'பாலினம்',
+    summary_symptoms_k: 'அறிகுறிகள்',
+    opt_label: '(விருப்பத்தேர்வு)'
   },
   "te-IN": {
     context_pill: "ఆరోగ్య కేంద్రం",
@@ -342,7 +377,12 @@ const I18N = {
     status_processing: 'వాక్ ప్రాసెసింగ్ జరుగుతోంది…',
     status_init: 'సందర్శన సెషన్ ప్రారంభమవుతోంది…',
     mic_denied: 'మైక్రోఫోన్ అనుమతి తిరస్కరించబడింది.',
-    status_clarify_processing: 'స్పష్టత ప్రాసెసింగ్…'
+    status_clarify_processing: 'స్పష్టత ప్రాసెసింగ్…',
+    label_gender: 'లింగం',
+    label_symptoms: 'ప్రధాన లక్షణాలు',
+    summary_gender_k: 'లింగం',
+    summary_symptoms_k: 'లక్షణాలు',
+    opt_label: '(ఐచ్ఛికం)'
   },
   "kn-IN": {
     context_pill: "ಆರೋಗ್ಯ ಕೇಂದ್ರ",
@@ -383,7 +423,12 @@ const I18N = {
     status_processing: 'ವಾಕ್ ಸಂಸ್ಕರಣೆ ನಡೆಯುತ್ತಿದೆ…',
     status_init: 'ಭೇಟಿ ಅಧಿವೇಶನ ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ…',
     mic_denied: 'ಮೈಕ್ರೊಫೋನ್ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ.',
-    status_clarify_processing: 'ಸ್ಪಷ್ಟೀಕರಣ ಸಂಸ್ಕರಣೆ…'
+    status_clarify_processing: 'ಸ್ಪಷ್ಟೀಕರಣ ಸಂಸ್ಕರಣೆ…',
+    label_gender: 'ಲಿಂಗ',
+    label_symptoms: 'ಮುಖ್ಯ ರೋಗಲಕ್ಷಣಗಳು',
+    summary_gender_k: 'ಲಿಂಗ',
+    summary_symptoms_k: 'ರೋಗಲಕ್ಷಣಗಳು',
+    opt_label: '(ಐಚ್ಛಿಕ)'
   },
   "ml-IN": {
     context_pill: "ആരോഗ്യ കേന്ദ്രം",
@@ -424,7 +469,12 @@ const I18N = {
     status_processing: 'വാക്ക് പ്രോസസ്സിംഗ് നടക്കുന്നു…',
     status_init: 'സന്ദർശന സെഷൻ ആരംഭിക്കുന്നു…',
     mic_denied: 'മൈക്രോഫോൺ അനുമതി നിരസിച്ചു.',
-    status_clarify_processing: 'വ്യക്തത പ്രോസസ്സിംഗ്…'
+    status_clarify_processing: 'വ്യക്തത പ്രോസസ്സിംഗ്…',
+    label_gender: 'ലിംഗം',
+    label_symptoms: 'പ്രധാന രോഗലക്ഷണങ്ങൾ',
+    summary_gender_k: 'ലിംഗം',
+    summary_symptoms_k: 'ലക്ഷണങ്ങൾ',
+    opt_label: '(ഓപ്ഷണൽ)'
   },
   "or-IN": {
     context_pill: "ସ୍ୱାସ୍ଥ୍ୟ କେନ୍ଦ୍ର",
@@ -465,7 +515,12 @@ const I18N = {
     status_processing: 'ବାକ୍ ପ୍ରକ୍ରିୟାକରଣ ଚାଲୁଛି…',
     status_init: 'ଭେଟି ସେସନ୍ ଆରମ୍ଭ ହେଉଛି…',
     mic_denied: 'ମାଇକ୍ରୋଫୋନ ଅନୁମତି ପ୍ରତ୍ୟାଖ୍ୟାନ।',
-    status_clarify_processing: 'ସ୍ପଷ୍ଟୀକରଣ ପ୍ରକ୍ରିୟାକରଣ…'
+    status_clarify_processing: 'ସ୍ପଷ୍ଟୀକରଣ ପ୍ରକ୍ରିୟାକରଣ…',
+    label_gender: 'ଲିଙ୍ଗ',
+    label_symptoms: 'ମୁଖ୍ୟ ଲକ୍ଷଣ',
+    summary_gender_k: 'ଲିଙ୍ଗ',
+    summary_symptoms_k: 'ଲକ୍ଷଣ',
+    opt_label: '(ଐଚ୍ଛିକ)'
   }
 };
 
@@ -543,7 +598,8 @@ const CHIP_LABELS = {
   "or-IN": { kamla: "କମଳା ଦେବୀ (45)", sunita: "ସୁନୀତା ବାଇ (38)", ramesh: "ରମେଶ କୁମାର (52)" }
 };
 
-const FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
+const FIELD_KEYS = ["person_name", "age", "gender", "village", "symptoms", "visit_date"];
+const REQUIRED_FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
 
 // DOM References
 const providerBadge = document.getElementById("provider-badge");
@@ -574,6 +630,8 @@ const summaryPatientV = document.getElementById("summary-patient-v");
 const summaryAgeV = document.getElementById("summary-age-v");
 const summaryVillageV = document.getElementById("summary-village-v");
 const summaryDateV = document.getElementById("summary-date-v");
+const summaryGenderV = document.getElementById("summary-gender-v");
+const summarySymptomsV = document.getElementById("summary-symptoms-v");
 
 // Navigation Tabs & Views
 const tabFormBtn = document.getElementById("tab-form-btn");
@@ -706,7 +764,9 @@ function updateEncounterSummary(fields) {
   if (!fields) return;
   if (summaryPatientV) summaryPatientV.textContent = fields.person_name?.canonical_value || "—";
   if (summaryAgeV) summaryAgeV.textContent = fields.age?.canonical_value ? `${fields.age.canonical_value}y` : "—";
+  if (summaryGenderV) summaryGenderV.textContent = fields.gender?.canonical_value || "—";
   if (summaryVillageV) summaryVillageV.textContent = fields.village?.canonical_value || "—";
+  if (summarySymptomsV) summarySymptomsV.textContent = fields.symptoms?.canonical_value || "—";
   if (summaryDateV) summaryDateV.textContent = fields.visit_date?.canonical_value || "—";
 }
 
@@ -717,7 +777,7 @@ function resetFormUI() {
   const transDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   transcriptContent.textContent = transDict.transcript_empty || "No audio transcribed yet. Click 'Start Dictation' or select a sample above.";
 
-  updateEncounterSummary({ person_name: {}, age: {}, village: {}, visit_date: {} });
+  updateEncounterSummary({ person_name: {}, age: {}, gender: {}, village: {}, symptoms: {}, visit_date: {} });
 
   FIELD_KEYS.forEach((key) => {
     const input = document.getElementById(`field-${key}`);
@@ -773,10 +833,14 @@ function renderDraft(draft) {
       }
 
       if (f.status === "missing" || f.status === "needs_repeat" || !f.canonical_value) {
-        allValid = false;
+        if (REQUIRED_FIELD_KEYS.includes(key)) {
+          allValid = false;
+        }
       }
     } else {
-      allValid = false;
+      if (REQUIRED_FIELD_KEYS.includes(key)) {
+        allValid = false;
+      }
     }
   });
 
@@ -788,8 +852,12 @@ function renderDraft(draft) {
     isClarifyingField = draft.active_prompt.target_field;
     clarifyFieldTitle.textContent = `${dict.clarify_alert_title}: ${formatFieldName(isClarifyingField)}`;
     clarifyPromptText.textContent = draft.active_prompt.prompt_text;
-    clarifyManualInput.value = "";
-    clarifyManualInput.focus();
+    if (clarifyManualInput) {
+      clarifyManualInput.value = "";
+    }
+    if (clarifyMicBtn) {
+      clarifyMicBtn.focus();
+    }
   } else {
     clarificationBanner.classList.add("hidden");
     isClarifyingField = null;
@@ -824,7 +892,9 @@ function formatFieldName(key) {
   switch (key) {
     case "person_name": return dict.label_name || "Patient Name";
     case "age": return dict.label_age || "Age";
+    case "gender": return dict.label_gender || "Gender";
     case "village": return dict.label_village || "Village";
+    case "symptoms": return dict.label_symptoms || "Symptoms";
     case "visit_date": return dict.label_date || "Visit Date";
     default: return key;
   }
@@ -1132,7 +1202,9 @@ function renderRegistryTable(records) {
     const fields = snap.fields || {};
     const name = fields.person_name ? fields.person_name.canonical_value : "—";
     const age = fields.age ? fields.age.canonical_value : "—";
+    const gender = fields.gender ? fields.gender.canonical_value : "—";
     const village = fields.village ? fields.village.canonical_value : "—";
+    const symptoms = fields.symptoms ? fields.symptoms.canonical_value : "—";
     const date = fields.visit_date ? fields.visit_date.canonical_value : "—";
     const timeFormatted = new Date(r.committed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
@@ -1141,7 +1213,9 @@ function renderRegistryTable(records) {
         <td><strong class="code-record-id">${escapeHtml(r.record_id)}</strong></td>
         <td>${escapeHtml(name)}</td>
         <td>${escapeHtml(age)}</td>
+        <td>${escapeHtml(gender)}</td>
         <td>${escapeHtml(village)}</td>
+        <td>${escapeHtml(symptoms)}</td>
         <td>${escapeHtml(date)}</td>
         <td>${escapeHtml(timeFormatted)}</td>
         <td><span class="badge badge-live">Verified ✓</span></td>
@@ -1157,7 +1231,7 @@ function exportRegistryCSV() {
     return;
   }
 
-  const headers = ["RecordID", "DraftID", "PatientName", "Age", "Village", "VisitDate", "CommittedAt"];
+  const headers = ["RecordID", "DraftID", "PatientName", "Age", "Gender", "Village", "Symptoms", "VisitDate", "CommittedAt"];
   const rows = committedRecordsCache.map((r) => {
     const f = r.snapshot.fields || {};
     return [
@@ -1165,7 +1239,9 @@ function exportRegistryCSV() {
       r.draft_id,
       `"${f.person_name?.canonical_value || ""}"`,
       f.age?.canonical_value || "",
+      `"${f.gender?.canonical_value || ""}"`,
       `"${f.village?.canonical_value || ""}"`,
+      `"${f.symptoms?.canonical_value || ""}"`,
       f.visit_date?.canonical_value || "",
       r.committed_at
     ].join(",");
@@ -1237,16 +1313,8 @@ function setupEventListeners() {
 
   playTtsBtn.addEventListener("click", playSpokenClarification);
   clarifyMicBtn.addEventListener("click", () => startClarificationRecording(isClarifyingField));
-  clarifySaveBtn.addEventListener("click", saveManualClarification);
-
-  // Enter key submits manual clarification (a11y keyboard enhancement)
-  if (clarifyManualInput) {
-    clarifyManualInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        saveManualClarification();
-      }
-    });
+  if (clarifySaveBtn) {
+    clarifySaveBtn.addEventListener("click", saveManualClarification);
   }
 
   commitBtn.addEventListener("click", commitCurrentDraft);
@@ -1272,15 +1340,7 @@ function setupEventListeners() {
     });
   });
 
-  // Inline Input Manual Edits
-  FIELD_KEYS.forEach((key) => {
-    const input = document.getElementById(`field-${key}`);
-    if (input) {
-      input.addEventListener("change", (e) => {
-        saveFieldManualEdit(key, e.target.value);
-      });
-    }
-  });
+  // Pure Voice-to-Form: Manual input editing removed per frontline field design
 }
 
 // Accessible Keyboard Shortcuts (frontend-a11y)
@@ -1297,7 +1357,11 @@ function setupKeyboardShortcuts() {
     // Escape to close clarification or reset active focus
     if (e.key === "Escape") {
       if (!clarificationBanner.classList.contains("hidden")) {
-        clarifyManualInput.blur();
+        if (clarifyManualInput) {
+          clarifyManualInput.blur();
+        } else if (clarifyMicBtn) {
+          clarifyMicBtn.blur();
+        }
       }
     }
   });
