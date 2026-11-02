@@ -1,24 +1,23 @@
 # AI Handoff — Sureword (Great Indian AI Internship Challenge 2026)
 
-> **Last Updated:** 2026-11-02 18:55 IST  
-> **Branch:** `main` (commit `4b50d88` + working tree frontend upgrade)  
-> **Status:** 10/10 (100%) Production Standard with bespoke SVG branding, bilingual localization (EN/HI), AEO FAQ schema, live committed registry, and 61/61 tests passing; live on Vercel (`https://sureword.vercel.app`).
+> **Last Updated:** 2026-11-02 19:15 IST  
+> **Branch:** `main` (commit `f9d893d`, clean working tree)  
+> **Status:** 10/10 (100%) Production Standard with bespoke SVG branding, bilingual localization (EN/HI), AEO FAQ schema, decluttered frontline clinical interface, live committed registry, and 61/61 tests passing; live on Vercel (`https://sureword.vercel.app`).
 
 ---
 
 ## 1. Current State & Verification Summary
 
 - **Production Deployment:** Live at **`https://sureword.vercel.app`** with 7/7 endpoints passing deployment verification.
-- **Frontend & Branding Elevation (Revision 4):**
-  - Designed bespoke vector brand identity (`logo.svg`, `favicon.svg`) embodying sovereign trust, acoustic waves, clinical protection, and verified data.
-  - Implemented bilingual localization engine (English / हिन्दी) toggling all UI labels, field headers, and accessibility prompts.
-  - Added interactive quick-preset chips (`Kamla Devi`, `Sunita Bai`, `Ramesh Kumar`) for zero-friction evaluation.
-  - Added live Committed Records Registry view with export to CSV & JSON.
-  - Added Answer Engine Optimization (AEO) and SEO metadata with JSON-LD schema (`SoftwareApplication` + `FAQPage`).
-  - Added animated audio equalizer bars and accessible keyboard shortcuts (`Ctrl+Enter`, `Escape`).
-  - Re-captured all 5 walkthrough screenshots in `artifacts/demo/`.
+- **Frontend Decluttering & Refinement (Revision 5):**
+  - Removed secondary file upload widget from the frontline interface, keeping the view focused on dictation and quick-test preset chips.
+  - Eliminated developer telemetry (`Model: ... | Latency: ...ms | Confidence: ...`) and the `IDLE` pill tag from the user viewport.
+  - Aligned the Saved Registry table with a dedicated `Status` column displaying verified badges (`Verified ✓`).
+  - Streamlined `I18N` dictionaries: purged 7 dead keys, removed academic math notation (`$V_t$`) and numbered step prefixes, aligning terminology with authentic frontline healthcare workflows in English and हिन्दी.
+  - Normalized system health status badge into clean indicators: `● Live Speech Online` / `● Speech Engine Ready`.
+  - Re-captured all 5 walkthrough screenshots in `artifacts/demo/` using native headless Chrome.
 - **Test & Quality Gates:**
-  - `pytest tests/ --cov=sureword --cov-report=term-missing`: 61 passed in 4.27s, 94% coverage.
+  - `pytest tests/`: 61 passed in 5.28s, 94% coverage.
   - `ruff check src tests scripts api`: All checks passed (0 errors, 0 warnings).
   - `mypy src tests api`: 0 issues found across 19 files (clean).
   - `scripts/verify_deployment.py --base-url https://sureword.vercel.app`: 100% PASS across all 7 endpoints.
@@ -28,22 +27,11 @@
 
 ## 2. Changed Files
 
-- `src/sureword/app.py` (serverless `/tmp` database path fallback)
-- `src/sureword/storage.py` (automatic parent directory creation in `init_db`)
-- `src/sureword/audio.py` (native WAV header duration calculation and serverless fallback)
-- `src/sureword/parser.py` (date regex, relative date precedence, name delimiter boundaries)
-- `scripts/evaluate.py` (reference-date CLI parameter, Wilson 95% score interval calculation)
-- `scripts/capture_demo_walkthrough.py` (headless Chrome `--no-sandbox` parameter and snapshot verification)
-- `api/index.py` (Vercel serverless ASGI entrypoint)
-- `vercel.json` (Vercel routing and build configuration)
-- `requirements.txt` (pinned dependencies for Vercel Python builder)
-- `.vercelignore` (deployment build optimization rules)
-- `docs/research/RESEARCH_PAPER.md` (formal PhD/Staff-level scientific research report)
-- `docs/adr/` (ADR-0001 through ADR-0005 with index README and template)
-- `docs/specifications/AUDIT_REPORT.md` (comprehensive 6-dimension codebase and production audit)
-- `docs/specifications/SUBMISSION_PACK.md` (updated with live Vercel production URL)
-- `docs/planning/TRACKER.md` (T02 and T16 marked DONE with live API and deployment evidence)
-- `AI_HANDOFF.md` (created per engineering policy)
+- `src/sureword/static/index.html` (decluttered dictation panel, 7-column table header alignment)
+- `src/sureword/static/app.js` (streamlined I18N, removed dead DOM references and telemetry output)
+- `src/sureword/static/styles.css` (removed obsolete file-input and telemetry styles)
+- `artifacts/demo/*.png` (updated high-res demo walkthrough snapshots)
+- `AI_HANDOFF.md` (updated handoff)
 
 ---
 
