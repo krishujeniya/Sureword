@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Evaluation runner for FieldCheck: compares B0, B1, B2, B3, and Policy P.
+"""Evaluation runner for Sureword: compares B0, B1, B2, B3, and Policy P.
 
 Computes primary accepted-field error, automatic coverage, uncaught error rate,
 whole-record correctness, and realized clarification burden.
@@ -19,9 +19,9 @@ from typing import Any
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from fieldcheck.contracts import FieldKey, FieldStatus, FieldValue
-from fieldcheck.parser import parse_visit_form
-from fieldcheck.policy import (
+from sureword.contracts import FieldKey, FieldStatus, FieldValue
+from sureword.parser import parse_visit_form
+from sureword.policy import (
     select_clarification_field_b1,
     select_clarification_field_b2,
     select_clarification_field_p,
@@ -86,7 +86,9 @@ def evaluate_policy(
                     status=FieldStatus.USER_CONFIRMED,
                 )
         elif policy_name == "B2":
-            prompt = select_clarification_field_b2(parsed, attempts_by_field, seed=seed, max_attempts=1)
+            prompt = select_clarification_field_b2(
+                parsed, attempts_by_field, seed=seed, max_attempts=1
+            )
             if prompt:
                 prompts_this_sample += 1
                 k = prompt.target_field
@@ -129,20 +131,26 @@ def evaluate_policy(
             gold_val = canonicalize(gold[k])
             cand_val = canonicalize(f.canonical_value)
 
-            is_accepted = f.status in {FieldStatus.PROPOSED, FieldStatus.USER_CONFIRMED, FieldStatus.MANUALLY_EDITED} and f.canonical_value is not None
+            is_accepted = (
+                f.status
+                in {FieldStatus.PROPOSED, FieldStatus.USER_CONFIRMED, FieldStatus.MANUALLY_EDITED}
+                and f.canonical_value is not None
+            )
 
             if is_accepted:
                 total_auto_accepted += 1
                 if cand_val != gold_val:
                     wrong_auto_accepted += 1
                     sample_correct = False
-                    error_rows.append({
-                        "sample_id": sample["sample_id"],
-                        "field": k,
-                        "expected": gold_val,
-                        "predicted": cand_val,
-                        "status": f.status.value,
-                    })
+                    error_rows.append(
+                        {
+                            "sample_id": sample["sample_id"],
+                            "field": k,
+                            "expected": gold_val,
+                            "predicted": cand_val,
+                            "status": f.status.value,
+                        }
+                    )
             else:
                 sample_correct = False
 
@@ -151,8 +159,16 @@ def evaluate_policy(
 
     # Compute metrics with explicit denominators
     primary_err = (wrong_auto_accepted / total_auto_accepted) if total_auto_accepted > 0 else 0.0
-    coverage = (total_auto_accepted / total_expected_critical_fields) if total_expected_critical_fields > 0 else 0.0
-    uncaught_err = (wrong_auto_accepted / total_expected_critical_fields) if total_expected_critical_fields > 0 else 0.0
+    coverage = (
+        (total_auto_accepted / total_expected_critical_fields)
+        if total_expected_critical_fields > 0
+        else 0.0
+    )
+    uncaught_err = (
+        (wrong_auto_accepted / total_expected_critical_fields)
+        if total_expected_critical_fields > 0
+        else 0.0
+    )
     burden = total_prompts / len(samples) if samples else 0.0
     record_accuracy = records_all_correct / len(samples) if samples else 0.0
 
@@ -173,7 +189,7 @@ def evaluate_policy(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Evaluate FieldCheck policies")
+    parser = argparse.ArgumentParser(description="Evaluate Sureword policies")
     parser.add_argument("--config", type=Path, default=Path("configs/experiment.json"))
     parser.add_argument("--manifest", type=Path, default=Path("data/manifests/test.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/evaluation"))
@@ -185,9 +201,13 @@ def main() -> None:
     policies = ["B0", "B1", "B2", "P", "B3"]
     results = {}
 
-    print("=========================================================================================")
-    print(f"FieldCheck Benchmark Evaluation — {len(samples)} Held-Out Test Samples")
-    print("=========================================================================================\n")
+    print(
+        "========================================================================================="
+    )
+    print(f"Sureword Benchmark Evaluation — {len(samples)} Held-Out Test Samples")
+    print(
+        "=========================================================================================\n"
+    )
 
     for pol in policies:
         res = evaluate_policy(pol, samples, budget_max_prompts=1, seed=42)
@@ -195,7 +215,13 @@ def main() -> None:
 
     # Print Markdown Summary Table
     headers = [
-        "Policy", "Description", "Primary Error", "Auto Coverage", "Uncaught Error", "Record Correctness", "Burden (prompts/form)"
+        "Policy",
+        "Description",
+        "Primary Error",
+        "Auto Coverage",
+        "Uncaught Error",
+        "Record Correctness",
+        "Burden (prompts/form)",
     ]
     descriptions = {
         "B0": "Raw ASR (No clarification)",
@@ -224,7 +250,9 @@ def main() -> None:
         json.dump(results, f, indent=2)
 
     print(f"\nArtifact saved: {results_path}")
-    print("=========================================================================================")
+    print(
+        "========================================================================================="
+    )
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
-# FieldCheck — Documentation Index
+# Sureword — Documentation Index
 
-This directory contains engineering documentation, research dossiers, architectural designs, and operational specifications for **FieldCheck**.
+This directory contains engineering documentation, research dossiers, architectural designs, and operational specifications for **Sureword**.
 
 ---
 

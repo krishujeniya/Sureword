@@ -1,9 +1,9 @@
 services:
-  fieldcheck:
+  sureword:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: fieldcheck-app
+    container_name: sureword-app
     ports:
       - "8000:8000"
     environment:
@@ -14,10 +14,10 @@ services:
       - GNANI_TTS_MODEL=${GNANI_TTS_MODEL:-timbre-2.5}
       - GNANI_LANGUAGE=${GNANI_LANGUAGE:-hi-IN}
       - ALLOW_FIXTURE_FALLBACK=${ALLOW_FIXTURE_FALLBACK:-true}
-      - DATABASE_PATH=/app/data/fieldcheck.db
+      - DATABASE_PATH=/app/data/sureword.db
     volumes:
-      - fieldcheck-data:/app/data
+      - sureword-data:/app/data
     restart: unless-stopped
 
 volumes:
-  fieldcheck-data:
+  sureword-data:

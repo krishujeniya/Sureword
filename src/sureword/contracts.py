@@ -1,4 +1,4 @@
-"""Typed Pydantic contracts and domain models for FieldCheck."""
+"""Typed Pydantic contracts and domain models for Sureword."""
 
 from __future__ import annotations
 

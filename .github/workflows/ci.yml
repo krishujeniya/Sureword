@@ -1,4 +1,4 @@
-name: FieldCheck CI
+name: Sureword CI
 
 on:
   push:

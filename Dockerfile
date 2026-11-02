@@ -24,7 +24,7 @@ RUN uv venv /opt/venv && \
 ENV PATH="/opt/venv/bin:$PATH"
 ENV HOST=0.0.0.0
 ENV PORT=8000
-ENV DATABASE_PATH=/app/data/fieldcheck.db
+ENV DATABASE_PATH=/app/data/sureword.db
 
 # Expose port
 EXPOSE 8000
@@ -34,4 +34,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/healthz || exit 1
 
 # Run FastAPI via uvicorn
-CMD ["uvicorn", "fieldcheck.app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "sureword.app:app", "--host", "0.0.0.0", "--port", "8000"]

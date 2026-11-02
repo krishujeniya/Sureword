@@ -29,7 +29,7 @@ htmlcov/
 .env.local
 *.db
 *.sqlite3
-fieldcheck.db
+sureword.db
 
 # Documentation & Raw Assets
 docs/

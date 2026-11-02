@@ -1,4 +1,4 @@
-"""Global pytest configuration and shared fixtures for FieldCheck test suite."""
+"""Global pytest configuration and shared fixtures for Sureword test suite."""
 
 import pytest
 

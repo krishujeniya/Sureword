@@ -111,9 +111,7 @@ def convert_and_normalize_audio(
                 f"Audio duration ({duration:.2f}s) exceeds maximum allowed limit ({max_seconds}s)"
             )
         if duration < 0.2:
-            raise AudioValidationError(
-                f"Audio duration ({duration:.2f}s) is too short or silent"
-            )
+            raise AudioValidationError(f"Audio duration ({duration:.2f}s) is too short or silent")
 
         with open(out_path, "rb") as out_f:
             wav_bytes = out_f.read()

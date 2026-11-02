@@ -1,5 +1,5 @@
 /**
- * FieldCheck Client Application Logic
+ * Sureword Client Application Logic
  */
 
 let currentDraftId = null;

@@ -2,7 +2,7 @@
 
 import pytest
 
-from fieldcheck.providers.gnani import GnaniClient, GnaniProviderError
+from sureword.providers.gnani import GnaniClient, GnaniProviderError
 
 
 @pytest.mark.asyncio

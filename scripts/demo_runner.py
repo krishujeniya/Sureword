@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""FieldCheck — 60-Second Video Demo Walkthrough Runner (T19 Helper).
+"""Sureword — 60-Second Video Demo Walkthrough Runner (T19 Helper).
 
 Guides the presenter through each segment of the 60-second submission video,
 showing exact timings, visual cues, and narration lines from docs/SUBMISSION_PACK.md.
@@ -19,7 +19,7 @@ STORYBOARD = [
     {
         "segment": "1/6: Opening & Problem Context",
         "time_window": "0:00 – 0:08 (8s)",
-        "visual_cue": "Display blank FieldCheck visit form (http://127.0.0.1:8000). Show fields: Name, Age, Village, Visit Date.",
+        "visual_cue": "Display blank Sureword visit form (http://127.0.0.1:8000). Show fields: Name, Age, Village, Visit Date.",
         "narration": "Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records.",
         "action": "Open browser to http://127.0.0.1:8000. Ensure microphone permission is granted.",
     },
@@ -55,7 +55,7 @@ STORYBOARD = [
         "segment": "6/6: Benchmark Card & GitHub Repository Link",
         "time_window": "0:54 – 1:00 (6s)",
         "visual_cue": "Switch to summary card: 50% relative error reduction (6.2% -> 3.1% at 1 prompt/form). Display GitHub URL.",
-        "narration": "FieldCheck: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub.",
+        "narration": "Sureword: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub.",
         "action": "Show benchmark chart/card and conclude recording within 60 seconds.",
     },
 ]
@@ -71,18 +71,20 @@ def check_server(base_url: str) -> bool:
 
 def run_demo_guide(base_url: str) -> None:
     print("=" * 72)
-    print("   FieldCheck — 60-Second Video Demo Walkthrough Guide (T19)")
+    print("   Sureword — 60-Second Video Demo Walkthrough Guide (T19)")
     print("=" * 72)
     print(f"Target Server: {base_url}")
 
     if not check_server(base_url):
         print(f"\n[WARNING] Server is not currently reachable at {base_url}.")
         print("Please launch it in another terminal before recording:")
-        print("   uv run uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000\n")
+        print("   uv run uvicorn sureword.app:app --host 127.0.0.1 --port 8000\n")
     else:
         print("[OK] Server is running and responsive at /healthz.\n")
 
-    print("Prepare your screen recorder (e.g., OBS Studio, SimpleScreenRecorder, or browser recorder).")
+    print(
+        "Prepare your screen recorder (e.g., OBS Studio, SimpleScreenRecorder, or browser recorder)."
+    )
     print("Press [Enter] to begin the countdown for each segment.\n")
 
     for step in STORYBOARD:
@@ -90,7 +92,7 @@ def run_demo_guide(base_url: str) -> None:
         print(f"[{step['segment']}] — Window: {step['time_window']}")
         print(f"Action:     {step['action']}")
         print(f"Visual:     {step['visual_cue']}")
-        print(f"Narration:  \"{step['narration']}\"")
+        print(f'Narration:  "{step["narration"]}"')
         print("-" * 72)
         try:
             input("Press [Enter] when ready for this segment (or Ctrl+C to exit)... ")
@@ -105,7 +107,7 @@ def run_demo_guide(base_url: str) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="FieldCheck 60-Second Demo Rehearsal Runner")
+    parser = argparse.ArgumentParser(description="Sureword 60-Second Demo Rehearsal Runner")
     parser.add_argument("--base-url", default="http://127.0.0.1:8000", help="App base URL")
     args = parser.parse_args()
     run_demo_guide(args.base_url)

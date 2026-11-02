@@ -1,4 +1,4 @@
-"""SQLite asynchronous storage and event auditing for FieldCheck."""
+"""SQLite asynchronous storage and event auditing for Sureword."""
 
 from __future__ import annotations
 
@@ -7,11 +7,11 @@ from datetime import UTC, datetime
 
 import aiosqlite
 
-from fieldcheck.contracts import Draft, DraftState, FieldValue
+from sureword.contracts import Draft, DraftState, FieldValue
 
 
 class Storage:
-    def __init__(self, db_path: str = "fieldcheck.db") -> None:
+    def __init__(self, db_path: str = "sureword.db") -> None:
         self.db_path = db_path
 
     async def init_db(self) -> None:
@@ -92,7 +92,9 @@ class Storage:
                         now,
                         json.dumps(draft.attempts_by_field),
                         draft.active_prompt.model_dump_json() if draft.active_prompt else None,
-                        draft.latest_transcript.model_dump_json() if draft.latest_transcript else None,
+                        draft.latest_transcript.model_dump_json()
+                        if draft.latest_transcript
+                        else None,
                     ),
                 )
 
@@ -145,17 +147,13 @@ class Storage:
         """Fetch draft and reconstitute all fields."""
         async with aiosqlite.connect(self.db_path) as db:
             db.row_factory = aiosqlite.Row
-            async with db.execute(
-                "SELECT * FROM drafts WHERE draft_id = ?", (draft_id,)
-            ) as cursor:
+            async with db.execute("SELECT * FROM drafts WHERE draft_id = ?", (draft_id,)) as cursor:
                 d_row = await cursor.fetchone()
                 if not d_row:
                     return None
 
             fields: dict[str, FieldValue] = {}
-            async with db.execute(
-                "SELECT * FROM fields WHERE draft_id = ?", (draft_id,)
-            ) as cursor:
+            async with db.execute("SELECT * FROM fields WHERE draft_id = ?", (draft_id,)) as cursor:
                 async for f_row in cursor:
                     fields[f_row["field_key"]] = FieldValue(
                         key=f_row["field_key"],
@@ -186,9 +184,7 @@ class Storage:
                 latest_transcript=latest_transcript,
             )
 
-    async def record_committed(
-        self, record_id: str, draft: Draft, idempotency_key: str
-    ) -> bool:
+    async def record_committed(self, record_id: str, draft: Draft, idempotency_key: str) -> bool:
         """Atomically commit draft with idempotency key.
 
         Returns True if newly inserted, False if idempotent replay.

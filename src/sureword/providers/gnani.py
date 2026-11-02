@@ -13,9 +13,9 @@ import time
 
 import httpx
 
-from fieldcheck.contracts import Transcript
+from sureword.contracts import Transcript
 
-logger = logging.getLogger("fieldcheck.providers.gnani")
+logger = logging.getLogger("sureword.providers.gnani")
 
 # Provider lock to serialize calls and protect 1-concurrent request accounts
 _PROVIDER_LOCK = asyncio.Lock()
@@ -49,8 +49,12 @@ class GnaniClient:
         allow_fixture_fallback: bool = True,
     ) -> None:
         self.api_key: str = str(api_key or os.getenv("GNANI_API_KEY") or "")
-        self.stt_url: str = str(stt_url or os.getenv("GNANI_STT_URL") or "https://api.vachana.ai/stt/v3")
-        self.tts_url: str = str(tts_url or os.getenv("GNANI_TTS_URL") or "https://api.vachana.ai/api/v1/tts/inference")
+        self.stt_url: str = str(
+            stt_url or os.getenv("GNANI_STT_URL") or "https://api.vachana.ai/stt/v3"
+        )
+        self.tts_url: str = str(
+            tts_url or os.getenv("GNANI_TTS_URL") or "https://api.vachana.ai/api/v1/tts/inference"
+        )
         self.stt_model: str = stt_model or os.getenv("GNANI_STT_MODEL", "prisma-v3")
         self.tts_model: str = tts_model or os.getenv("GNANI_TTS_MODEL", "timbre-2.5")
         self.default_language: str = default_language or os.getenv("GNANI_LANGUAGE", "hi-IN")
@@ -58,7 +62,9 @@ class GnaniClient:
 
     def has_credentials(self) -> bool:
         """Check whether valid non-placeholder API key is set."""
-        return bool(self.api_key and self.api_key.strip() and "your_gnani_api_key" not in self.api_key)
+        return bool(
+            self.api_key and self.api_key.strip() and "your_gnani_api_key" not in self.api_key
+        )
 
     async def transcribe_audio(
         self,
@@ -71,7 +77,9 @@ class GnaniClient:
 
         if not self.has_credentials():
             if self.allow_fixture_fallback:
-                logger.info("No Gnani API key configured. Using deterministic fixture transcription.")
+                logger.info(
+                    "No Gnani API key configured. Using deterministic fixture transcription."
+                )
                 fixture_text = os.getenv(
                     "FIXTURE_TRANSCRIPT",
                     "मरीज का नाम कमला देवी है, उम्र 150 साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026",
@@ -108,7 +116,9 @@ class GnaniClient:
             start_t = time.perf_counter()
             for attempt in range(retries + 1):
                 try:
-                    async with httpx.AsyncClient(timeout=httpx.Timeout(20.0, connect=5.0)) as client:
+                    async with httpx.AsyncClient(
+                        timeout=httpx.Timeout(20.0, connect=5.0)
+                    ) as client:
                         resp = await client.post(
                             self.stt_url,
                             headers=headers,
@@ -140,10 +150,13 @@ class GnaniClient:
                         )
 
                     if resp.status_code in {429, 502, 503, 504} and attempt < retries:
-                        backoff = 1.0 * (2 ** attempt)
+                        backoff = 1.0 * (2**attempt)
                         logger.warning(
                             "Gnani STT returned HTTP %s. Retrying in %ss (attempt %s/%s)...",
-                            resp.status_code, backoff, attempt + 1, retries
+                            resp.status_code,
+                            backoff,
+                            attempt + 1,
+                            retries,
                         )
                         await asyncio.sleep(backoff)
                         continue
@@ -200,11 +213,17 @@ class GnaniClient:
                             timeout=5,
                             check=False,
                         )
-                        if res.returncode == 0 and os.path.exists(tmp_wav) and os.path.getsize(tmp_wav) > 44:
+                        if (
+                            res.returncode == 0
+                            and os.path.exists(tmp_wav)
+                            and os.path.getsize(tmp_wav) > 44
+                        ):
                             with open(tmp_wav, "rb") as out_f:
                                 return out_f.read()
                     except Exception as ex:
-                        logger.warning("Local espeak fallback failed: %s; using minimal WAV header", ex)
+                        logger.warning(
+                            "Local espeak fallback failed: %s; using minimal WAV header", ex
+                        )
                     finally:
                         if tmp_wav and os.path.exists(tmp_wav):
                             try:
@@ -236,7 +255,9 @@ class GnaniClient:
         async with _PROVIDER_LOCK:
             for attempt in range(retries + 1):
                 try:
-                    async with httpx.AsyncClient(timeout=httpx.Timeout(15.0, connect=5.0)) as client:
+                    async with httpx.AsyncClient(
+                        timeout=httpx.Timeout(15.0, connect=5.0)
+                    ) as client:
                         resp = await client.post(
                             self.tts_url,
                             headers=headers,
@@ -256,7 +277,7 @@ class GnaniClient:
                             return resp.content
 
                     if resp.status_code in {429, 502, 503, 504} and attempt < retries:
-                        backoff = 1.0 * (2 ** attempt)
+                        backoff = 1.0 * (2**attempt)
                         await asyncio.sleep(backoff)
                         continue
 

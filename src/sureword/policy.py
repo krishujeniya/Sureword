@@ -1,11 +1,11 @@
-"""Selective risk policies and clarification ranking for FieldCheck."""
+"""Selective risk policies and clarification ranking for Sureword."""
 
 from __future__ import annotations
 
 import random
 from typing import NamedTuple
 
-from fieldcheck.contracts import ClarificationPrompt, FieldKey, FieldStatus, FieldValue
+from sureword.contracts import ClarificationPrompt, FieldKey, FieldStatus, FieldValue
 
 
 class FieldRiskAssessment(NamedTuple):
@@ -81,10 +81,7 @@ def select_clarification_field_p(
             # Reached max attempts for this field; cannot ask again
             continue
 
-        prompt_text = PROMPT_TEMPLATES.get(
-            assessment.key,
-            f"Please clarify {assessment.key}."
-        )
+        prompt_text = PROMPT_TEMPLATES.get(assessment.key, f"Please clarify {assessment.key}.")
         return ClarificationPrompt(
             target_field=assessment.key,
             prompt_text=prompt_text,
@@ -141,7 +138,8 @@ def select_clarification_field_b2(
     """Baseline B2: Seeded random field selection from eligible fields."""
     rng = random.Random(seed)
     eligible = [
-        k for k, f in fields.items()
+        k
+        for k, f in fields.items()
         if f.status != FieldStatus.USER_CONFIRMED and attempts_by_field.get(k, 0) < max_attempts
     ]
     if not eligible:

@@ -1,6 +1,6 @@
-"""Unit tests for FieldCheck data contracts and models."""
+"""Unit tests for Sureword data contracts and models."""
 
-from fieldcheck.contracts import (
+from sureword.contracts import (
     CommitRequest,
     Draft,
     DraftState,

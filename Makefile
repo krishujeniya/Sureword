@@ -4,7 +4,7 @@ PYTHON ?= uv run python
 UV ?= uv
 
 help:
-	@echo "FieldCheck — Developer Operations"
+	@echo "Sureword — Developer Operations"
 	@echo "================================="
 	@echo "make install       Install dependencies in editable development mode"
 	@echo "make dev           Run local FastAPI development server (uvicorn)"
@@ -22,7 +22,7 @@ install:
 	$(UV) pip install -e ".[dev]"
 
 dev:
-	$(PYTHON) -m uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000 --reload
+	$(PYTHON) -m uvicorn sureword.app:app --host 127.0.0.1 --port 8000 --reload
 
 test:
 	$(PYTHON) -m pytest tests/ -v
@@ -46,10 +46,10 @@ clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
 	find . -type f -name "*.py[co]" -delete
-	rm -rf .pytest_cache .ruff_cache .mypy_cache dist build artifacts/ci_eval fieldcheck.db
+	rm -rf .pytest_cache .ruff_cache .mypy_cache dist build artifacts/ci_eval sureword.db
 
 docker-build:
-	docker build -t fieldcheck:latest .
+	docker build -t sureword:latest .
 
 docker-run:
-	docker run -p 8000:8000 --env-file .env fieldcheck:latest
+	docker run -p 8000:8000 --env-file .env sureword:latest

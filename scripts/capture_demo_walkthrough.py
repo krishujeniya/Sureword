@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Automated Demo Screencast & Step Snapshot Capture for FieldCheck.
+"""Automated Demo Screencast & Step Snapshot Capture for Sureword.
 
 Exercises the entire 60-second submission flow and captures high-resolution
 screenshots of each state using native headless Chrome.
@@ -35,7 +35,9 @@ def generate_wav(duration_s: float = 0.5, sample_rate: int = 16000) -> bytes:
     return header + (b"\x00" * data_size)
 
 
-def capture_screenshot(chrome_bin: str, url: str, output_png: Path, window_size: str = "1280,820") -> bool:
+def capture_screenshot(
+    chrome_bin: str, url: str, output_png: Path, window_size: str = "1280,820"
+) -> bool:
     cmd = [
         chrome_bin,
         "--headless",
@@ -46,7 +48,9 @@ def capture_screenshot(chrome_bin: str, url: str, output_png: Path, window_size:
         url,
     ]
     try:
-        res = subprocess.run(cmd, capture_output=True, timeout=10, stdin=subprocess.DEVNULL, check=False)
+        res = subprocess.run(
+            cmd, capture_output=True, timeout=10, stdin=subprocess.DEVNULL, check=False
+        )
         return res.returncode == 0 and output_png.exists()
     except Exception as ex:
         print(f"Error capturing {output_png}: {ex}")
@@ -59,7 +63,7 @@ def build_preview_html(output_dir: Path, steps_info: list[dict[str, str]]) -> No
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FieldCheck — 60-Second Demo Storyboard Walkthrough</title>
+  <title>Sureword — 60-Second Demo Storyboard Walkthrough</title>
   <style>
     body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
@@ -77,20 +81,20 @@ def build_preview_html(output_dir: Path, steps_info: list[dict[str, str]]) -> No
 </head>
 <body>
   <div class="container">
-    <h1>FieldCheck: 60-Second Video Demo Walkthrough</h1>
+    <h1>Sureword: 60-Second Video Demo Walkthrough</h1>
     <p class="lead">Storyboard sequence matching official nomination guidelines and docs/SUBMISSION_PACK.md §3</p>
 """
     for s in steps_info:
         html_content += f"""
     <div class="step-card">
       <div class="step-header">
-        <div class="step-title">{s['title']}</div>
-        <div class="step-time">{s['time']}</div>
+        <div class="step-title">{s["title"]}</div>
+        <div class="step-time">{s["time"]}</div>
       </div>
-      <div class="step-desc"><strong>Visual Action:</strong> {s['desc']}</div>
-      <div class="step-narration"><strong>Narration:</strong> "{s['narration']}"</div>
+      <div class="step-desc"><strong>Visual Action:</strong> {s["desc"]}</div>
+      <div class="step-narration"><strong>Narration:</strong> "{s["narration"]}"</div>
       <div class="step-img-wrap">
-        <img src="{s['filename']}" alt="{s['title']}">
+        <img src="{s["filename"]}" alt="{s["title"]}">
       </div>
     </div>
 """
@@ -128,7 +132,9 @@ def main() -> None:
             sys.exit(1)
     except Exception as ex:
         print(f"Cannot connect to server at {args.base_url}: {ex}")
-        print("Please start the server first: uv run uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000")
+        print(
+            "Please start the server first: uv run uvicorn sureword.app:app --host 127.0.0.1 --port 8000"
+        )
         sys.exit(1)
 
     steps_info: list[dict[str, str]] = []
@@ -137,13 +143,15 @@ def main() -> None:
     step1_png = args.output / "step1_blank_form.png"
     if capture_screenshot(chrome_bin, f"{args.base_url}/", step1_png):
         print(f"  -> Saved: {step1_png}")
-        steps_info.append({
-            "title": "Step 1: Blank Frontline Visit Form",
-            "time": "0:00 – 0:08",
-            "desc": "Open FieldCheck web application. Blank visit form with 4 core fields: Person Name, Age, Village, Visit Date.",
-            "narration": "Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records.",
-            "filename": "step1_blank_form.png",
-        })
+        steps_info.append(
+            {
+                "title": "Step 1: Blank Frontline Visit Form",
+                "time": "0:00 – 0:08",
+                "desc": "Open Sureword web application. Blank visit form with 4 core fields: Person Name, Age, Village, Visit Date.",
+                "narration": "Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records.",
+                "filename": "step1_blank_form.png",
+            }
+        )
 
     print("\n[2/5] Creating draft and processing dictation with physiological age bound error...")
     d_res = client.post("/api/drafts").json()
@@ -158,25 +166,29 @@ def main() -> None:
     time.sleep(0.5)
     if capture_screenshot(chrome_bin, f"{args.base_url}/?draft_id={draft_id}", step2_png):
         print(f"  -> Saved: {step2_png}")
-        steps_info.append({
-            "title": "Step 2: Dictation Transcribed & Age Flagged (Needs Repeat)",
-            "time": "0:08 – 0:32",
-            "desc": "Prisma transcript streams in. Name, Village, and Date show valid; Age 150 is flagged out of physiological bounds (1-120) with a red Needs Repeat badge.",
-            "narration": "Gnani Prisma transcribes the audio. Our deterministic parser flags that age 150 is out of valid physiological bounds.",
-            "filename": "step2_dictation_flagged.png",
-        })
+        steps_info.append(
+            {
+                "title": "Step 2: Dictation Transcribed & Age Flagged (Needs Repeat)",
+                "time": "0:08 – 0:32",
+                "desc": "Prisma transcript streams in. Name, Village, and Date show valid; Age 150 is flagged out of physiological bounds (1-120) with a red Needs Repeat badge.",
+                "narration": "Gnani Prisma transcribes the audio. Our deterministic parser flags that age 150 is out of valid physiological bounds.",
+                "filename": "step2_dictation_flagged.png",
+            }
+        )
 
     print("\n[3/5] Capturing Step 3: Spoken Clarification Banner Active...")
     step3_png = args.output / "step3_clarification_banner.png"
     if capture_screenshot(chrome_bin, f"{args.base_url}/?draft_id={draft_id}", step3_png):
         print(f"  -> Saved: {step3_png}")
-        steps_info.append({
-            "title": "Step 3: Timbre Spoken Clarification Audio & Banner",
-            "time": "0:32 – 0:46",
-            "desc": "Gnani Timbre speaks prompt: 'कृपया मरीज़ की सही उम्र दोबारा बोलिए।' System asks user to repeat only the uncertain field.",
-            "narration": "Gnani Timbre speaks up to clarify only the uncertain field. We repeat just the age, and the record updates with full provenance.",
-            "filename": "step3_clarification_banner.png",
-        })
+        steps_info.append(
+            {
+                "title": "Step 3: Timbre Spoken Clarification Audio & Banner",
+                "time": "0:32 – 0:46",
+                "desc": "Gnani Timbre speaks prompt: 'कृपया मरीज़ की सही उम्र दोबारा बोलिए।' System asks user to repeat only the uncertain field.",
+                "narration": "Gnani Timbre speaks up to clarify only the uncertain field. We repeat just the age, and the record updates with full provenance.",
+                "filename": "step3_clarification_banner.png",
+            }
+        )
 
     print("\n[4/5] Clarifying age to 45 and capturing Step 4: Ready for Review...")
     draft_curr = client.get(f"/api/drafts/{draft_id}").json()
@@ -195,13 +207,15 @@ def main() -> None:
     time.sleep(0.5)
     if capture_screenshot(chrome_bin, f"{args.base_url}/?draft_id={draft_id}", step4_png):
         print(f"  -> Saved: {step4_png}")
-        steps_info.append({
-            "title": "Step 4: Age Corrected & State Transitions to READY_FOR_REVIEW",
-            "time": "0:46 – 0:54",
-            "desc": "Age updates to 45 with Confirmed badge. All 4 fields verified. Verify & Commit Record button becomes active.",
-            "narration": "The record cannot commit until all fields are verified. Review is explicit, and save is idempotent.",
-            "filename": "step4_ready_for_review.png",
-        })
+        steps_info.append(
+            {
+                "title": "Step 4: Age Corrected & State Transitions to READY_FOR_REVIEW",
+                "time": "0:46 – 0:54",
+                "desc": "Age updates to 45 with Confirmed badge. All 4 fields verified. Verify & Commit Record button becomes active.",
+                "narration": "The record cannot commit until all fields are verified. Review is explicit, and save is idempotent.",
+                "filename": "step4_ready_for_review.png",
+            }
+        )
 
     print("\n[5/5] Committing record and capturing Step 5: Committed Local Audit...")
     client.post(
@@ -216,13 +230,15 @@ def main() -> None:
     time.sleep(0.5)
     if capture_screenshot(chrome_bin, f"{args.base_url}/?draft_id={draft_id}", step5_png):
         print(f"  -> Saved: {step5_png}")
-        steps_info.append({
-            "title": "Step 5: Record Committed with Local ID & Full JSON Audit",
-            "time": "0:54 – 1:00",
-            "desc": "Record ID generated (REC-20261031-XXXX). Complete JSON provenance audit log displayed locally.",
-            "narration": "FieldCheck: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub.",
-            "filename": "step5_committed_record.png",
-        })
+        steps_info.append(
+            {
+                "title": "Step 5: Record Committed with Local ID & Full JSON Audit",
+                "time": "0:54 – 1:00",
+                "desc": "Record ID generated (REC-20261031-XXXX). Complete JSON provenance audit log displayed locally.",
+                "narration": "Sureword: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub.",
+                "filename": "step5_committed_record.png",
+            }
+        )
 
     build_preview_html(args.output, steps_info)
     print("\n========================================================")

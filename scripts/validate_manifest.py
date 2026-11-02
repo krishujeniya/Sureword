@@ -53,7 +53,9 @@ def validate_splits(dev_path: Path, test_path: Path) -> None:
     # 1. Sample ID Collision Check
     sample_collisions = dev_sample_ids.intersection(test_sample_ids)
     if sample_collisions:
-        print(f"\n[FAIL] Found {len(sample_collisions)} overlapping sample IDs between dev and test: {sample_collisions}")
+        print(
+            f"\n[FAIL] Found {len(sample_collisions)} overlapping sample IDs between dev and test: {sample_collisions}"
+        )
         sys.exit(1)
     print("\n[PASS] Zero sample ID overlap between dev and test splits.")
 
@@ -62,7 +64,9 @@ def validate_splits(dev_path: Path, test_path: Path) -> None:
     if speaker_leakage:
         print(f"\n[FAIL] Speaker leakage detected! Overlapping speakers: {speaker_leakage}")
         sys.exit(1)
-    print(f"[PASS] Zero speaker leakage. Dev speakers: {sorted(list(dev_speakers))}; Test speakers: {sorted(list(test_speakers))}")
+    print(
+        f"[PASS] Zero speaker leakage. Dev speakers: {sorted(list(dev_speakers))}; Test speakers: {sorted(list(test_speakers))}"
+    )
 
     # 3. Required Fields Check
     required_keys = {"sample_id", "speaker_id", "language", "gold_fields"}
@@ -70,7 +74,9 @@ def validate_splits(dev_path: Path, test_path: Path) -> None:
         for r in recs:
             missing = required_keys - set(r.keys())
             if missing:
-                print(f"\n[FAIL] Record {r.get('sample_id')} in {split_name} missing required fields: {missing}")
+                print(
+                    f"\n[FAIL] Record {r.get('sample_id')} in {split_name} missing required fields: {missing}"
+                )
                 sys.exit(1)
             # Check 4 critical fields in gold_fields
             gf = r["gold_fields"]
@@ -87,8 +93,12 @@ def validate_splits(dev_path: Path, test_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate Dataset Manifests")
-    parser.add_argument("--dev", type=Path, default=Path("data/manifests/dev.jsonl"), help="Dev manifest")
-    parser.add_argument("--test", type=Path, default=Path("data/manifests/test.jsonl"), help="Test manifest")
+    parser.add_argument(
+        "--dev", type=Path, default=Path("data/manifests/dev.jsonl"), help="Dev manifest"
+    )
+    parser.add_argument(
+        "--test", type=Path, default=Path("data/manifests/test.jsonl"), help="Test manifest"
+    )
     args = parser.parse_args()
 
     validate_splits(args.dev, args.test)

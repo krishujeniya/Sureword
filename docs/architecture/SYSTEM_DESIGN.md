@@ -1,6 +1,6 @@
-# FieldCheck — System Architecture & Design
+# Sureword — System Architecture & Design
 
-> **Document ID:** DOC-FC-ARCH-01  
+> **Document ID:** DOC-SW-ARCH-01  
 > **Status:** Production Specification  
 > **Author:** Krish Ujeniya  
 
@@ -8,9 +8,9 @@
 
 ## 1. System Overview
 
-FieldCheck is an asynchronous reliability layer for voice-driven structured record entry in frontline Indian public health workflows. When frontline health workers (such as ASHAs or ANMs) dictate visit records, phonetic similarities and code-mixed speech often cause automated speech recognition (ASR) engines to silently substitute critical entities (e.g. names, ages, villages, or dates).
+Sureword is an asynchronous reliability layer for voice-driven structured record entry in frontline Indian public health workflows. When frontline health workers (such as ASHAs or ANMs) dictate visit records, phonetic similarities and code-mixed speech often cause automated speech recognition (ASR) engines to silently substitute critical entities (e.g. names, ages, villages, or dates).
 
-FieldCheck uses Gnani Prisma for speech-to-text, parses structured fields deterministically, computes uncertainty-driven risk scores per field, and uses Gnani Timbre to issue spoken clarification requests for *only* the single most uncertain field before committing the record.
+Sureword uses Gnani Prisma for speech-to-text, parses structured fields deterministically, computes uncertainty-driven risk scores per field, and uses Gnani Timbre to issue spoken clarification requests for *only* the single most uncertain field before committing the record.
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -21,7 +21,7 @@ FieldCheck uses Gnani Prisma for speech-to-text, parses structured fields determ
                         ▼
 ┌────────────────────────────────────────────────────────┐
 │                   FastAPI Core                         │
-│               (src/fieldcheck/app.py)                  │
+│               (src/sureword/app.py)                    │
 └───────┬───────────────────────┬────────────────────────┘
         │                       │
         ▼                       ▼
@@ -106,7 +106,7 @@ The code adheres to the standard PyPA `src-layout` with explicit boundaries:
 
 ## 4. Policy Engine & Risk Ranking
 
-FieldCheck implements and compares 5 policies under identical clarification constraints (max 1 prompt/turn):
+Sureword implements and compares 5 policies under identical clarification constraints (max 1 prompt/turn):
 
 1. **B0 (Raw ASR):** No clarification; all fields accepted directly from transcription.
 2. **B1 (Alphabetical):** Prompts for invalid fields first, then falls back to alphabetical order.

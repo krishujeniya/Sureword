@@ -1,4 +1,4 @@
-"""Integration tests for FieldCheck FastAPI endpoints."""
+"""Integration tests for Sureword FastAPI endpoints."""
 
 import os
 import tempfile
@@ -7,7 +7,7 @@ from collections.abc import AsyncGenerator
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from fieldcheck.app import app, storage
+from sureword.app import app, storage
 
 
 @pytest.fixture(autouse=True)

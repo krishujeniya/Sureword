@@ -2,9 +2,9 @@
 
 > **Handoff for Gemini 3.8 Flash High, as requested by Krish.** This name identifies the intended reader; it is not a verified API model identifier or an application dependency.
 >
-> **Revision:** 2 — aligned with the renewed research-and-engineering brief. **Prepared/updated:** 31 October 2026, Asia/Kolkata. **Owner:** Krish Ujeniya. **Working directory:** `/home/ai/Downloads/gnani`.
+> **Revision:** 2 — aligned with the renewed research-and-engineering brief. **Prepared/updated:** 31 October 2026, Asia/Kolkata. **Owner:** Krish Ujeniya. **Working directory:** `/home/ai/Documents/projects/Freelance/Sureword`.
 >
-> **Decision:** Build **FieldCheck**, a small voice-to-form application that asks users to repeat uncertain fields before saving a fictional household-visit record. Use real Gnani Prisma speech recognition; add real Timbre spoken clarification. Study whether selective clarification improves field accuracy at a fixed clarification budget.
+> **Decision:** Build **Sureword**, a small voice-to-form application that asks users to repeat uncertain fields before saving a fictional household-visit record. Use real Gnani Prisma speech recognition; add real Timbre spoken clarification. Study whether selective clarification improves field accuracy at a fixed clarification budget.
 >
 > **Current state:** Research inputs reviewed; this tracker created. No application, dataset, API smoke test, measured research result, deployment, or submission exists in this workspace. All implementation tasks below are pending.
 
@@ -57,7 +57,7 @@ Keep all planning in this file. Read the following in the brief's requested orde
 | Gate | Current state | Evidence needed to pass | What may proceed now |
 |---|---|---|---|
 | G1 evidence | PARTIAL | Account-level API/credit evidence; suitable data rights; user/workflow and capability audit | Local scaffold and targeted evidence work; no live-capability claim. |
-| G2 one project | PROVISIONAL DECISION | FieldCheck retained; tie sensitivity and stop conditions in §4.1 acknowledged | One narrow prototype; no parallel product. |
+| G2 one project | PROVISIONAL DECISION | Sureword retained; tie sensitivity and stop conditions in §4.1 acknowledged | One narrow prototype; no parallel product. |
 | G3 research | SPECIFIED, NOT FROZEN | T11 hashes and development-only choices; controls in §5.4 | Develop parser and metric fixtures; no held-out claims. |
 | G4 architecture | PROPOSED | T03/T06/T07 contracts and state checks exercised | Build the minimum structure after document/account review. |
 | G5 vertical slice | NOT STARTED | Actual input hash, redacted request/response, visible fields and run evidence | Highest implementation priority; no simulated pass. |
@@ -104,12 +104,12 @@ Labels: **V** = primary-source text checked in this review; **D** = documented c
 | PDF's RAS coefficient 0.5064 is a universal decision threshold | R as a transfer assumption | Do not copy its formula or threshold into the policy. Local costs and validation are required. |
 | OIWER is an acoustic confidence/phoneme oracle | R, S12 concerns orthographic scoring | Use explicit text normalization; no claims of acoustic verification from text agreement. |
 | Two transcripts agreeing proves correctness | R | Both can repeat the same error. Measure false acceptance. |
-| Crop-loss legal deadlines, fraud recovery windows, farmer call volumes and named local persona are all verified | U in this review | Do not publish these report claims or imply a real user interview. They are unnecessary for FieldCheck. |
+| Crop-loss legal deadlines, fraud recovery windows, farmer call volumes and named local persona are all verified | U in this review | Do not publish these report claims or imply a real user interview. They are unnecessary for Sureword. |
 | Krish's repositories prove production performance or speech expertise | U; conflicting report assessments | Assume one developer comfortable with Python; no borrowed performance claims. |
 
 ## 3. Source register and prior art
 
-Initially checked on 31 October 2026; S1 and S3 reopened for revision 2 on the same date. Other source checks refer to the initial review, not a second full literature audit. “Checked” means the cited page/content was readable, not that its reported experiments were reproduced. Keep paper results separate from FieldCheck results.
+Initially checked on 31 October 2026; S1 and S3 reopened for revision 2 on the same date. Other source checks refer to the initial review, not a second full literature audit. “Checked” means the cited page/content was readable, not that its reported experiments were reproduced. Keep paper results separate from Sureword results.
 
 | ID | Primary source | Supported use and limits |
 |---|---|---|
@@ -133,7 +133,7 @@ The PDF's Bhili boosting numbers, G-SPIN details, RECOVER references, TTS–STT 
 
 ### 3.1 Defensible novelty boundary
 
-| Existing capability | FieldCheck overlap | What remains to test |
+| Existing capability | Sureword overlap | What remains to test |
 |---|---|---|
 | IndicContextEval: context-sensitive entity recognition | Task-critical entities and optional contextual ASR | Whether a field-level clarification policy helps actual structured task outcomes. |
 | DeRAGEC: retrieval and entity correction | Candidate ambiguity | Whether asking instead of silently replacing offers a better error/burden tradeoff. |
@@ -148,7 +148,7 @@ The PDF's Bhili boosting numbers, G-SPIN details, RECOVER references, TTS–STT 
 
 Scores are engineering judgments from 1–5, not probabilities. Total = `sum(weight × score / 5)`. “Delivery” includes a working demo by the deadline. All candidates use fictional records and no government integration.
 
-| Criterion | Weight | FieldCheck visit forms | Crop-loss intake | Kirana order capture |
+| Criterion | Weight | Sureword visit forms | Crop-loss intake | Kirana order capture |
 |---|---:|---:|---:|---:|
 | Indian problem evidence | 15 | 4 | 3 | 3 |
 | Reachable users / validation | 10 | 2 | 2 | 3 |
@@ -162,9 +162,9 @@ Scores are engineering judgments from 1–5, not probabilities. Total = `sum(wei
 | Cost, privacy and domain risk | 5 | 4 | 2 | 4 |
 | **Total / 100** | **100** | **73** | **61** | **73** |
 
-**Selected: FieldCheck.** It ties kirana under this conservative rubric and wins the tie on the directly checked government workflow and the focused field-error research question. Kirana is the strongest runner-up and has better delivery/data feasibility; it loses on differentiation and currently weaker verified user evidence. Crop-loss loses because its dossier bundles legal intake, context routing, chemical advice, financial stress tests and unverified API features.
+**Selected: Sureword.** It ties kirana under this conservative rubric and wins the tie on the directly checked government workflow and the focused field-error research question. Kirana is the strongest runner-up and has better delivery/data feasibility; it loses on differentiation and currently weaker verified user evidence. Crop-loss loses because its dossier bundles legal intake, context routing, chemical advice, financial stress tests and unverified API features.
 
-**Challenge the ranking:** Lowering FieldCheck delivery from 4 to 3 puts it below kirana by 3 points. The selection is therefore conditional on a short API/form slice by 2 November. Lack of worker access narrows the claim to a simulated workflow; it does not automatically justify building a second domain. If the slice fails for domain-specific extraction complexity, reduce to one field per turn. Change domain only after recording concrete evidence that the simplified form still cannot be built; do not run parallel products.
+**Challenge the ranking:** Lowering Sureword delivery from 4 to 3 puts it below kirana by 3 points. The selection is therefore conditional on a short API/form slice by 2 November. Lack of worker access narrows the claim to a simulated workflow; it does not automatically justify building a second domain. If the slice fails for domain-specific extraction complexity, reduce to one field per turn. Change domain only after recording concrete evidence that the simplified form still cannot be built; do not run parallel products.
 
 Cyber-fraud intake is excluded before scoring because it adds official-service confusion and unnecessary sensitive-domain requirements. Generic grievance and farmer Q&A are excluded because application novelty is weak. The chosen primary award target is **Real Deal**; actual user value still needs evidence. A clear 60-second demo is a secondary goal. Do not assert geographic eligibility or target seven awards at once.
 
@@ -183,7 +183,7 @@ Cyber-fraud intake is excluded before scoring because it adds official-service c
 
 The observed failure rate and time cost in the intended worker workflow are **unknown**. T05 must separate two questions: do intended users need this tool, and does the policy improve speech-field handling? Neither is answered by an attractive demo.
 
-Proposed small workflow check: two consenting workers or domain-informed participants each enter six fictional records using their usual feasible input method and FieldCheck. Counterbalance order with matched record difficulty; use different equivalent records to reduce memorization. Record completion time, manual corrections, unresolved fields, final exact-match fields, device/language and participant preference with reasons. Report this as a small formative usability check, not an efficacy trial. If only students or friends participate, label them accurately and do not generalize to ASHAs.
+Proposed small workflow check: two consenting workers or domain-informed participants each enter six fictional records using their usual feasible input method and Sureword. Counterbalance order with matched record difficulty; use different equivalent records to reduce memorization. Record completion time, manual corrections, unresolved fields, final exact-match fields, device/language and participant preference with reasons. Report this as a small formative usability check, not an efficacy trial. If only students or friends participate, label them accurately and do not generalize to ASHAs.
 
 Ask about record collection, duplicate entry, connectivity, interruptions, language, shared devices and private places to speak. Do not presume voice is always preferred or typing is impossible. Do not measure clinical outcomes. If users reject dictation or the chosen fields do not fit their workflow, change the form/schema before collecting the benchmark and record the decision.
 
@@ -333,9 +333,9 @@ Tracker.md
 README.md
 pyproject.toml + tested lock file
 .env.example + .gitignore
-src/fieldcheck/{app,contracts,parser,policy,state,storage,audio}.py
-src/fieldcheck/providers/gnani.py
-src/fieldcheck/static/{index.html,app.js,styles.css}
+src/sureword/{app,contracts,parser,policy,state,storage,audio}.py
+src/sureword/providers/gnani.py
+src/sureword/static/{index.html,app.js,styles.css}
 scripts/{smoke_gnani,validate_manifest,evaluate}.py
 configs/{schema,policy,experiment}.json
 data/manifests/{dev,test}.jsonl
@@ -370,7 +370,7 @@ Use cache keys covering normalized audio hash, endpoint, model, language, all re
 
 Manifest fields: `sample_id`, `source_recording_id`, `speaker_id`, `template_family`, `split`, `language`, `condition`, `audio_path`, `sha256`, `duration_ms`, `sample_rate`, `reference_text`, `gold_fields`, `consent_ref`, `licence_ref`, `clarification_paths`, `normalization_version`. Resolve paths without publishing private consent information.
 
-**External data:** IndicContextEval is an optional P2 generalization test, not the critical path. Its transcript/entity labels do not automatically provide FieldCheck form labels. Review original terms, provider processing, contest restrictions, PII and schema suitability before any upload. IndicVoices, Kathbath, LAHAJA, Svarah and mirrors are deferred. If external rights remain unclear, use only the approved role-play corpus and disclose its limits.
+**External data:** IndicContextEval is an optional P2 generalization test, not the critical path. Its transcript/entity labels do not automatically provide Sureword form labels. Review original terms, provider processing, contest restrictions, PII and schema suitability before any upload. IndicVoices, Kathbath, LAHAJA, Svarah and mirrors are deferred. If external rights remain unclear, use only the approved role-play corpus and disclose its limits.
 
 **Freeze procedure:** Validate hashes and zero overlap, write config and manifest hashes into the run ledger, choose thresholds on development only, then evaluate once on held-out test data. Bug fixes after test inspection require a new run/version and explicit disclosure; do not quietly retune on failures.
 
@@ -383,7 +383,7 @@ Owner `G` = Gemini implements/checks; `K` = Krish supplies real-world inputs and
 | T00 | P1 / G / DONE | — | Timeboxed owner capability audit under §4.3 | Local repos Anchor (c8b7eb9) and Hadron (2492f32) inspected; reusable FastAPI/Pydantic/SQLite skills verified | None; confirmed solo Python capability. |
 | T01 | P0 / K+G / IN_PROGRESS | — | Verify eligibility, registered account and latest terms; add redacted ledger entry | Krish confirms eligibility/account; rules checked with date | Eligibility unclear: seek organiser clarification; do not claim eligible. Local prototype work can continue. |
 | T02 | P0 / K+G / IN_PROGRESS | T01 | Configure server key; run short STT and TTS probes; record exact models, schema, language and credit deltas | Probe script scripts/smoke_gnani.py built; runs in deterministic fixture mode; pending live credentials | Missing key: local fixtures only; T04 live verification pending live key. |
-| T03 | P0 / G / DONE | — | Create minimal service, static UI, typed contracts, pinned dependencies and environment example | Service operational; GET /healthz 200 OK; contracts in src/fieldcheck/contracts.py; .env.example created | None; zero external heavy dependencies. |
+| T03 | P0 / G / DONE | — | Create minimal service, static UI, typed contracts, pinned dependencies and environment example | Service operational; GET /healthz 200 OK; contracts in src/sureword/contracts.py; .env.example created | None; zero external heavy dependencies. |
 | T04 | P0 / G / DONE | T02,T03 | First vertical slice: microphone/upload → Prisma → simple fields on screen | Audio conversion (16kHz mono WAV via ffmpeg), Prisma adapter, and field parsing verified in integration tests | None. |
 | T05 | P1 / K+G / DONE | T01 | Validate workflow with two willing workers/domain-informed users if reachable | Anonymized notes on present workflow, useful fields, corrections and acceptability in docs/WORKFLOW_VALIDATION.md | Formative usability protocol completed on simulated proxy cohort; explicit simulation limits disclosed. |
 | T06 | P0 / G / DONE | T04 | Freeze four-field schema; implement deterministic parsing and normalization | Four fields frozen; Devanagari numerals, Hindi words, date formats, village dictionary, age bounds 1-120 pass unit tests | None. |
@@ -415,7 +415,7 @@ The following commands are **implementation targets, not existing scripts or exe
 |---|---|---|
 | Core correctness | `python -m pytest tests/unit -q` | Parser/state/metric edge cases with observed totals and exit code. |
 | Adapter failure handling | `python -m pytest tests/integration -q` | Labeled fixtures for success/error/timeout/malformed response; no network by default. |
-| Static checks | `python -m ruff check src tests scripts` and `python -m mypy src/fieldcheck` | Both tools configured and passing after last relevant edit. |
+| Static checks | `python -m ruff check src tests scripts` and `python -m mypy src/sureword` | Both tools configured and passing after last relevant edit. |
 | Data integrity | `python scripts/validate_manifest.py --dev data/manifests/dev.jsonl --test data/manifests/test.jsonl` | Zero prohibited overlap, valid labels/hashes/durations and rights references. |
 | Genuine provider smoke | `python scripts/smoke_gnani.py --audio private/smoke.wav --output artifacts/smoke` | Real STT/TTS, redacted model/request evidence and billed usage; server key required. |
 | Frozen evaluation | `python scripts/evaluate.py --config configs/experiment.json --output artifacts/evaluation` | Paired predictions, denominator checks, error rows, config/data hashes and plots. |
@@ -471,7 +471,7 @@ Estimate total charge as `STT billed seconds × observed rate + TTS billed chara
 |---|---|---|
 | 0–8 s | Fictional visit form; one clear documentation problem | “A transcript can look right while one field is wrong.” |
 | 8–18 s | Speak a short Hindi-English form; real audio visibly recorded | Identify the intended worker workflow without implying a field deployment. |
-| 18–35 s | Prisma text populates fields; show actual uncertainty reasons | “FieldCheck transcribes with Gnani Prisma and checks each field.” |
+| 18–35 s | Prisma text populates fields; show actual uncertainty reasons | “Sureword transcribes with Gnani Prisma and checks each field.” |
 | 35–48 s | Timbre asks for one field again; user responds; draft updates | “It asks for the uncertain field before the record is saved.” |
 | 48–55 s | Show one real result card or actual task outcome | State actual sample size and error/burden counts, or state evaluation is inconclusive. |
 | 55–60 s | Reviewed local record, app and repository links | “A prototype for more reliable voice form entry.” |
@@ -480,9 +480,9 @@ Choose the scenario from development/demo material, not by selectively presentin
 
 ### 10.2 Draft copy to finalize only after evidence exists
 
-**LinkedIn draft:** “I built FieldCheck, a prototype for Hindi-English voice entry of fictional household-visit records. Gnani Prisma transcribes the audio, and Gnani Timbre asks for fields that need clarification before a local save. I evaluated [actual methods] on [actual original recordings / speakers]. [Measured finding or explicit null result]. This is a simulated workflow, not a clinical system. Demo: [link]. Code and methods: [link]. [Tag verified official Gnani AI account] #GnaniAI #GreatIndianAIInternshipChallenge”
+**LinkedIn draft:** “I built Sureword, a prototype for Hindi-English voice entry of fictional household-visit records. Gnani Prisma transcribes the audio, and Gnani Timbre asks for fields that need clarification before a local save. I evaluated [actual methods] on [actual original recordings / speakers]. [Measured finding or explicit null result]. This is a simulated workflow, not a clinical system. Demo: [link]. Code and methods: [link]. [Tag verified official Gnani AI account] #GnaniAI #GreatIndianAIInternshipChallenge”
 
-**X draft:** “FieldCheck turns Hindi-English voice into a reviewable visit form using Gnani Prisma + Timbre. It asks again for uncertain fields. Fictional data; prototype. Demo/code: [link] [official tag] #GnaniAI #GreatIndianAIInternshipChallenge”
+**X draft:** “Sureword turns Hindi-English voice into a reviewable visit form using Gnani Prisma + Timbre. It asks again for uncertain fields. Fictional data; prototype. Demo/code: [link] [official tag] #GnaniAI #GreatIndianAIInternshipChallenge”
 
 Replace every bracketed placeholder before publishing; remove unsupported capabilities. Check the platform's current length limits. Public posting is a Krish-owned task, not an action performed by this tracker creation.
 
@@ -563,12 +563,12 @@ A P0 prototype may be submitted with an inconclusive study. Do not mark P1 compl
 | 2026-10-31 | Primary-source review | S1–S15 above; quick start resolves 30-versus-60-second conflict | Some dedicated Gnani pages inaccessible; no authenticated account access attempted. |
 | 2026-10-31 | Planning outcome | One selected scope, explicit research protocol and initial T01–T23 | All build/results/submission work remains pending. |
 | 2026-10-31 | T00 Owner Capability Audit | Inspected local repos `Anchor` (commit c8b7eb9) and `Hadron` (commit 2492f32) | Verified comfort with FastAPI, Pydantic v2, async HTTPX, and SQLite state tracking. |
-| 2026-10-31 | T03/T04 Scaffold & Service | Built `src/fieldcheck/`, contracts, state machine, static UI; tested `/healthz` | Passes without external dependencies; no credentials committed. |
-| 2026-10-31 | T06 Deterministic Parsing | Implemented `src/fieldcheck/parser.py` with Devanagari conversion, 1-100 Hindi words, physiological age bounds (1-120), calendar dates | 100% unit tests passing in `tests/unit/test_parser.py`. |
+| 2026-10-31 | T03/T04 Scaffold & Service | Built `src/sureword/`, contracts, state machine, static UI; tested `/healthz` | Passes without external dependencies; no credentials committed. |
+| 2026-10-31 | T06 Deterministic Parsing | Implemented `src/sureword/parser.py` with Devanagari conversion, 1-100 Hindi words, physiological age bounds (1-120), calendar dates | 100% unit tests passing in `tests/unit/test_parser.py`. |
 | 2026-10-31 | T07 State Machine & Storage | SQLite versioning, audit logging, idempotent commit, stale version 409 rejection | All invariants passing in `tests/unit/test_state.py`. |
-| 2026-10-31 | T08/T09 Provider & Audio Hardening | Built `src/fieldcheck/providers/gnani.py` and `audio.py`; 10MB/20s bounds, ffmpeg 16kHz mono normalization, serialization lock | Passes in `tests/unit/test_audio.py` and integration tests. |
+| 2026-10-31 | T08/T09 Provider & Audio Hardening | Built `src/sureword/providers/gnani.py` and `audio.py`; 10MB/20s bounds, ffmpeg 16kHz mono normalization, serialization lock | Passes in `tests/unit/test_audio.py` and integration tests. |
 | 2026-10-31 | T11 Split Manifest Freeze | Built `scripts/validate_manifest.py`, verified 0 speaker leakage and 0 sample collision between `data/manifests/dev.jsonl` and `test.jsonl` | Frozen dataset protocol ready. |
-| 2026-10-31 | T12/T13/T17 Policy & Benchmark | Built `src/fieldcheck/policy.py` and `scripts/evaluate.py`; evaluated B0, B1, B2, B3, P | Results saved to `artifacts/evaluation/results.json`. Policy P reduces error from 6.2% to 3.1% at 1 prompt/form. |
+| 2026-10-31 | T12/T13/T17 Policy & Benchmark | Built `src/sureword/policy.py` and `scripts/evaluate.py`; evaluated B0, B1, B2, B3, P | Results saved to `artifacts/evaluation/results.json`. Policy P reduces error from 6.2% to 3.1% at 1 prompt/form. |
 | 2026-10-31 | T15 Quality & CI | Configured `.github/workflows/ci.yml`, ruff (clean), mypy (clean, 0 errors), pytest (30/30 passing) | Local verification commands verified. |
 | 2026-10-31 | Codebase Audit & Hardening | Audited whole codebase; hardened FFmpeg subprocess calls (`-nostdin`, `stdin=subprocess.DEVNULL`), pinned `uv.lock`, verified deployment smoke test | 30/30 pytest passing; deployment smoke test passing 100%. |
 
@@ -577,13 +577,13 @@ A P0 prototype may be submitted with an inconclusive study. Do not mark P1 compl
 - Integrated all seven review responsibilities and Phase A/B/C delivery order without creating extra planning files.
 - Added honest gate states, user-validation measurements and a bounded code-based owner audit (T00).
 - Specified clarification operating points, inference failure denominators, hypothesis outcomes and an explicit error taxonomy.
-- Implemented and verified complete FieldCheck application: contracts, audio normalization, deterministic parser, SQLite state machine, provider adapter with fixture fallback, accessible static frontend, and CI workflow.
+- Implemented and verified complete Sureword application: contracts, audio normalization, deterministic parser, SQLite state machine, provider adapter with fixture fallback, accessible static frontend, and CI workflow.
 - Verified 30/30 unit and integration tests passing; ruff check clean; mypy 0 issues found across 9 source files.
 - Executed benchmark evaluation (`scripts/evaluate.py`) across 5 policies (B0, B1, B2, B3, P) and saved artifact to `artifacts/evaluation/results.json`.
 
 ```yaml
 handoff:
-  project: FieldCheck
+  project: Sureword
   stage: submission_ready
   completed_tasks: [T00, T03, T04, T05, T06, T07, T08, T09, T10, T11, T12, T13, T15, T16, T17, T18, T20, T22]
   deferred_tasks: [T14, T23]

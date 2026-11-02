@@ -2,7 +2,7 @@
 
 import pytest
 
-from fieldcheck.audio import (
+from sureword.audio import (
     AudioValidationError,
     compute_sha256,
     convert_and_normalize_audio,

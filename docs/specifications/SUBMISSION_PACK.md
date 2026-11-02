@@ -1,7 +1,7 @@
-# FieldCheck — Contest Submission, Demo, and Interview Pack
+# Sureword — Contest Submission, Demo, and Interview Pack
 
 > **Great Indian AI Internship Challenge 2026**  
-> **Project:** FieldCheck  
+> **Project:** Sureword  
 > **Author:** Krish Ujeniya  
 > **Track:** Build Sovereign AI for India  
 > **Primary Target Award:** The Real Deal
@@ -11,7 +11,7 @@
 ## 1. Official Nomination Form Draft Answers
 
 ### 1. Project Title
-**FieldCheck: Selective Voice-to-Form Clarification for Frontline Healthcare Visit Entry**
+**Sureword: Selective Voice-to-Form Clarification for Frontline Healthcare Visit Entry**
 
 ### 2. One-Line Summary
 A reliability layer for frontline visit dictation that pairs Gnani Prisma speech recognition with Gnani Timbre spoken clarification to identify and verify uncertain fields before saving.
@@ -19,7 +19,7 @@ A reliability layer for frontline visit dictation that pairs Gnani Prisma speech
 ### 3. Problem Statement & Indian Frontline Context
 In Indian public healthcare workflows (e.g. ASHA household surveys and ANM digital tablet entry described in NHSRC/MoHFW operational guidelines), frontline workers capture structured visit records under noisy conditions and high workloads. 
 
-Standard end-to-end ASR often outputs fluent Hindi-English sentences that mask critical field-level errors—such as a mistranscribed person name, an erroneous age, or an altered village. When workers are forced to repeat entire paragraphs, dictation fatigue sets in. FieldCheck introduces an active uncertainty layer: it transcribes dictation using Gnani Prisma, deterministically validates physiological bounds and schemas, ranks fields by estimated risk, and uses Gnani Timbre to ask the speaker to repeat *only* the single most uncertain field before committing the record locally.
+Standard end-to-end ASR often outputs fluent Hindi-English sentences that mask critical field-level errors—such as a mistranscribed person name, an erroneous age, or an altered village. When workers are forced to repeat entire paragraphs, dictation fatigue sets in. Sureword introduces an active uncertainty layer: it transcribes dictation using Gnani Prisma, deterministically validates physiological bounds and schemas, ranks fields by estimated risk, and uses Gnani Timbre to ask the speaker to repeat *only* the single most uncertain field before committing the record locally.
 
 ### 4. Technical Architecture & Gnani Integration
 - **Speech Recognition:** Integrates Gnani Prisma STT (`POST https://api.vachana.ai/stt/v3`) for conversational Hindi-English speech recognition.
@@ -29,7 +29,7 @@ Standard end-to-end ASR often outputs fluent Hindi-English sentences that mask c
 - **Audit Storage & State Machine:** SQLite transactions enforce strict lifecycle progression (`EMPTY → CAPTURING → TRANSCRIBING → DRAFT → NEEDS_CLARIFICATION → READY_FOR_REVIEW → COMMITTED`). Rejects stale version edits (HTTP 409) and prevents saving unreviewed or unresolved records.
 
 ### 5. Research Novelty & Prior Art Boundaries
-- **Prior Art Distinction:** IndicContextEval benchmarked contextual ASR; DeRAGEC explored candidate denoising; RAS studied model abstention. FieldCheck studies an operational systems question: at a strictly equal clarification budget (maximum 1 repeat prompt per form), does selective risk-ranked verification reduce critical-field errors compared to schema-first or random selection?
+- **Prior Art Distinction:** IndicContextEval benchmarked contextual ASR; DeRAGEC explored candidate denoising; RAS studied model abstention. Sureword studies an operational systems question: at a strictly equal clarification budget (maximum 1 repeat prompt per form), does selective risk-ranked verification reduce critical-field errors compared to schema-first or random selection?
 - **Controlled Baselines:** Evaluated against B0 (raw ASR without prompts), B1 (schema errors first then alphabetical), B2 (seeded random selection), and B3 (unconstrained confirm-all upper bound).
 
 ### 6. Measured Benchmark Outcomes
@@ -50,11 +50,11 @@ Evaluated on frozen, speaker-disjoint test manifests (`data/manifests/test.jsonl
 
 ### LinkedIn Post Draft
 ```text
-I built FieldCheck, an open-source prototype designed to make voice-based frontline visit documentation in India more reliable.
+I built Sureword, an open-source prototype designed to make voice-based frontline visit documentation in India more reliable.
 
 Frontline workers often dictate household visit details in Hindi and English. While automated speech recognition works well on general phrases, critical fields like names, ages, and dates can get mistranscribed. Asking workers to repeat an entire dictation is frustrating and slow.
 
-FieldCheck uses Gnani Prisma for speech-to-text and deterministic parsing to validate four core fields. When a field is ambiguous or out of bounds, the system uses Gnani Timbre to ask for only that specific field through spoken audio before saving.
+Sureword uses Gnani Prisma for speech-to-text and deterministic parsing to validate four core fields. When a field is ambiguous or out of bounds, the system uses Gnani Timbre to ask for only that specific field through spoken audio before saving.
 
 In our controlled benchmark on held-out test recordings:
 - Raw transcription had a 6.2% accepted-field error rate.
@@ -70,7 +70,7 @@ Live Demo & Code: [Insert GitHub / Demo Link]
 
 ### X (Twitter) Post Draft
 ```text
-FieldCheck turns Hindi-English voice into structured visit forms using Gnani Prisma STT + Timbre TTS.
+Sureword turns Hindi-English voice into structured visit forms using Gnani Prisma STT + Timbre TTS.
 
 Instead of re-dictating everything when audio is uncertain, it asks you to repeat only the single most uncertain field.
 
@@ -85,12 +85,12 @@ Demo & code: [Insert Link]
 
 | Time | Visual / Screen Action | Spoken Script / Audio |
 |---|---|---|
-| **0:00–0:08** | Open FieldCheck web interface. Show blank visit form (`person_name`, `age`, `village`, `visit_date`). | *"Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records."* |
+| **0:00–0:08** | Open Sureword web interface. Show blank visit form (`person_name`, `age`, `village`, `visit_date`). | *"Frontline workers dictate household visits in Hindi-English, but a single mistranscribed name or age can quietly corrupt digital records."* |
 | **0:08–0:18** | Click **Start Recording**. Speak: *"मरीज का नाम कमला देवी, उम्र 150 साल, गाँव रामपुर, 30 अक्टूबर 2026"* (intentional out-of-bounds age). | *"Let's dictate a visit with a physiological error: age 150 years."* |
 | **0:18–0:32** | Click **Stop Recording**. Real-time transcript appears; fields populate. Name, Village, and Date show green; **Age** badge turns red (`Needs Repeat`). | *"Gnani Prisma transcribes the audio. Our deterministic parser flags that age 150 is out of valid bounds."* |
 | **0:32–0:46** | Clarification banner appears. Timbre audio plays: *"कृपया मरीज़ की सही उम्र दोबारा बोलिए।"* Click **Speak This Field** and say *"पैंतालीस साल"* (45 years). Age updates to 45 (`Confirmed`). | *"Gnani Timbre speaks up to clarify only the uncertain field. We repeat just the age, and the record updates with full provenance."* |
 | **0:46–0:54** | Form transitions to `READY_FOR_REVIEW`. Click **Verify & Commit Record**. Record ID `REC-20261031-XXXX` generated with clean JSON audit. | *"The record cannot commit until all fields are verified. Review is explicit, and save is idempotent."* |
-| **0:54–1:00** | Flash comparative benchmark card (6.2% → 3.1% error at 1 prompt/form). Display GitHub repository URL. | *"FieldCheck: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub."* |
+| **0:54–1:00** | Flash comparative benchmark card (6.2% → 3.1% error at 1 prompt/form). Display GitHub repository URL. | *"Sureword: selective clarification for sovereign speech workflows. Code and benchmarks on GitHub."* |
 
 ---
 

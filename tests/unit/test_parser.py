@@ -2,8 +2,8 @@
 
 from datetime import date
 
-from fieldcheck.contracts import FieldKey, FieldStatus
-from fieldcheck.parser import (
+from sureword.contracts import FieldKey, FieldStatus
+from sureword.parser import (
     convert_devanagari_digits,
     normalize_number,
     parse_age,

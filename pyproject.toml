@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "fieldcheck"
+name = "sureword"
 version = "0.1.0"
-description = "FieldCheck: Selective voice-to-form clarification for frontline healthcare visits using Gnani Prisma & Timbre"
+description = "Sureword: Selective voice-to-form clarification for frontline healthcare visits using Gnani Prisma & Timbre"
 authors = [{ name = "Krish Ujeniya" }]
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,7 +31,7 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fieldcheck"]
+packages = ["src/sureword"]
 
 [tool.ruff]
 line-length = 100

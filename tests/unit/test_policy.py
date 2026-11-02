@@ -1,7 +1,7 @@
 """Unit tests for risk assessment and clarification selection policies."""
 
-from fieldcheck.contracts import FieldStatus, FieldValue
-from fieldcheck.policy import (
+from sureword.contracts import FieldStatus, FieldValue
+from sureword.policy import (
     compute_field_risk,
     rank_fields_by_risk,
     select_clarification_field_b1,
@@ -26,10 +26,16 @@ def test_compute_field_risk_levels() -> None:
 
 def test_rank_fields_by_risk() -> None:
     fields = {
-        "person_name": FieldValue(key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED),
+        "person_name": FieldValue(
+            key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED
+        ),
         "age": FieldValue(key="age", status=FieldStatus.MISSING),
-        "village": FieldValue(key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED),
-        "visit_date": FieldValue(key="visit_date", canonical_value="2026-10-30", status=FieldStatus.PROPOSED),
+        "village": FieldValue(
+            key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED
+        ),
+        "visit_date": FieldValue(
+            key="visit_date", canonical_value="2026-10-30", status=FieldStatus.PROPOSED
+        ),
     }
 
     ranked = rank_fields_by_risk(fields)
@@ -39,10 +45,16 @@ def test_rank_fields_by_risk() -> None:
 
 def test_select_clarification_p() -> None:
     fields = {
-        "person_name": FieldValue(key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED),
+        "person_name": FieldValue(
+            key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED
+        ),
         "age": FieldValue(key="age", status=FieldStatus.NEEDS_REPEAT),
-        "village": FieldValue(key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED),
-        "visit_date": FieldValue(key="visit_date", canonical_value="2026-10-30", status=FieldStatus.USER_CONFIRMED),
+        "village": FieldValue(
+            key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED
+        ),
+        "visit_date": FieldValue(
+            key="visit_date", canonical_value="2026-10-30", status=FieldStatus.USER_CONFIRMED
+        ),
     }
     attempts: dict[str, int] = {}
 
@@ -53,10 +65,14 @@ def test_select_clarification_p() -> None:
 
 def test_select_clarification_b1() -> None:
     fields = {
-        "person_name": FieldValue(key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED),
+        "person_name": FieldValue(
+            key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED
+        ),
         "age": FieldValue(key="age", canonical_value="45", status=FieldStatus.PROPOSED),
         "village": FieldValue(key="village", canonical_value="Rampur", status=FieldStatus.PROPOSED),
-        "visit_date": FieldValue(key="visit_date", canonical_value="2026-10-30", status=FieldStatus.PROPOSED),
+        "visit_date": FieldValue(
+            key="visit_date", canonical_value="2026-10-30", status=FieldStatus.PROPOSED
+        ),
     }
     attempts: dict[str, int] = {}
 
@@ -67,7 +83,9 @@ def test_select_clarification_b1() -> None:
 
 def test_select_clarification_b2() -> None:
     fields = {
-        "person_name": FieldValue(key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED),
+        "person_name": FieldValue(
+            key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED
+        ),
         "age": FieldValue(key="age", canonical_value="45", status=FieldStatus.PROPOSED),
     }
     attempts: dict[str, int] = {}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Automated deployment verification and smoke test runner for FieldCheck.
+"""Automated deployment verification and smoke test runner for Sureword.
 
 Exercises health check, static asset serving, draft lifecycle, audio conversion,
 field parsing, clarification, idempotent commit, and session cleanup.
@@ -35,7 +35,7 @@ def generate_test_wav(duration_s: float = 0.5, sample_rate: int = 16000) -> byte
 
 def run_deployment_check(base_url: str) -> None:
     print("=================================================================")
-    print(f"FieldCheck — Deployment Smoke Verification: {base_url}")
+    print(f"Sureword — Deployment Smoke Verification: {base_url}")
     print("=================================================================\n")
 
     client = httpx.Client(base_url=base_url, timeout=15.0)
@@ -58,7 +58,7 @@ def run_deployment_check(base_url: str) -> None:
     try:
         res = client.get("/")
         elapsed = (time.perf_counter() - t0) * 1000.0
-        if res.status_code == 200 and "FieldCheck" in res.text:
+        if res.status_code == 200 and "Sureword" in res.text:
             checks.append(("GET / (UI)", True, elapsed, "OK (HTML served)"))
         else:
             checks.append(("GET / (UI)", False, elapsed, f"Failed (HTTP {res.status_code})"))
@@ -96,9 +96,23 @@ def run_deployment_check(base_url: str) -> None:
         if res.status_code == 200:
             d_res = res.json()
             curr_v = d_res["draft"]["version"]
-            checks.append(("POST /api/drafts/{id}/audio", True, elapsed, f"OK (v{curr_v}, state: {d_res['draft']['state']})"))
+            checks.append(
+                (
+                    "POST /api/drafts/{id}/audio",
+                    True,
+                    elapsed,
+                    f"OK (v{curr_v}, state: {d_res['draft']['state']})",
+                )
+            )
         else:
-            checks.append(("POST /api/drafts/{id}/audio", False, elapsed, f"HTTP {res.status_code}: {res.text[:100]}"))
+            checks.append(
+                (
+                    "POST /api/drafts/{id}/audio",
+                    False,
+                    elapsed,
+                    f"HTTP {res.status_code}: {res.text[:100]}",
+                )
+            )
     except Exception as ex:
         checks.append(("POST /api/drafts/{id}/audio", False, 0.0, f"Error: {ex}"))
 
@@ -117,9 +131,18 @@ def run_deployment_check(base_url: str) -> None:
         if res.status_code == 200:
             d_res = res.json()
             curr_v = d_res["version"]
-            checks.append(("POST /api/drafts/{id}/clarify", True, elapsed, f"OK (v{curr_v}, person_name verified)"))
+            checks.append(
+                (
+                    "POST /api/drafts/{id}/clarify",
+                    True,
+                    elapsed,
+                    f"OK (v{curr_v}, person_name verified)",
+                )
+            )
         else:
-            checks.append(("POST /api/drafts/{id}/clarify", False, elapsed, f"HTTP {res.status_code}"))
+            checks.append(
+                ("POST /api/drafts/{id}/clarify", False, elapsed, f"HTTP {res.status_code}")
+            )
     except Exception as ex:
         checks.append(("POST /api/drafts/{id}/clarify", False, 0.0, f"Error: {ex}"))
 
@@ -157,7 +180,14 @@ def run_deployment_check(base_url: str) -> None:
             rec_id = res.json().get("record_id")
             checks.append(("POST /api/drafts/{id}/commit", True, elapsed, f"OK ({rec_id})"))
         else:
-            checks.append(("POST /api/drafts/{id}/commit", False, elapsed, f"HTTP {res.status_code}: {res.text[:100]}"))
+            checks.append(
+                (
+                    "POST /api/drafts/{id}/commit",
+                    False,
+                    elapsed,
+                    f"HTTP {res.status_code}: {res.text[:100]}",
+                )
+            )
     except Exception as ex:
         checks.append(("POST /api/drafts/{id}/commit", False, 0.0, f"Error: {ex}"))
 
@@ -198,8 +228,10 @@ def print_summary_and_exit(checks: list[tuple[str, bool, float, str]]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="FieldCheck Deployment Verification")
-    parser.add_argument("--base-url", type=str, default="http://127.0.0.1:8000", help="Base URL of deployment")
+    parser = argparse.ArgumentParser(description="Sureword Deployment Verification")
+    parser.add_argument(
+        "--base-url", type=str, default="http://127.0.0.1:8000", help="Base URL of deployment"
+    )
     args = parser.parse_args()
 
     run_deployment_check(args.base_url)

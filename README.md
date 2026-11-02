@@ -1,4 +1,4 @@
-# FieldCheck
+# Sureword
 
 > **Voice-to-Form Frontline Visit Entry with Selective Clarification**  
 > Built for the Great Indian AI Internship Challenge 2026.  
@@ -10,7 +10,7 @@
 
 In Indian frontline healthcare workflows (such as ASHA household survey visits and ANM tablet entry), workers collect critical structured information under noisy conditions and time pressure. Standard automated speech recognition (ASR) outputs often look fluent while silently transcribing critical fields incorrectly—such as patient name, age, village, or visit date.
 
-**FieldCheck** introduces a selective clarification reliability layer:
+**Sureword** introduces a selective clarification reliability layer:
 1. Dictation of visit details in conversational Hindi-English code-mix.
 2. Transcription via **Gnani Prisma**.
 3. Deterministic parsing and physiological/format validation into four core fields (`person_name`, `age`, `village`, `visit_date`).
@@ -67,7 +67,7 @@ This repository follows production-grade FAANG/Tier-1 engineering standards, usi
 │       └── TRACKER.md            # Execution tracker, task milestones, and evidence ledger
 │
 ├── src/                          # Application source code (PyPA src-layout)
-│   └── fieldcheck/
+│   └── sureword/
 │       ├── py.typed              # PEP 561 inline type indicator
 │       ├── __init__.py           # Package initialization
 │       ├── app.py                # FastAPI endpoints, lifespan, and static mounting
@@ -124,7 +124,8 @@ This repository follows production-grade FAANG/Tier-1 engineering standards, usi
 
 ```bash
 # Clone and enter directory
-cd /path/to/gnani
+git clone https://github.com/krishujeniya/Sureword.git
+cd Sureword
 
 # Quick setup with Makefile (creates venv and installs all dependencies)
 make install
@@ -141,7 +142,7 @@ cp .env.example .env
 make dev
 
 # Or directly with Uvicorn
-uv run python -m uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000 --reload
+uv run python -m uvicorn sureword.app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Open `http://127.0.0.1:8000` in your web browser.
@@ -150,7 +151,7 @@ Open `http://127.0.0.1:8000` in your web browser.
 
 ## 4. Verification & Testing
 
-FieldCheck adheres to strict verification discipline:
+Sureword adheres to strict verification discipline:
 
 ```bash
 # Run unit and integration tests

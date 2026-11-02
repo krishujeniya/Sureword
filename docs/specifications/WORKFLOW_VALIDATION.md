@@ -1,4 +1,4 @@
-# FieldCheck — Frontline Healthcare Workflow Validation & Usability Protocol
+# Sureword — Frontline Healthcare Workflow Validation & Usability Protocol
 
 > **Document ID:** DOC-FC-WF-01  
 > **Target Task:** T05 (Workflow Validation & Usability Protocol)  
@@ -23,13 +23,13 @@ In India's primary healthcare network, Accredited Social Health Activists (ASHAs
 
 ## 2. Formative Usability Trial Protocol
 
-To evaluate the operational acceptability of FieldCheck prior to clinical trials, a counterbalanced formative usability protocol was designed using fictional visit records.
+To evaluate the operational acceptability of Sureword prior to clinical trials, a counterbalanced formative usability protocol was designed using fictional visit records.
 
 ### Methodology
 - **Participants:** 2 domain-informed volunteer participants (representing frontline data entry tasks).
 - **Task:** Enter 6 fictional household visit records across two matched difficulty sets:
   - **Condition A (Baseline):** Manual keypad typing on a mobile device form.
-  - **Condition B (FieldCheck):** Code-mixed Hindi-English voice dictation with selective Timbre clarification.
+  - **Condition B (Sureword):** Code-mixed Hindi-English voice dictation with selective Timbre clarification.
 - **Counterbalancing:** Participant 1 completed Condition A followed by Condition B; Participant 2 completed Condition B followed by Condition A.
 - **Test Scenarios Evaluated:**
   1. *Clean visit dictation* (all 4 fields valid on first pass).
@@ -43,7 +43,7 @@ To evaluate the operational acceptability of FieldCheck prior to clinical trials
 
 ## 3. Usability Findings & Metrics
 
-| Metric | Condition A (Manual Typing) | Condition B (FieldCheck Voice + Timbre) | Delta / Impact |
+| Metric | Condition A (Manual Typing) | Condition B (Sureword Voice + Timbre) | Delta / Impact |
 |---|---|---|---|
 | **Mean Task Completion Time** | 38.4 seconds / form | 14.2 seconds / form | **63% reduction in entry time** |
 | **Cognitive Interruption Rate** | Continuous typing focus | Interrupted only when prompt sounded (avg 1 turn) | Significantly reduced manual fatigue |
@@ -60,7 +60,7 @@ To evaluate the operational acceptability of FieldCheck prior to clinical trials
 ## 4. Ethical Boundaries & Scope Limitations
 
 1. **Simulated Cohort Disclosure:** This formative usability trial was conducted with consenting volunteer proxies on fictional demographic records. It does **not** constitute a formal clinical trial on active ASHA personnel.
-2. **No Diagnostic Functionality:** FieldCheck acts strictly as a structured demographic intake tool (`person_name`, `age`, `village`, `visit_date`). It does not record clinical symptoms, prescribe medication, or compute diagnostic scores.
+2. **No Diagnostic Functionality:** Sureword acts strictly as a structured demographic intake tool (`person_name`, `age`, `village`, `visit_date`). It does not record clinical symptoms, prescribe medication, or compute diagnostic scores.
 3. **Pre-Requisite for Field Deployment:** Real-world primary health center (PHC) rollout requires:
    - Institutional Review Board (IRB) / Ethics Committee clearance.
    - Formal data protection compliance with the Digital Personal Data Protection (DPDP) Act 2023.

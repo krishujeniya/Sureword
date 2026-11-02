@@ -1,4 +1,4 @@
-"""FastAPI application for FieldCheck."""
+"""FastAPI application for Sureword."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile, st
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from fieldcheck.audio import AudioValidationError, convert_and_normalize_audio
-from fieldcheck.contracts import (
+from sureword.audio import AudioValidationError, convert_and_normalize_audio
+from sureword.contracts import (
     AudioProcessResponse,
     CommitRequest,
     CommitResponse,
@@ -22,21 +22,21 @@ from fieldcheck.contracts import (
     FieldStatus,
     FieldValue,
 )
-from fieldcheck.parser import (
+from sureword.parser import (
     parse_age,
     parse_date,
     parse_person_name,
     parse_village,
     parse_visit_form,
 )
-from fieldcheck.providers.gnani import GnaniClient, GnaniProviderError
-from fieldcheck.state import DraftStateMachine, StateTransitionError
-from fieldcheck.storage import Storage
+from sureword.providers.gnani import GnaniClient, GnaniProviderError
+from sureword.state import DraftStateMachine, StateTransitionError
+from sureword.storage import Storage
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-DB_PATH = os.getenv("DATABASE_PATH", "fieldcheck.db")
+DB_PATH = os.getenv("DATABASE_PATH", "sureword.db")
 
 # Components
 storage = Storage(db_path=DB_PATH)
@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
 
 app = FastAPI(
-    title="FieldCheck API",
+    title="Sureword API",
     description="Selective voice-to-form clarification for frontline healthcare visit entry",
     version="0.1.0",
     lifespan=lifespan,
@@ -124,11 +124,7 @@ async def process_draft_audio(
             raise HTTPException(status_code=409, detail=str(ste)) from ste
         raise HTTPException(status_code=400, detail=str(ste)) from ste
 
-    next_act = (
-        "CLARIFY"
-        if updated_draft.state == DraftState.NEEDS_CLARIFICATION
-        else "REVIEW"
-    )
+    next_act = "CLARIFY" if updated_draft.state == DraftState.NEEDS_CLARIFICATION else "REVIEW"
 
     return AudioProcessResponse(
         draft=updated_draft,
@@ -147,7 +143,9 @@ async def clarify_field(
 ) -> Draft:
     """Apply targeted clarification via typed manual edit or repeated voice."""
     if not manual_value and not audio_file:
-        raise HTTPException(status_code=400, detail="Must provide either manual_value or audio_file")
+        raise HTTPException(
+            status_code=400, detail="Must provide either manual_value or audio_file"
+        )
 
     if manual_value is not None and manual_value.strip():
         # Manual edit takes precedence
@@ -170,7 +168,9 @@ async def clarify_field(
         try:
             transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
         except GnaniProviderError as gpe:
-            raise HTTPException(status_code=502, detail=f"Speech clarification error: {gpe}") from gpe
+            raise HTTPException(
+                status_code=502, detail=f"Speech clarification error: {gpe}"
+            ) from gpe
 
         # Targeted parser for specific field
         if target_field == FieldKey.PERSON_NAME.value:

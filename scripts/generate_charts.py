@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate publication-ready evaluation charts for FieldCheck.
+"""Generate publication-ready evaluation charts for Sureword.
 
 Reads artifacts/evaluation/results.json and produces:
 - artifacts/evaluation/error_vs_burden.png
@@ -42,7 +42,7 @@ def generate_charts(results_path: Path, output_dir: Path) -> None:
         "B0": "#64748b",  # slate
         "B1": "#0284c7",  # sky blue
         "B2": "#eab308",  # yellow
-        "P": "#16a34a",   # emerald green
+        "P": "#16a34a",  # emerald green
         "B3": "#8b5cf6",  # purple
     }
 
@@ -53,14 +53,17 @@ def generate_charts(results_path: Path, output_dir: Path) -> None:
 
     # --- Chart 1: Error vs. Clarification Burden ---
     plt.figure(figsize=(8, 5.5), dpi=300)
-    plt.style.use("seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default")
+    plt.style.use(
+        "seaborn-v0_8-whitegrid" if "seaborn-v0_8-whitegrid" in plt.style.available else "default"
+    )
 
     for p in policies:
         x = data[p]["realized_clarification_burden"]
         y = data[p]["primary_accepted_field_error"] * 100
         size = 180 if p == "P" else 130
         plt.scatter(
-            x, y,
+            x,
+            y,
             color=colors[p],
             s=size,
             label=labels[p],
@@ -77,12 +80,19 @@ def generate_charts(results_path: Path, output_dir: Path) -> None:
             fontsize=9,
         )
 
-    plt.title("FieldCheck: Critical-Field Error vs. Clarification Burden", fontsize=12, fontweight="bold", pad=12)
+    plt.title(
+        "Sureword: Critical-Field Error vs. Clarification Burden",
+        fontsize=12,
+        fontweight="bold",
+        pad=12,
+    )
     plt.xlabel("Realized Clarification Burden (prompts / form)", fontsize=10, labelpad=8)
     plt.ylabel("Primary Accepted-Field Error (%)", fontsize=10, labelpad=8)
     plt.ylim(-0.5, max(errors) + 2.0)
     plt.xlim(-0.2, 4.5)
-    plt.axvline(1.0, color="#94a3b8", linestyle="--", alpha=0.7, label="Budget Limit (1.0 prompt/form)")
+    plt.axvline(
+        1.0, color="#94a3b8", linestyle="--", alpha=0.7, label="Budget Limit (1.0 prompt/form)"
+    )
     plt.legend(frameon=True, loc="upper right", fontsize=9)
     plt.tight_layout()
 
@@ -96,11 +106,43 @@ def generate_charts(results_path: Path, output_dir: Path) -> None:
     x = np.arange(len(policies))
     width = 0.25
 
-    plt.bar(x - width, errors, width, label="Primary Error (%)", color="#ef4444", alpha=0.9, edgecolor="black", linewidth=0.8)
-    plt.bar(x, coverages, width, label="Coverage (%)", color="#0284c7", alpha=0.9, edgecolor="black", linewidth=0.8)
-    plt.bar(x + width, correctness, width, label="Whole-Record Correctness (%)", color="#16a34a", alpha=0.9, edgecolor="black", linewidth=0.8)
+    plt.bar(
+        x - width,
+        errors,
+        width,
+        label="Primary Error (%)",
+        color="#ef4444",
+        alpha=0.9,
+        edgecolor="black",
+        linewidth=0.8,
+    )
+    plt.bar(
+        x,
+        coverages,
+        width,
+        label="Coverage (%)",
+        color="#0284c7",
+        alpha=0.9,
+        edgecolor="black",
+        linewidth=0.8,
+    )
+    plt.bar(
+        x + width,
+        correctness,
+        width,
+        label="Whole-Record Correctness (%)",
+        color="#16a34a",
+        alpha=0.9,
+        edgecolor="black",
+        linewidth=0.8,
+    )
 
-    plt.title("FieldCheck: Comparative Metric Profiles Across Policies", fontsize=12, fontweight="bold", pad=12)
+    plt.title(
+        "Sureword: Comparative Metric Profiles Across Policies",
+        fontsize=12,
+        fontweight="bold",
+        pad=12,
+    )
     plt.xlabel("Verification Policy", fontsize=10, labelpad=8)
     plt.ylabel("Percentage (%)", fontsize=10, labelpad=8)
     plt.xticks(x, [labels[p] for p in policies], fontsize=9)
@@ -115,7 +157,7 @@ def generate_charts(results_path: Path, output_dir: Path) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate FieldCheck evaluation charts")
+    parser = argparse.ArgumentParser(description="Generate Sureword evaluation charts")
     parser.add_argument("--results", type=Path, default=Path("artifacts/evaluation/results.json"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/evaluation"))
     args = parser.parse_args()

@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from fieldcheck.contracts import (
+from sureword.contracts import (
     Draft,
     DraftState,
     FieldKey,
@@ -13,8 +13,8 @@ from fieldcheck.contracts import (
     FieldValue,
     Transcript,
 )
-from fieldcheck.policy import select_clarification_field_p
-from fieldcheck.storage import Storage
+from sureword.policy import select_clarification_field_p
+from sureword.storage import Storage
 
 
 class StateTransitionError(Exception):
@@ -72,13 +72,18 @@ class DraftStateMachine:
             )
 
         if draft.state == DraftState.COMMITTED:
-            raise StateTransitionError("Cannot modify an already committed draft", "ALREADY_COMMITTED")
+            raise StateTransitionError(
+                "Cannot modify an already committed draft", "ALREADY_COMMITTED"
+            )
 
         # Update fields
         for k, new_f in parsed_fields.items():
             current_f = draft.fields.get(k)
             # If current field was already manually edited or confirmed, preserve unless new turn explicitly overrides
-            if current_f and current_f.status in {FieldStatus.MANUALLY_EDITED, FieldStatus.USER_CONFIRMED}:
+            if current_f and current_f.status in {
+                FieldStatus.MANUALLY_EDITED,
+                FieldStatus.USER_CONFIRMED,
+            }:
                 continue
             draft.fields[k] = new_f
 
@@ -122,7 +127,9 @@ class DraftStateMachine:
             )
 
         if draft.state == DraftState.COMMITTED:
-            raise StateTransitionError("Cannot modify an already committed draft", "ALREADY_COMMITTED")
+            raise StateTransitionError(
+                "Cannot modify an already committed draft", "ALREADY_COMMITTED"
+            )
 
         # Update field and track attempts
         draft.fields[target_field] = updated_field
@@ -175,7 +182,11 @@ class DraftStateMachine:
             FieldKey.VISIT_DATE.value,
         ):
             f = draft.fields.get(k)
-            if not f or f.status in {FieldStatus.MISSING, FieldStatus.NEEDS_REPEAT} or not f.canonical_value:
+            if (
+                not f
+                or f.status in {FieldStatus.MISSING, FieldStatus.NEEDS_REPEAT}
+                or not f.canonical_value
+            ):
                 raise StateTransitionError(
                     f"Cannot commit: field '{k}' is unresolved ({f.status if f else 'missing'})",
                     "UNRESOLVED_FIELD",
