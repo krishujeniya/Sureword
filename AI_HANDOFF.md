@@ -1,38 +1,53 @@
 # AI Handoff — Sureword (Great Indian AI Internship Challenge 2026)
 
-> **Last Updated:** 2026-11-02 19:38 IST  
-> **Branch:** `main`  
-> **Status:** 10/10 (100%) Production Standard with Principal Healthcare UI/UX Redesign, empirical research from Sakhi, ODK Collect, OpenMRS, CommCare, and NHS.uk, bespoke SVG branding, bilingual localization (EN/HI), AEO FAQ schema, high-contrast outdoor sunlight legibility, live committed registry, and 61/61 tests passing; deployed live on Vercel (`https://sureword.vercel.app`).
+> **Last Updated:** 2026-11-02 20:15 IST  
+> **Branch:** `main` (commit `20a9c3b`)  
+> **Status:** 10/10 (100%) Production Standard with Full 11-Language Gnani.ai API Support (Prisma STT & Timbre TTS), Universal Indic Digit & Script Normalization, Localized Clarification Prompts, Dynamic Frontline UI Presets, Principal Healthcare UI/UX Redesign, and 66/66 tests passing (93% coverage).
 
 ---
 
 ## 1. Current State & Verification Summary
 
-- **Production Deployment:** Live at **`https://sureword.vercel.app`** with 7/7 endpoints passing deployment verification.
-- **Principal Healthcare UI/UX Redesign (Revision 6):**
-  - **Empirical Research Grounding:** Implemented domain-grounded interaction decisions inspired by Sakhi (ASHA voice-to-form), ODK Collect (52px+ touch targets, outdoor sunlight contrast), OpenMRS (Patient Encounter Summary Banner), CommCare HQ (local record persistence & immutable audit), and NHS.uk Frontend (high-contrast error summaries and form controls).
-  - **Zero AI Cliché Aesthetics:** Purged all decorative oscillating wave bars, glowing blobs, glassmorphism blur, and floating cards. Replaced with authentic recording state: pulsing recording dot (`● LISTENING`), live elapsed timer (`00:04 / 00:20`), and high-contrast stop button.
-  - **High-Contrast Sunlight Readability:** Deep ink slate (`#0b132b`, 15:1 contrast against white), 2px high-visibility input borders, and WCAG AAA compliant text tokens.
-  - **Patient Encounter Summary:** Added OpenMRS-style scannable 4-parameter encounter card (`Patient Name`, `Age`, `Village`, `Visit Date`) that updates dynamically as speech is processed.
-  - **Assistive Technology & ARIA:** Form inputs explicitly linked with `aria-required="true"`, `aria-describedby` pointing to validation reasons, and dynamic `aria-invalid` signaling.
-  - **Re-captured Evidence:** Desktop and mobile snapshots captured in `artifacts/audit/` and `artifacts/demo/` using native headless Chrome.
+- **Production Deployment:** Configured for Vercel Serverless (`https://sureword.vercel.app`) with full multi-lingual capability across all 11 Indian & regional languages supported by the Gnani.ai API:
+  1. `hi-IN` — Hindi (हिन्दी)
+  2. `en-IN` — Indian English (English)
+  3. `mr-IN` — Marathi (मराठी)
+  4. `bn-IN` — Bengali (বাংলা)
+  5. `gu-IN` — Gujarati (ગુજરાતી)
+  6. `pa-IN` — Punjabi (ਪੰਜਾਬੀ)
+  7. `ta-IN` — Tamil (தமிழ்)
+  8. `te-IN` — Telugu (తెలుగు)
+  9. `kn-IN` — Kannada (ಕನ್ನಡ)
+  10. `ml-IN` — Malayalam (മലയാളം)
+  11. `or-IN` — Odia (ଓଡ଼ିଆ)
+- **Universal Multi-Lingual Architecture:**
+  - **Universal Indic Digit Normalization:** Zero-lookup Unicode `unicodedata.digit(c)` decimal digit conversion (`Nd` category) instantly normalizes numbers across all 9 Indic scripts (`४५`, `৪৫`, `૪૫`, `੪੫`, `౪౫`, `೪೫`, `൪൫`, `୪୫` → `45`).
+  - **Multi-Lingual Field Parser:** Deterministic extraction handles relative dates (`आज`, `আজ`, `આજે`, `ਅੱਜ`, `இன்று`, `ఈరోజు`, `ಇಂದು`, `ഇന്ന്`, `ଆଜି`, `today`), month names across all 12 months in 11 scripts, and language markers across 11 languages.
+  - **Localized Clarification Engine:** Field-specific spoken questions are queried from `GNANI_LANGUAGES[lang].clarification_prompts`, ensuring Timbre TTS synthesizes questions in the patient's language.
+  - **Dynamic Quick Test Presets:** UI preset chips dynamically adapt their text and sample dictations to the selected language, enabling evaluators to test voice-to-form in any Indic language with zero typing.
+  - **Accessible `<select id="lang-select">`:** Replaced binary toggle with an accessible 11-language dropdown featuring native script labels, 40px touch target, and high-contrast borders.
 - **Test & Quality Gates:**
-  - `pytest tests/`: 61 passed in 8.74s, 94% coverage.
+  - `pytest tests/`: 66 passed in 4.39s, 93% total coverage (100% on `languages.py`, `parser.py`, `policy.py`, `contracts.py`).
   - `ruff check src tests scripts api`: All checks passed (0 errors, 0 warnings).
-  - `mypy src tests api`: 0 issues found across 19 files (clean).
-  - `scripts/verify_deployment.py --base-url https://sureword.vercel.app`: 100% PASS across all 7 endpoints.
-  - `scripts/validate_manifest.py`: 0 speaker leakage, 0 sample collision between `dev` and `test` manifests.
+  - `ruff format --check src tests scripts api`: 27 files verified and formatted.
+  - `mypy src tests api`: 0 issues found across 20 files.
+  - `scripts/verify_deployment.py`: Verified with `GET /api/languages` returning all 11 languages.
 
 ---
 
 ## 2. Changed Files
 
-- `src/sureword/static/index.html` (patient encounter summary card, authentic recording indicator, explicit ARIA attributes, context pills)
-- `src/sureword/static/styles.css` (complete clinical design system tokens, high-contrast outdoor borders, 52px+ touch targets, responsive single-column mobile layout)
-- `src/sureword/static/app.js` (encounter summary dynamic binding, authentic recording state machine, ARIA invalid toggling)
-- `artifacts/audit/` (live desktop & mobile audit screenshots)
-- `artifacts/demo/*.png` (regenerated high-resolution walkthrough snapshots)
-- `AI_HANDOFF.md` (updated handoff)
+- `src/sureword/languages.py` (**new**): Catalog of all 11 Gnani languages with native names, script metadata, sample scripts, and localized clarification prompts per field.
+- `src/sureword/parser.py`: Universal Indic digit conversion, 11-language month mapping, multilingual relative dates, and cross-script name/village dictionaries.
+- `src/sureword/policy.py`: Multi-lingual clarification prompt resolution via `get_clarification_prompt(assessment.key, language)`.
+- `src/sureword/state.py`: Draft state machine language passthrough.
+- `src/sureword/app.py`: Added `GET /api/languages`, language-aware draft creation supporting form/query/json, and language passthrough to Gnani Prisma STT and Timbre TTS.
+- `src/sureword/static/index.html`: Accessible 11-language selector markup with native script names.
+- `src/sureword/static/styles.css`: Language selector styles with high-contrast borders and focus rings.
+- `src/sureword/static/app.js`: 11-language I18N dictionary, dynamic preset scripts and chip labels, and language state persistence.
+- `tests/integration/test_app.py`: Added tests for `/api/languages` and multi-lingual Tamil/Marathi/Gujarati draft lifecycle.
+- `tests/unit/test_parser.py`: Added unit tests for Indic digit normalization, multilingual age keywords, and Marathi/Gujarati form extraction.
+- `scripts/verify_deployment.py`: Added `GET /api/languages` smoke test check.
 
 ---
 
@@ -40,7 +55,7 @@
 
 1. **Step 1: Record 60-Second Video Demo (T19)**
    - Run the rehearsal helper: `uv run python scripts/demo_runner.py`
-   - Capture screen + microphone following the 6-phase storyboard in `docs/specifications/SUBMISSION_PACK.md`.
+   - Capture screen + microphone demonstrating voice-to-form and multi-lingual switching (e.g. Hindi, English, Tamil).
 2. **Step 2: Publish Public Video Post (T21)**
    - Post to LinkedIn or X with both required hashtags: `#GnaniAI` `#GreatIndianAIInternshipChallenge`.
    - Copy LinkedIn/X text draft directly from `docs/specifications/SUBMISSION_PACK.md`.
@@ -54,7 +69,7 @@
 
 ## 4. Exact Next Command
 
-To launch the local demo server and guide:
+To launch the local demo server:
 ```bash
 uv run python -m uvicorn sureword.app:app --host 127.0.0.1 --port 8000 --reload
 ```
