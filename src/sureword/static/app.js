@@ -265,14 +265,17 @@ function resetFormUI() {
 }
 
 function updateStateUI(state, version) {
-  stateBadge.textContent = state;
-  versionBadge.textContent = `v${version}`;
-
-  stateBadge.className = "badge " + (
-    state === "READY_FOR_REVIEW" ? "badge-live" :
-    state === "NEEDS_CLARIFICATION" ? "badge-fixture" :
-    state === "COMMITTED" ? "badge-live" : "badge-neutral"
-  );
+  if (stateBadge) {
+    stateBadge.textContent = state;
+    stateBadge.className = "badge " + (
+      state === "READY_FOR_REVIEW" ? "badge-live" :
+      state === "NEEDS_CLARIFICATION" ? "badge-fixture" :
+      state === "COMMITTED" ? "badge-live" : "badge-neutral"
+    );
+  }
+  if (versionBadge) {
+    versionBadge.textContent = `v${version}`;
+  }
 }
 
 function renderDraft(draft) {
@@ -730,31 +733,25 @@ function exportRegistryJSON() {
 
 // Navigation Tabs Switcher
 function switchTab(targetView) {
-  [tabFormBtn, tabRegistryBtn, tabScienceBtn].forEach((btn) => {
-    btn.classList.remove("active");
-    btn.setAttribute("aria-selected", "false");
-  });
-  [viewForm, viewRegistry, viewScience].forEach((panel) => {
-    panel.classList.remove("active");
-    panel.classList.add("hidden");
-  });
+  if (tabFormBtn) {
+    tabFormBtn.classList.toggle("active", targetView === "form");
+    tabFormBtn.setAttribute("aria-selected", targetView === "form" ? "true" : "false");
+  }
+  if (tabRegistryBtn) {
+    tabRegistryBtn.classList.toggle("active", targetView === "registry");
+    tabRegistryBtn.setAttribute("aria-selected", targetView === "registry" ? "true" : "false");
+  }
 
-  if (targetView === "form") {
-    tabFormBtn.classList.add("active");
-    tabFormBtn.setAttribute("aria-selected", "true");
-    viewForm.classList.add("active");
-    viewForm.classList.remove("hidden");
-  } else if (targetView === "registry") {
-    tabRegistryBtn.classList.add("active");
-    tabRegistryBtn.setAttribute("aria-selected", "true");
-    viewRegistry.classList.add("active");
-    viewRegistry.classList.remove("hidden");
-    loadCommittedRecords();
-  } else if (targetView === "science") {
-    tabScienceBtn.classList.add("active");
-    tabScienceBtn.setAttribute("aria-selected", "true");
-    viewScience.classList.add("active");
-    viewScience.classList.remove("hidden");
+  if (viewForm) {
+    viewForm.classList.toggle("active", targetView === "form");
+    viewForm.classList.toggle("hidden", targetView !== "form");
+  }
+  if (viewRegistry) {
+    viewRegistry.classList.toggle("active", targetView === "registry");
+    viewRegistry.classList.toggle("hidden", targetView !== "registry");
+    if (targetView === "registry") {
+      loadCommittedRecords();
+    }
   }
 }
 
@@ -762,9 +759,8 @@ function switchTab(targetView) {
 function setupEventListeners() {
   langToggleBtn.addEventListener("click", toggleLanguage);
 
-  tabFormBtn.addEventListener("click", () => switchTab("form"));
-  tabRegistryBtn.addEventListener("click", () => switchTab("registry"));
-  tabScienceBtn.addEventListener("click", () => switchTab("science"));
+  if (tabFormBtn) tabFormBtn.addEventListener("click", () => switchTab("form"));
+  if (tabRegistryBtn) tabRegistryBtn.addEventListener("click", () => switchTab("registry"));
 
   newDraftBtn.addEventListener("click", initNewDraft);
   recordBtn.addEventListener("click", toggleRecording);
@@ -780,12 +776,23 @@ function setupEventListeners() {
   exportCsvBtn.addEventListener("click", exportRegistryCSV);
   exportJsonBtn.addEventListener("click", exportRegistryJSON);
 
-  copyJsonBtn.addEventListener("click", () => {
-    navigator.clipboard.writeText(savedJson.textContent).then(() => {
-      copyJsonBtn.textContent = "✓ Copied!";
-      setTimeout(() => { copyJsonBtn.textContent = I18N[currentLanguage].btn_copy_json; }, 2000);
+  const viewInRegistryBtn = document.getElementById("view-in-registry-btn");
+  if (viewInRegistryBtn) {
+    viewInRegistryBtn.addEventListener("click", () => switchTab("registry"));
+  }
+  const startNextDraftBtn = document.getElementById("start-next-draft-btn");
+  if (startNextDraftBtn) {
+    startNextDraftBtn.addEventListener("click", initNewDraft);
+  }
+
+  if (copyJsonBtn) {
+    copyJsonBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(savedJson.textContent).then(() => {
+        copyJsonBtn.textContent = "✓ Copied!";
+        setTimeout(() => { copyJsonBtn.textContent = I18N[currentLanguage].btn_copy_json; }, 2000);
+      });
     });
-  });
+  }
 
   // Preset Chips
   document.querySelectorAll(".preset-chip").forEach((chip) => {

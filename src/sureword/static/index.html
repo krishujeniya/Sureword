@@ -3,33 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sureword — Sovereign Voice-to-Form AI for Frontline Healthcare</title>
+  <title>Sureword — Frontline Healthcare Voice Documentation</title>
   
   <!-- SEO & AEO Primary Metadata -->
-  <meta name="description" content="Sureword is an Indian sovereign voice-to-form documentation system with budget-constrained selective spoken clarification for frontline healthcare workers (ASHA/ANM). Powered by Gnani Prisma STT and Timbre TTS.">
-  <meta name="keywords" content="Sureword, Sovereign AI, Gnani.ai, Frontline Healthcare, ASHA worker voice assistant, Prisma STT, Timbre TTS, Indic ASR, selective clarification, voice to form, Great Indian AI Internship Challenge">
+  <meta name="description" content="Sureword is an Indian frontline voice-to-form medical documentation system with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
+  <meta name="keywords" content="Sureword, Sovereign AI, Gnani.ai, Frontline Healthcare, ASHA worker voice assistant, Prisma STT, Timbre TTS, Indic ASR, selective clarification, voice to form">
   <meta name="author" content="Krish Ujeniya">
-  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://sureword.vercel.app/">
   
-  <!-- Open Graph / Facebook -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sureword.vercel.app/">
-  <meta property="og:title" content="Sureword — Sovereign Voice-to-Form AI for Indian Frontline Healthcare">
-  <meta property="og:description" content="Frontline voice documentation with budget-constrained selective spoken clarification. Reduces visit record field error by 50% using Gnani Prisma STT and Timbre TTS.">
+  <meta property="og:title" content="Sureword — Frontline Healthcare Voice Documentation">
+  <meta property="og:description" content="Frontline voice-to-form documentation with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
   <meta property="og:image" content="https://sureword.vercel.app/static/logo.svg">
   <meta property="og:site_name" content="Sureword">
   <meta property="og:locale" content="en_IN">
   
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://sureword.vercel.app/">
-  <meta name="twitter:title" content="Sureword — Sovereign Voice-to-Form AI">
-  <meta name="twitter:description" content="Selective spoken clarification for frontline healthcare visits in India. Powered by Gnani.ai Prisma STT & Timbre TTS.">
+  <meta name="twitter:title" content="Sureword — Frontline Healthcare Voice Documentation">
+  <meta name="twitter:description" content="Frontline voice-to-form documentation with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
   <meta name="twitter:image" content="https://sureword.vercel.app/static/logo.svg">
-  <meta name="twitter:creator" content="@krishujeniya">
   
-  <!-- Favicon & Touch Icons -->
+  <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="apple-touch-icon" href="/static/favicon.svg">
   <meta name="theme-color" content="#0A2540">
@@ -37,7 +35,7 @@
   <!-- Stylesheet -->
   <link rel="stylesheet" href="/static/styles.css">
 
-  <!-- AEO Structured Data: SoftwareApplication & FAQPage -->
+  <!-- AEO Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -47,23 +45,11 @@
         "@id": "https://sureword.vercel.app/#software",
         "name": "Sureword",
         "applicationCategory": "HealthApplication",
-        "operatingSystem": "All modern web browsers (Chrome, Edge, Safari, Firefox)",
-        "softwareVersion": "1.0.0",
-        "description": "Sovereign voice-to-form frontline visit entry system with budget-constrained selective spoken clarification, powered by Gnani Prisma STT v3.0 and Timbre TTS v2.5.",
+        "operatingSystem": "All modern browsers",
+        "description": "Frontline voice-to-form visit documentation with selective spoken clarification, powered by Gnani Prisma STT and Timbre TTS.",
         "url": "https://sureword.vercel.app/",
-        "author": {
-          "@type": "Person",
-          "name": "Krish Ujeniya"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "Gnani.ai Great Indian AI Internship Challenge 2026"
-        },
-        "offers": {
-          "@type": "Offer",
-          "price": "0.00",
-          "priceCurrency": "INR"
-        }
+        "author": { "@type": "Person", "name": "Krish Ujeniya" },
+        "publisher": { "@type": "Organization", "name": "Gnani.ai Great Indian AI Internship Challenge 2026" }
       },
       {
         "@type": "FAQPage",
@@ -74,39 +60,15 @@
             "name": "What is Sureword?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sureword is a frontline voice-to-form documentation system designed for Indian healthcare workers (such as ASHAs and ANMs). It captures spoken visit narratives in Hindi-English and automatically converts them into structured clinical records, asking targeted spoken clarification questions only when uncertainty exceeds risk thresholds."
+              "text": "Sureword is a voice-to-form documentation assistant for frontline healthcare workers. It captures visit narratives in Hindi-English and structures them into clinical records, asking targeted clarification questions only when uncertainty exceeds risk thresholds."
             }
           },
           {
             "@type": "Question",
-            "name": "How does selective spoken clarification improve form accuracy?",
+            "name": "How does selective spoken clarification work?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Rather than reprompting workers for every field (which causes cognitive fatigue) or accepting raw ASR transcripts unverified (which permits silent data corruption), Sureword implements Budget-Constrained Spoken Clarification Policy P. It calculates entity-level semantic risk and prompts the worker to repeat only high-risk ambiguous fields under a strict single-prompt budget, cutting primary field error by 50% relative."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Why does Sureword use deterministic parsing instead of generative LLMs?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Frontline medical records require absolute auditability and zero hallucination. Generative LLMs can invent dates, normalize names into nonexistent entities, or hallucinate physiological parameters under ambiguous audio. Sureword uses deterministic regex, Devanagari digit converters, dictionary matching, and physiological bounds (1-120 years) to guarantee that every saved field traces directly to spoken spans."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Which sovereign speech engines are integrated into Sureword?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sureword integrates genuine Gnani.ai sovereign AI APIs: Gnani Prisma v3.0 STT for sub-300ms Indian Hindi-English speech transcription, and Gnani Timbre v2.5 TTS (Bhavna neural voice) for spoken clarification prompts."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How does Sureword ensure data privacy and security?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sureword enforces OWASP defense-in-depth principles: zero API keys exposed to the client, ephemeral serverless storage in isolated /tmp directories, parameterized SQL queries preventing injection, 10MB/20s upload ceilings preventing denial of service, and cryptographic SHA-256 integrity hashes for all audio recordings."
+              "text": "Rather than reprompting every field or accepting raw ASR unverified, Sureword calculates field-level risk and prompts workers to repeat only high-risk ambiguous fields under a strict budget, cutting error by 50% relative."
             }
           }
         ]
@@ -120,33 +82,27 @@
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <div class="app-wrapper">
-    <!-- Sovereign Navigation & Brand Header -->
+    <!-- Header -->
     <header class="app-header" role="banner">
       <div class="container header-container">
         <div class="brand">
           <div class="logo-wrapper" aria-hidden="true">
-            <img src="/static/logo.svg" alt="Sureword Sovereign Shield Logo" width="46" height="46" class="brand-logo-img">
+            <img src="/static/logo.svg" alt="Sureword Logo" width="40" height="40" class="brand-logo-img">
           </div>
-          <div class="brand-text">
-            <div class="brand-title-row">
-              <h1 class="brand-name">Sureword</h1>
-              <span class="sovereign-tag" data-i18n="sovereign_badge">Sovereign Health AI</span>
-            </div>
-            <p class="brand-tagline" data-i18n="tagline">Voice-to-Form Frontline Visit Entry • Powered by Gnani Prisma &amp; Timbre</p>
+          <div>
+            <h1 class="brand-name">Sureword</h1>
+            <p class="brand-tagline" data-i18n="tagline">Frontline Healthcare Voice Entry</p>
           </div>
         </div>
 
-        <!-- Navigation Tabs & Language / Status Controls -->
+        <!-- Navigation Tabs & Language / Status -->
         <div class="header-actions">
           <nav class="nav-tabs" role="tablist" aria-label="Main Navigation">
-            <button id="tab-form-btn" class="nav-tab active" role="tab" aria-selected="true" aria-controls="view-form" data-i18n="tab_form">
+            <button id="tab-form-btn" class="nav-tab active" role="tab" aria-selected="true" aria-controls="view-form">
               📝 <span data-i18n="tab_form_text">Visit Entry</span>
             </button>
-            <button id="tab-registry-btn" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-registry" data-i18n="tab_registry">
+            <button id="tab-registry-btn" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-registry">
               📋 <span data-i18n="tab_registry_text">Saved Registry</span> <span id="registry-count-pill" class="pill-counter">0</span>
-            </button>
-            <button id="tab-science-btn" class="nav-tab" role="tab" aria-selected="false" aria-controls="view-science" data-i18n="tab_science">
-              🔬 <span data-i18n="tab_science_text">Scientific Specs &amp; FAQ</span>
             </button>
           </nav>
 
@@ -154,11 +110,7 @@
             <button id="lang-toggle-btn" class="lang-switch-btn" title="Switch language / भाषा बदलें" aria-label="Toggle language between English and Hindi">
               🌐 <span id="current-lang-text">हिन्दी</span>
             </button>
-            <div class="status-pills">
-              <span id="provider-badge" class="badge badge-neutral" title="Speech Provider Status">Checking Gnani...</span>
-              <span id="state-badge" class="badge badge-neutral" title="State Machine Invariant">EMPTY</span>
-              <span id="version-badge" class="badge badge-neutral" title="Draft Version Invariant">v1</span>
-            </div>
+            <span id="provider-badge" class="badge badge-neutral" title="Speech Provider Status">Connecting...</span>
           </div>
         </div>
       </div>
@@ -172,29 +124,28 @@
       <!-- VIEW 1: Clinical Dictation & Form Entry -->
       <div id="view-form" class="view-panel active" role="tabpanel" aria-labelledby="tab-form-btn">
         <div class="grid-layout">
-          <!-- Left Column: Dictation Controls & Speech Pipeline -->
+          <!-- Left Column: Dictation Controls -->
           <section class="card dictation-card" aria-labelledby="dictate-heading">
             <div class="card-header">
-              <h2 id="dictate-heading" data-i18n="step1_title">1. Dictate Visit Record</h2>
-              <span class="step-indicator" data-i18n="step1_indicator">ASHA Voice Input</span>
+              <h2 id="dictate-heading" data-i18n="step1_title">Dictate Visit</h2>
             </div>
             
             <p class="instruction" data-i18n="step1_desc">
-              Speak frontline household visit details in Hindi-English code-switched speech.
+              Speak visit details in Hindi or English (Name, Age, Village, Visit Date).
             </p>
 
-            <!-- Quick Preset Chips for Rapid Testing & Demonstration -->
-            <div class="presets-section">
-              <span class="presets-label" data-i18n="presets_label">Quick Test Presets:</span>
+            <!-- Compact Quick Presets -->
+            <div class="presets-row">
+              <span class="presets-label" data-i18n="presets_label">Quick Test:</span>
               <div class="preset-chips">
-                <button type="button" class="preset-chip" data-preset="kamla" title="Load sample visit for Kamla Devi (45y, Rampur)">
-                  👤 Kamla Devi (45y, Rampur)
+                <button type="button" class="preset-chip" data-preset="kamla" title="Sample visit: Kamla Devi">
+                  Kamla Devi (45y)
                 </button>
-                <button type="button" class="preset-chip" data-preset="sunita" title="Load sample visit for Sunita Bai (38y, Bilaspur)">
-                  👤 Sunita Bai (38y, Bilaspur)
+                <button type="button" class="preset-chip" data-preset="sunita" title="Sample visit: Sunita Bai">
+                  Sunita Bai (38y)
                 </button>
-                <button type="button" class="preset-chip" data-preset="ramesh" title="Load sample visit for Ramesh Kumar (52y, Sonpur)">
-                  👤 Ramesh Kumar (52y, Sonpur)
+                <button type="button" class="preset-chip" data-preset="ramesh" title="Sample visit: Ramesh Kumar">
+                  Ramesh Kumar (52y)
                 </button>
               </div>
             </div>
@@ -214,28 +165,24 @@
                 <div class="wave-bar"></div>
                 <div class="wave-bar"></div>
                 <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
               </div>
 
               <div id="recording-timer" class="timer hidden" aria-live="off">00:00 / 00:20</div>
             </div>
 
-            <!-- Alternative Audio File Upload -->
-            <div class="divider"><span data-i18n="divider_or">OR UPLOAD AUDIO</span></div>
-
-            <div class="upload-container">
+            <!-- Secondary Audio File Upload -->
+            <div class="upload-compact">
               <input type="file" id="audio-file-input" accept="audio/*" class="file-input" aria-label="Upload visit audio recording">
-              <button id="upload-btn" class="btn btn-secondary" data-i18n="upload_btn">Upload Audio File</button>
+              <button id="upload-btn" class="btn btn-secondary btn-sm" data-i18n="upload_btn">Upload File</button>
             </div>
 
             <!-- Live Transcript Card -->
             <div class="transcript-box" aria-live="polite">
               <div class="transcript-box-header">
-                <h3 data-i18n="transcript_title">Prisma Speech Transcript</h3>
+                <h3 data-i18n="transcript_title">Transcript</h3>
                 <span id="transcript-source-tag" class="pill-tag">IDLE</span>
               </div>
-              <div id="transcript-content" class="transcript-text">No audio transcribed yet. Click 'Start Dictation' or select a preset above.</div>
+              <div id="transcript-content" class="transcript-text">No audio transcribed yet. Click 'Start Dictation' or select a sample above.</div>
               <div id="transcript-meta" class="transcript-meta"></div>
             </div>
           </section>
@@ -243,27 +190,21 @@
           <!-- Right Column: Structured Visit Form & Clarification -->
           <section class="card form-card" aria-labelledby="form-heading">
             <div class="form-header">
-              <div class="form-title-group">
-                <h2 id="form-heading" data-i18n="step2_title">2. Structured Clinical Fields</h2>
-                <span class="step-indicator" data-i18n="step2_indicator">Deterministic Extraction</span>
-              </div>
-              <button id="new-draft-btn" class="btn btn-sm btn-ghost" title="Reset and start new visit session" data-i18n="btn_new_session">
+              <h2 id="form-heading" data-i18n="step2_title">Structured Visit Form</h2>
+              <button id="new-draft-btn" class="btn btn-sm btn-ghost" title="Reset and start new visit session">
                 ↺ <span data-i18n="btn_new_session_text">New Session</span>
               </button>
             </div>
 
-            <!-- Targeted Spoken Clarification Banner (Policy P) -->
+            <!-- Targeted Spoken Clarification Banner -->
             <div id="clarification-banner" class="clarification-box hidden" role="region" aria-live="assertive" aria-labelledby="clarify-field-title">
               <div class="clarification-header">
                 <div class="alert-icon-wrapper" aria-hidden="true">⚠️</div>
                 <div class="alert-content">
-                  <div class="alert-title-row">
-                    <strong id="clarify-field-title" data-i18n="clarify_alert_title">Targeted Spoken Clarification Needed</strong>
-                    <span class="badge badge-warning" data-i18n="clarify_policy_tag">Policy P Active</span>
-                  </div>
+                  <strong id="clarify-field-title" data-i18n="clarify_alert_title">Clarification Needed</strong>
                   <p id="clarify-prompt-text" class="clarify-text"></p>
                 </div>
-                <button id="play-tts-btn" class="btn btn-sm btn-speech" title="Hear spoken prompt synthesized with Gnani Timbre" aria-label="Hear spoken clarification prompt with Gnani Timbre">
+                <button id="play-tts-btn" class="btn btn-sm btn-speech" title="Hear spoken prompt" aria-label="Hear spoken clarification prompt">
                   🔊 <span data-i18n="btn_hear_prompt">Hear Prompt</span>
                 </button>
               </div>
@@ -286,7 +227,7 @@
               <!-- 1. Person Name -->
               <div class="form-group" id="group-person_name">
                 <div class="field-label-row">
-                  <label for="field-person_name" data-i18n="label_name">Patient / Person Name</label>
+                  <label for="field-person_name" data-i18n="label_name">Patient Name</label>
                   <span class="status-tag tag-missing" id="tag-person_name">Missing</span>
                 </div>
                 <div class="input-with-reasons">
@@ -298,7 +239,7 @@
               <!-- 2. Age -->
               <div class="form-group" id="group-age">
                 <div class="field-label-row">
-                  <label for="field-age" data-i18n="label_age">Age (Completed Years, 1–120)</label>
+                  <label for="field-age" data-i18n="label_age">Age (Completed Years)</label>
                   <span class="status-tag tag-missing" id="tag-age">Missing</span>
                 </div>
                 <div class="input-with-reasons">
@@ -310,7 +251,7 @@
               <!-- 3. Village -->
               <div class="form-group" id="group-village">
                 <div class="field-label-row">
-                  <label for="field-village" data-i18n="label_village">Village / Hamlet</label>
+                  <label for="field-village" data-i18n="label_village">Village</label>
                   <span class="status-tag tag-missing" id="tag-village">Missing</span>
                 </div>
                 <div class="input-with-reasons">
@@ -322,7 +263,7 @@
               <!-- 4. Visit Date -->
               <div class="form-group" id="group-visit_date">
                 <div class="field-label-row">
-                  <label for="field-visit_date" data-i18n="label_date">Visit Date (YYYY-MM-DD)</label>
+                  <label for="field-visit_date" data-i18n="label_date">Visit Date</label>
                   <span class="status-tag tag-missing" id="tag-visit_date">Missing</span>
                 </div>
                 <div class="input-with-reasons">
@@ -334,25 +275,29 @@
               <!-- Commit Action Bar -->
               <div class="commit-bar">
                 <div class="commit-info" id="commit-validation-info" data-i18n="commit_info_incomplete">
-                  Form incomplete. Complete all 4 clinical fields to commit record.
+                  Complete all 4 fields to save record.
                 </div>
                 <button type="button" id="commit-btn" class="btn btn-success btn-commit" disabled>
-                  ✓ <span data-i18n="btn_commit">Verify &amp; Commit Record</span> <kbd class="kbd-shortcut">Ctrl+↵</kbd>
+                  ✓ <span data-i18n="btn_commit">Verify &amp; Save Record</span>
                 </button>
               </div>
             </form>
 
-            <!-- Committed Result Card -->
+            <!-- Committed Result Confirmation -->
             <div id="committed-result" class="committed-box hidden" role="region" aria-live="polite">
               <div class="committed-header">
                 <div class="check-icon-badge" aria-hidden="true">✓</div>
-                <div>
-                  <h3 data-i18n="committed_heading">Clinical Visit Record Committed Locally</h3>
+                <div class="committed-text-block">
+                  <h3 data-i18n="committed_heading">Visit Record Saved</h3>
                   <p><span data-i18n="record_id_label">Record ID:</span> <strong id="saved-record-id" class="code-record-id"></strong></p>
                 </div>
-                <button id="copy-json-btn" class="btn btn-sm btn-ghost" title="Copy JSON payload" data-i18n="btn_copy_json">📋 Copy JSON</button>
               </div>
-              <pre id="saved-json" class="json-preview"></pre>
+              <div class="committed-actions-row">
+                <button id="view-in-registry-btn" class="btn btn-sm btn-primary">📋 View in Saved Registry</button>
+                <button id="start-next-draft-btn" class="btn btn-sm btn-secondary">↺ Next Visit</button>
+              </div>
+              <!-- Hidden JSON preview for programmatic test access -->
+              <pre id="saved-json" class="visually-hidden"></pre>
             </div>
           </section>
         </div>
@@ -363,13 +308,13 @@
         <section class="card registry-card">
           <div class="registry-header-row">
             <div>
-              <h2 data-i18n="registry_title">Committed Household Visit Registry</h2>
-              <p class="subtitle" data-i18n="registry_subtitle">Immutable clinical audit trail stored in versioned SQLite database ($V_t$).</p>
+              <h2 data-i18n="registry_title">Saved Visit Records</h2>
+              <p class="subtitle" data-i18n="registry_subtitle">Locally committed household visit documentation.</p>
             </div>
             <div class="registry-actions">
-              <button id="refresh-registry-btn" class="btn btn-sm btn-ghost" title="Reload committed records">↻ Refresh</button>
-              <button id="export-csv-btn" class="btn btn-sm btn-secondary" title="Export registry as CSV">📥 Export CSV</button>
-              <button id="export-json-btn" class="btn btn-sm btn-secondary" title="Export registry as JSON">📥 Export JSON</button>
+              <button id="refresh-registry-btn" class="btn btn-sm btn-ghost" title="Reload records">↻ Refresh</button>
+              <button id="export-csv-btn" class="btn btn-sm btn-secondary" title="Export as CSV">📥 Export CSV</button>
+              <button id="export-json-btn" class="btn btn-sm btn-secondary" title="Export as JSON">📥 Export JSON</button>
             </div>
           </div>
 
@@ -383,109 +328,28 @@
                   <th scope="col">Age</th>
                   <th scope="col">Village</th>
                   <th scope="col">Visit Date</th>
-                  <th scope="col">Committed At</th>
-                  <th scope="col">Integrity Invariant</th>
+                  <th scope="col">Saved At</th>
                 </tr>
               </thead>
               <tbody id="registry-table-body">
                 <tr>
-                  <td colspan="7" class="table-empty">No committed visit records found in session. Complete a form to commit.</td>
+                  <td colspan="6" class="table-empty">No saved visit records yet. Complete a form to save.</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </section>
       </div>
-
-      <!-- VIEW 3: Scientific Specs & AEO FAQ -->
-      <div id="view-science" class="view-panel hidden" role="tabpanel" aria-labelledby="tab-science-btn">
-        <section class="card science-card">
-          <div class="science-header">
-            <h2>Scientific Methodology &amp; Sovereign AI Architecture</h2>
-            <p class="subtitle">Empirical validation and technical specifications for the Great Indian AI Internship Challenge 2026.</p>
-          </div>
-
-          <!-- Key Metrics Grid -->
-          <div class="metrics-summary-grid">
-            <div class="metric-card">
-              <span class="metric-val">50.0%</span>
-              <span class="metric-label">Relative Error Reduction</span>
-              <span class="metric-sub">From 6.2% ($B_0$) to 3.1% ($P$)</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-val">236 ms</span>
-              <span class="metric-label">Live Prisma STT Latency</span>
-              <span class="metric-sub">Prisma v3.0 REST endpoint</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-val">666 ms</span>
-              <span class="metric-label">Live Timbre TTS Latency</span>
-              <span class="metric-sub">Timbre v2.5 Bhavna Voice</span>
-            </div>
-            <div class="metric-card">
-              <span class="metric-val">100%</span>
-              <span class="metric-label">Zero Hallucination</span>
-              <span class="metric-sub">Deterministic entity bounds</span>
-            </div>
-          </div>
-
-          <!-- FAQ Accordion (AEO Optimized) -->
-          <div class="faq-accordion">
-            <details class="faq-item" open>
-              <summary class="faq-question">1. How does Budget-Constrained Selective Spoken Clarification work?</summary>
-              <div class="faq-answer">
-                <p>Standard voice interfaces either reprompt the user for every field (causing severe cognitive burden) or silently accept ASR transcriptions (admitting corrupted health records). Sureword evaluates a risk assessment function $R(f) \in [0.0, 1.0]$ for each field:</p>
-                <ul>
-                  <li><strong>Format &amp; Range Violations:</strong> $R=0.9$ (e.g., physiological age &gt; 120 or invalid calendar dates like Feb 30).</li>
-                  <li><strong>Out-of-Dictionary Entities:</strong> $R=0.7$ (village names extracted purely via markers).</li>
-                  <li><strong>Proposed Valid Candidates:</strong> $R=0.25 - 0.35$.</li>
-                  <li><strong>Confirmed / Edited Entities:</strong> $R=0.0$ (no re-prompting).</li>
-                </ul>
-                <p>Policy $P$ selects the single highest-risk entity ($\arg\max_{f} R(f)$) needing clarification and synthesizes an ASHA clarification prompt via Gnani Timbre, ensuring field accuracy is doubled at a deterministic 1.0 prompt/form cost ceiling.</p>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary class="faq-question">2. Why deterministic parsing instead of generative LLMs for medical forms?</summary>
-              <div class="faq-answer">
-                <p>Frontline healthcare records require absolute auditability and zero hallucination. Generative LLMs can invent dates, normalize names into nonexistent entities, or hallucinate physiological parameters under ambiguous audio. Sureword uses deterministic regex, Devanagari digit converters, dictionary matching, and physiological bounds (1-120 years) to guarantee that every saved field traces directly to spoken spans.</p>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary class="faq-question">3. What is the Action-WER Orthogonality Theorem ($WER \perp \text{Accuracy}$)?</summary>
-              <div class="faq-answer">
-                <p>In clinical documentation, Word Error Rate (WER) is orthogonal to downstream action accuracy: a transcription with 5% WER that corrupts only patient age (e.g. 15 to 50) produces a 100% clinically invalid visit record, whereas a 25% WER transcription that misses filler words ("जी", "है", "का") produces a 100% correct form. Therefore, Sureword measures exact entity match with 95% Wilson Score Confidence Intervals.</p>
-              </div>
-            </details>
-
-            <details class="faq-item">
-              <summary class="faq-question">4. How is frontline sovereign data privacy guaranteed?</summary>
-              <div class="faq-answer">
-                <p>Sureword adheres to strict sovereign privacy standards: zero third-party tracking scripts, zero client API key exposure, ephemeral serverless execution on Vercel Edge with local SQLite persistence in isolated /tmp directories, and cryptographic SHA-256 integrity hashing for all voice recordings.</p>
-              </div>
-            </details>
-          </div>
-        </section>
-      </div>
     </main>
 
-    <!-- Sovereign Production Footer -->
+    <!-- Footer -->
     <footer class="app-footer" role="contentinfo">
       <div class="container footer-container">
-        <div class="footer-left">
-          <div class="footer-brand">
-            <img src="/static/logo.svg" alt="Sureword Logo" width="24" height="24">
-            <strong>Sureword</strong>
-          </div>
-          <p class="footer-copy">Built for the <strong>Great Indian AI Internship Challenge 2026</strong> (Gnani.ai). Sovereign frontline AI for India.</p>
-        </div>
+        <p class="footer-copy">Sureword • Frontline Healthcare Voice Entry • Powered by Gnani Prisma &amp; Timbre</p>
         <div class="footer-links">
-          <a href="https://github.com/krishujeniya/Sureword" target="_blank" rel="noopener noreferrer">GitHub Repository</a>
+          <a href="https://github.com/krishujeniya/Sureword" target="_blank" rel="noopener noreferrer">GitHub</a>
           <span class="sep">•</span>
-          <a href="https://sureword.vercel.app/" target="_blank" rel="noopener noreferrer">Production Deployment</a>
-          <span class="sep">•</span>
-          <a href="https://docs.gnani.ai/" target="_blank" rel="noopener noreferrer">Gnani AI Docs</a>
+          <a href="https://sureword.vercel.app/" target="_blank" rel="noopener noreferrer">Production</a>
         </div>
       </div>
     </footer>
