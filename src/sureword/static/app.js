@@ -17,7 +17,8 @@ let committedRecordsCache = [];
 // Bilingual Localization Dictionary
 const I18N = {
   en: {
-    tagline: "Frontline Healthcare Voice Documentation",
+    context_pill: "Frontline Health",
+    tagline: "Bilingual Voice-to-Form Visit Documentation",
     tab_form_text: "Visit Entry",
     tab_registry_text: "Saved Registry",
     step1_title: "Dictate Visit",
@@ -25,9 +26,14 @@ const I18N = {
     presets_label: "Quick Test:",
     record_start: "Start Dictation",
     record_stop: "Stop Dictation",
+    rec_live: "LISTENING",
     transcript_title: "Live Transcript",
     step2_title: "Structured Visit Form",
     btn_new_session_text: "New Visit",
+    summary_patient_k: "Patient",
+    summary_age_k: "Age",
+    summary_village_k: "Village",
+    summary_date_k: "Visit Date",
     clarify_alert_title: "Clarification Needed",
     btn_hear_prompt: "Hear Prompt",
     btn_speak_field: "Speak Answer",
@@ -36,8 +42,8 @@ const I18N = {
     label_age: "Age (Years)",
     label_village: "Village",
     label_date: "Visit Date",
-    commit_info_incomplete: "Fill all 4 fields to save record.",
-    commit_info_ready: "All fields verified. Ready to save.",
+    commit_info_incomplete: "Complete all 4 fields to save record.",
+    commit_info_ready: "All 4 fields verified. Review carefully and save.",
     commit_info_committed: "Visit record saved.",
     btn_commit: "Save Visit Record",
     committed_heading: "Visit Record Saved",
@@ -46,7 +52,8 @@ const I18N = {
     registry_subtitle: "Locally verified household visit documentation."
   },
   hi: {
-    tagline: "सामुदायिक स्वास्थ्य वॉयस प्रलेखन",
+    context_pill: "सामुदायिक स्वास्थ्य",
+    tagline: "द्विभाषी वॉयस-टू-फॉर्म भेंट दस्तावेज़ीकरण",
     tab_form_text: "भेंट प्रपत्र",
     tab_registry_text: "सहेजे गए रिकॉर्ड",
     step1_title: "भेंट विवरण बोलें",
@@ -54,9 +61,14 @@ const I18N = {
     presets_label: "त्वरित परीक्षण:",
     record_start: "बोलना शुरू करें",
     record_stop: "रिकॉर्डिंग रोकें",
+    rec_live: "सुन रहे हैं",
     transcript_title: "वाक् प्रतिलेखन",
     step2_title: "संरचित चिकित्सा प्रपत्र",
     btn_new_session_text: "नई भेंट",
+    summary_patient_k: "मरीज",
+    summary_age_k: "आयु",
+    summary_village_k: "गाँव",
+    summary_date_k: "भेंट तारीख",
     clarify_alert_title: "स्पष्टीकरण आवश्यक",
     btn_hear_prompt: "प्रश्न सुनें",
     btn_speak_field: "उत्तर बोलें",
@@ -66,7 +78,7 @@ const I18N = {
     label_village: "गाँव",
     label_date: "भेंट की तारीख",
     commit_info_incomplete: "रिकॉर्ड सहेजने के लिए सभी 4 फ़ील्ड भरें।",
-    commit_info_ready: "सभी फ़ील्ड सत्यापित हैं। सहेजने के लिए तैयार।",
+    commit_info_ready: "सभी 4 फ़ील्ड सत्यापित हैं। सहेजने के लिए तैयार।",
     commit_info_committed: "रिकॉर्ड सहेजा गया।",
     btn_commit: "रिकॉर्ड सहेजें",
     committed_heading: "भेंट रिकॉर्ड सहेजा गया",
@@ -92,7 +104,7 @@ const currentLangText = document.getElementById("current-lang-text");
 const recordBtn = document.getElementById("record-btn");
 const recordText = document.getElementById("record-text");
 const recordingTimer = document.getElementById("recording-timer");
-const audioWaveContainer = document.getElementById("audio-wave-container");
+const recordingStateIndicator = document.getElementById("recording-state-indicator");
 const statusMessage = document.getElementById("status-message");
 const transcriptContent = document.getElementById("transcript-content");
 const newDraftBtn = document.getElementById("new-draft-btn");
@@ -110,6 +122,12 @@ const savedRecordId = document.getElementById("saved-record-id");
 const savedJson = document.getElementById("saved-json");
 const ttsAudioPlayer = document.getElementById("tts-audio-player");
 
+// Patient Encounter Summary DOM Elements (OpenMRS Inspired)
+const summaryPatientV = document.getElementById("summary-patient-v");
+const summaryAgeV = document.getElementById("summary-age-v");
+const summaryVillageV = document.getElementById("summary-village-v");
+const summaryDateV = document.getElementById("summary-date-v");
+
 // Navigation Tabs & Views
 const tabFormBtn = document.getElementById("tab-form-btn");
 const tabRegistryBtn = document.getElementById("tab-registry-btn");
@@ -118,8 +136,6 @@ const viewRegistry = document.getElementById("view-registry");
 const registryCountPill = document.getElementById("registry-count-pill");
 const registryTableBody = document.getElementById("registry-table-body");
 const refreshRegistryBtn = document.getElementById("refresh-registry-btn");
-const exportCsvBtn = document.getElementById("export-csv-btn");
-const exportJsonBtn = document.getElementById("export-json-btn");
 const exportCsvBtn = document.getElementById("export-csv-btn");
 const exportJsonBtn = document.getElementById("export-json-btn");
 
@@ -217,16 +233,30 @@ async function loadExistingDraft(draftId) {
   }
 }
 
+function updateEncounterSummary(fields) {
+  if (!fields) return;
+  if (summaryPatientV) summaryPatientV.textContent = fields.person_name?.canonical_value || "—";
+  if (summaryAgeV) summaryAgeV.textContent = fields.age?.canonical_value ? `${fields.age.canonical_value}y` : "—";
+  if (summaryVillageV) summaryVillageV.textContent = fields.village?.canonical_value || "—";
+  if (summaryDateV) summaryDateV.textContent = fields.visit_date?.canonical_value || "—";
+}
+
 function resetFormUI() {
   committedResult.classList.add("hidden");
   clarificationBanner.classList.add("hidden");
+  if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
   transcriptContent.textContent = "No audio transcribed yet. Click 'Start Dictation' or select a sample above.";
+
+  updateEncounterSummary({ person_name: {}, age: {}, village: {}, visit_date: {} });
 
   FIELD_KEYS.forEach((key) => {
     const input = document.getElementById(`field-${key}`);
     const tag = document.getElementById(`tag-${key}`);
     const reasons = document.getElementById(`reasons-${key}`);
-    if (input) input.value = "";
+    if (input) {
+      input.value = "";
+      input.setAttribute("aria-invalid", "false");
+    }
     if (tag) {
       tag.textContent = "Missing";
       tag.className = "status-tag tag-missing";
@@ -239,23 +269,14 @@ function resetFormUI() {
 }
 
 function updateStateUI(state, version) {
-  if (stateBadge) {
-    stateBadge.textContent = state;
-    stateBadge.className = "badge " + (
-      state === "READY_FOR_REVIEW" ? "badge-live" :
-      state === "NEEDS_CLARIFICATION" ? "badge-fixture" :
-      state === "COMMITTED" ? "badge-live" : "badge-neutral"
-    );
-  }
-  if (versionBadge) {
-    versionBadge.textContent = `v${version}`;
-  }
+  // Clinical state handling
 }
 
 function renderDraft(draft) {
   currentDraftId = draft.draft_id;
   currentVersion = draft.version;
   updateStateUI(draft.state, currentVersion);
+  updateEncounterSummary(draft.fields);
 
   let allValid = true;
 
@@ -275,6 +296,9 @@ function renderDraft(draft) {
       }
       if (reasonsDiv) {
         reasonsDiv.innerHTML = f.reasons.length ? f.reasons.join("<br>") : "";
+      }
+      if (input) {
+        input.setAttribute("aria-invalid", (f.status === "needs_repeat" || (f.status === "missing" && !f.canonical_value)) ? "true" : "false");
       }
 
       if (f.status === "missing" || f.status === "needs_repeat" || !f.canonical_value) {
@@ -364,8 +388,7 @@ async function startRecording() {
     mediaRecorder.onstop = async () => {
       const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
       clearInterval(recordTimerInterval);
-      recordingTimer.classList.add("hidden");
-      audioWaveContainer.classList.add("hidden");
+      if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
       recordBtn.classList.remove("btn-recording");
       recordText.textContent = I18N[currentLanguage].record_start;
 
@@ -382,14 +405,13 @@ async function startRecording() {
     recordStartTime = Date.now();
     recordBtn.classList.add("btn-recording");
     recordText.textContent = I18N[currentLanguage].record_stop;
-    recordingTimer.classList.remove("hidden");
-    audioWaveContainer.classList.remove("hidden");
+    if (recordingStateIndicator) recordingStateIndicator.classList.remove("hidden");
 
     recordTimerInterval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
       const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
       const ss = String(elapsed % 60).padStart(2, "0");
-      recordingTimer.textContent = `${mm}:${ss} / 00:20`;
+      if (recordingTimer) recordingTimer.textContent = `${mm}:${ss} / 00:20`;
 
       if (elapsed >= 20) {
         stopRecording();
@@ -539,7 +561,6 @@ async function playSpokenClarification() {
   try {
     playTtsBtn.disabled = true;
     playTtsBtn.textContent = "🔊 Synthesizing...";
-    audioWaveContainer.classList.remove("hidden");
 
     const res = await fetch(`/api/drafts/${currentDraftId}/speech`, { method: "POST" });
     if (!res.ok) throw new Error("TTS generation failed");
@@ -553,12 +574,10 @@ async function playSpokenClarification() {
     ttsAudioPlayer.onended = () => {
       playTtsBtn.disabled = false;
       playTtsBtn.textContent = `🔊 ${I18N[currentLanguage].btn_hear_prompt}`;
-      audioWaveContainer.classList.add("hidden");
     };
   } catch (err) {
     playTtsBtn.disabled = false;
     playTtsBtn.textContent = `🔊 ${I18N[currentLanguage].btn_hear_prompt}`;
-    audioWaveContainer.classList.add("hidden");
     showStatus("Could not play spoken prompt: " + err.message, "error");
   }
 }

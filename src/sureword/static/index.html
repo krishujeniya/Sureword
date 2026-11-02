@@ -87,11 +87,14 @@
       <div class="container header-container">
         <div class="brand">
           <div class="logo-wrapper" aria-hidden="true">
-            <img src="/static/logo.svg" alt="Sureword Logo" width="40" height="40" class="brand-logo-img">
+            <img src="/static/logo.svg" alt="Sureword Logo" width="42" height="42" class="brand-logo-img">
           </div>
           <div>
-            <h1 class="brand-name">Sureword</h1>
-            <p class="brand-tagline" data-i18n="tagline">Frontline Healthcare Voice Entry</p>
+            <div class="brand-title-row">
+              <h1 class="brand-name">Sureword</h1>
+              <span class="context-pill" data-i18n="context_pill">Frontline Health</span>
+            </div>
+            <p class="brand-tagline" data-i18n="tagline">Bilingual Voice-to-Form Visit Documentation</p>
           </div>
         </div>
 
@@ -110,7 +113,7 @@
             <button id="lang-toggle-btn" class="lang-switch-btn" title="Switch language / भाषा बदलें" aria-label="Toggle language between English and Hindi">
               🌐 <span id="current-lang-text">हिन्दी</span>
             </button>
-            <span id="provider-badge" class="badge badge-neutral" title="Speech Provider Status">Connecting...</span>
+            <span id="provider-badge" class="badge badge-neutral" role="status" title="Speech Provider Status">Connecting...</span>
           </div>
         </div>
       </div>
@@ -157,17 +160,12 @@
                 <span id="record-text" data-i18n="record_start">Start Dictation</span>
               </button>
               
-              <!-- Audio Waveform Visualizer -->
-              <div id="audio-wave-container" class="audio-wave-container hidden" aria-hidden="true">
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
-                <div class="wave-bar"></div>
+              <!-- Authentic Recording State (No Fake Waves) -->
+              <div id="recording-state-indicator" class="recording-state-indicator hidden" aria-live="polite">
+                <span class="rec-dot" aria-hidden="true">●</span>
+                <span class="rec-label" data-i18n="rec_live">LISTENING</span>
+                <span id="recording-timer" class="timer">00:00 / 00:20</span>
               </div>
-
-              <div id="recording-timer" class="timer hidden" aria-live="off">00:00 / 00:20</div>
             </div>
 
             <!-- Live Transcript Card -->
@@ -184,11 +182,31 @@
             <div class="form-header">
               <h2 id="form-heading" data-i18n="step2_title">Structured Visit Form</h2>
               <button id="new-draft-btn" class="btn btn-sm btn-ghost" title="Reset and start new visit session">
-                ↺ <span data-i18n="btn_new_session_text">New Session</span>
+                ↺ <span data-i18n="btn_new_session_text">New Visit</span>
               </button>
             </div>
 
-            <!-- Targeted Spoken Clarification Banner -->
+            <!-- Patient Encounter Summary Card (OpenMRS Inspired) -->
+            <div id="patient-encounter-summary" class="patient-summary-card" aria-label="Current Patient Encounter Summary">
+              <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_patient_k">Patient</span>
+                <strong class="summary-v" id="summary-patient-v">—</strong>
+              </div>
+              <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_age_k">Age</span>
+                <strong class="summary-v" id="summary-age-v">—</strong>
+              </div>
+              <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_village_k">Village</span>
+                <strong class="summary-v" id="summary-village-v">—</strong>
+              </div>
+              <div class="summary-col">
+                <span class="summary-k" data-i18n="summary_date_k">Visit Date</span>
+                <strong class="summary-v" id="summary-date-v">—</strong>
+              </div>
+            </div>
+
+            <!-- Targeted Spoken Clarification Banner (NHS Pattern) -->
             <div id="clarification-banner" class="clarification-box hidden" role="region" aria-live="assertive" aria-labelledby="clarify-field-title">
               <div class="clarification-header">
                 <div class="alert-icon-wrapper" aria-hidden="true">⚠️</div>
@@ -214,59 +232,67 @@
               </div>
             </div>
 
-            <!-- Interactive Clinical Form -->
+            <!-- Interactive Clinical Form with Explicit ARIA -->
             <form id="visit-form" class="fields-form" onsubmit="return false;">
               <!-- 1. Person Name -->
               <div class="form-group" id="group-person_name">
                 <div class="field-label-row">
-                  <label for="field-person_name" data-i18n="label_name">Patient Name</label>
+                  <label for="field-person_name">
+                    <span data-i18n="label_name">Patient Name</span> <span class="req-star" aria-hidden="true">*</span>
+                  </label>
                   <span class="status-tag tag-missing" id="tag-person_name">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="text" id="field-person_name" name="person_name" placeholder="Full name of person" autocomplete="off">
-                  <div class="reasons-list" id="reasons-person_name"></div>
+                  <input type="text" id="field-person_name" name="person_name" placeholder="Full name of person" autocomplete="off" aria-required="true" aria-describedby="reasons-person_name">
+                  <div class="reasons-list" id="reasons-person_name" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
               <!-- 2. Age -->
               <div class="form-group" id="group-age">
                 <div class="field-label-row">
-                  <label for="field-age" data-i18n="label_age">Age (Years)</label>
+                  <label for="field-age">
+                    <span data-i18n="label_age">Age (Years)</span> <span class="req-star" aria-hidden="true">*</span>
+                  </label>
                   <span class="status-tag tag-missing" id="tag-age">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="number" id="field-age" name="age" min="1" max="120" placeholder="e.g. 45" autocomplete="off">
-                  <div class="reasons-list" id="reasons-age"></div>
+                  <input type="number" id="field-age" name="age" min="1" max="120" placeholder="e.g. 45" autocomplete="off" aria-required="true" aria-describedby="reasons-age">
+                  <div class="reasons-list" id="reasons-age" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
               <!-- 3. Village -->
               <div class="form-group" id="group-village">
                 <div class="field-label-row">
-                  <label for="field-village" data-i18n="label_village">Village</label>
+                  <label for="field-village">
+                    <span data-i18n="label_village">Village</span> <span class="req-star" aria-hidden="true">*</span>
+                  </label>
                   <span class="status-tag tag-missing" id="tag-village">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="text" id="field-village" name="village" placeholder="e.g. Rampur" autocomplete="off">
-                  <div class="reasons-list" id="reasons-village"></div>
+                  <input type="text" id="field-village" name="village" placeholder="e.g. Rampur" autocomplete="off" aria-required="true" aria-describedby="reasons-village">
+                  <div class="reasons-list" id="reasons-village" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
               <!-- 4. Visit Date -->
               <div class="form-group" id="group-visit_date">
                 <div class="field-label-row">
-                  <label for="field-visit_date" data-i18n="label_date">Visit Date</label>
+                  <label for="field-visit_date">
+                    <span data-i18n="label_date">Visit Date</span> <span class="req-star" aria-hidden="true">*</span>
+                  </label>
                   <span class="status-tag tag-missing" id="tag-visit_date">Missing</span>
                 </div>
                 <div class="input-with-reasons">
-                  <input type="date" id="field-visit_date" name="visit_date">
-                  <div class="reasons-list" id="reasons-visit_date"></div>
+                  <input type="date" id="field-visit_date" name="visit_date" aria-required="true" aria-describedby="reasons-visit_date">
+                  <div class="reasons-list" id="reasons-visit_date" role="alert" aria-live="polite"></div>
                 </div>
               </div>
 
               <!-- Commit Action Bar -->
               <div class="commit-bar">
-                <div class="commit-info" id="commit-validation-info" data-i18n="commit_info_incomplete">
+                <div class="commit-info" id="commit-validation-info" data-i18n="commit_info_incomplete" role="status" aria-live="polite">
                   Complete all 4 fields to save record.
                 </div>
                 <button type="button" id="commit-btn" class="btn btn-success btn-commit" disabled>

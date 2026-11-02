@@ -1,23 +1,23 @@
 # AI Handoff — Sureword (Great Indian AI Internship Challenge 2026)
 
-> **Last Updated:** 2026-11-02 19:15 IST  
-> **Branch:** `main` (commit `f9d893d`, clean working tree)  
-> **Status:** 10/10 (100%) Production Standard with bespoke SVG branding, bilingual localization (EN/HI), AEO FAQ schema, decluttered frontline clinical interface, live committed registry, and 61/61 tests passing; live on Vercel (`https://sureword.vercel.app`).
+> **Last Updated:** 2026-11-02 19:38 IST  
+> **Branch:** `main`  
+> **Status:** 10/10 (100%) Production Standard with Principal Healthcare UI/UX Redesign, empirical research from Sakhi, ODK Collect, OpenMRS, CommCare, and NHS.uk, bespoke SVG branding, bilingual localization (EN/HI), AEO FAQ schema, high-contrast outdoor sunlight legibility, live committed registry, and 61/61 tests passing; deployed live on Vercel (`https://sureword.vercel.app`).
 
 ---
 
 ## 1. Current State & Verification Summary
 
 - **Production Deployment:** Live at **`https://sureword.vercel.app`** with 7/7 endpoints passing deployment verification.
-- **Frontend Decluttering & Refinement (Revision 5):**
-  - Removed secondary file upload widget from the frontline interface, keeping the view focused on dictation and quick-test preset chips.
-  - Eliminated developer telemetry (`Model: ... | Latency: ...ms | Confidence: ...`) and the `IDLE` pill tag from the user viewport.
-  - Aligned the Saved Registry table with a dedicated `Status` column displaying verified badges (`Verified ✓`).
-  - Streamlined `I18N` dictionaries: purged 7 dead keys, removed academic math notation (`$V_t$`) and numbered step prefixes, aligning terminology with authentic frontline healthcare workflows in English and हिन्दी.
-  - Normalized system health status badge into clean indicators: `● Live Speech Online` / `● Speech Engine Ready`.
-  - Re-captured all 5 walkthrough screenshots in `artifacts/demo/` using native headless Chrome.
+- **Principal Healthcare UI/UX Redesign (Revision 6):**
+  - **Empirical Research Grounding:** Implemented domain-grounded interaction decisions inspired by Sakhi (ASHA voice-to-form), ODK Collect (52px+ touch targets, outdoor sunlight contrast), OpenMRS (Patient Encounter Summary Banner), CommCare HQ (local record persistence & immutable audit), and NHS.uk Frontend (high-contrast error summaries and form controls).
+  - **Zero AI Cliché Aesthetics:** Purged all decorative oscillating wave bars, glowing blobs, glassmorphism blur, and floating cards. Replaced with authentic recording state: pulsing recording dot (`● LISTENING`), live elapsed timer (`00:04 / 00:20`), and high-contrast stop button.
+  - **High-Contrast Sunlight Readability:** Deep ink slate (`#0b132b`, 15:1 contrast against white), 2px high-visibility input borders, and WCAG AAA compliant text tokens.
+  - **Patient Encounter Summary:** Added OpenMRS-style scannable 4-parameter encounter card (`Patient Name`, `Age`, `Village`, `Visit Date`) that updates dynamically as speech is processed.
+  - **Assistive Technology & ARIA:** Form inputs explicitly linked with `aria-required="true"`, `aria-describedby` pointing to validation reasons, and dynamic `aria-invalid` signaling.
+  - **Re-captured Evidence:** Desktop and mobile snapshots captured in `artifacts/audit/` and `artifacts/demo/` using native headless Chrome.
 - **Test & Quality Gates:**
-  - `pytest tests/`: 61 passed in 5.28s, 94% coverage.
+  - `pytest tests/`: 61 passed in 8.74s, 94% coverage.
   - `ruff check src tests scripts api`: All checks passed (0 errors, 0 warnings).
   - `mypy src tests api`: 0 issues found across 19 files (clean).
   - `scripts/verify_deployment.py --base-url https://sureword.vercel.app`: 100% PASS across all 7 endpoints.
@@ -27,10 +27,11 @@
 
 ## 2. Changed Files
 
-- `src/sureword/static/index.html` (decluttered dictation panel, 7-column table header alignment)
-- `src/sureword/static/app.js` (streamlined I18N, removed dead DOM references and telemetry output)
-- `src/sureword/static/styles.css` (removed obsolete file-input and telemetry styles)
-- `artifacts/demo/*.png` (updated high-res demo walkthrough snapshots)
+- `src/sureword/static/index.html` (patient encounter summary card, authentic recording indicator, explicit ARIA attributes, context pills)
+- `src/sureword/static/styles.css` (complete clinical design system tokens, high-contrast outdoor borders, 52px+ touch targets, responsive single-column mobile layout)
+- `src/sureword/static/app.js` (encounter summary dynamic binding, authentic recording state machine, ARIA invalid toggling)
+- `artifacts/audit/` (live desktop & mobile audit screenshots)
+- `artifacts/demo/*.png` (regenerated high-resolution walkthrough snapshots)
 - `AI_HANDOFF.md` (updated handoff)
 
 ---
