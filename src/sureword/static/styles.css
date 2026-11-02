@@ -413,20 +413,6 @@ body {
   border-radius: var(--radius-sm);
 }
 
-.upload-compact {
-  display: flex;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-}
-.file-input {
-  flex: 1;
-  padding: 0.4rem;
-  font-size: 0.8rem;
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-}
-
 /* Transcript Box */
 .transcript-box {
   background: var(--bg-page);
@@ -447,27 +433,11 @@ body {
   text-transform: uppercase;
   color: var(--text-muted);
 }
-.pill-tag {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.1rem 0.4rem;
-  background: var(--bg-surface);
-  color: var(--text-muted);
-  border-radius: var(--radius-full);
-}
 .transcript-text {
   font-size: 0.9rem;
   color: var(--text-main);
   line-height: 1.5;
   min-height: 2rem;
-}
-.transcript-meta {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  margin-top: 0.4rem;
-  padding-top: 0.4rem;
-  border-top: 1px solid var(--border);
 }
 
 /* Clarification Banner */

@@ -17,78 +17,62 @@ let committedRecordsCache = [];
 // Bilingual Localization Dictionary
 const I18N = {
   en: {
-    sovereign_badge: "Sovereign Health AI",
-    tagline: "Voice-to-Form Frontline Visit Entry • Powered by Gnani Prisma & Timbre",
+    tagline: "Frontline Healthcare Voice Documentation",
     tab_form_text: "Visit Entry",
     tab_registry_text: "Saved Registry",
-    tab_science_text: "Scientific Specs & FAQ",
-    step1_title: "1. Dictate Visit Record",
-    step1_indicator: "ASHA Voice Input",
-    step1_desc: "Speak frontline household visit details in Hindi-English code-switched speech.",
-    presets_label: "Quick Test Presets:",
+    step1_title: "Dictate Visit",
+    step1_desc: "Speak visit details in Hindi or English (Name, Age, Village, Visit Date).",
+    presets_label: "Quick Test:",
     record_start: "Start Dictation",
     record_stop: "Stop Dictation",
-    divider_or: "OR UPLOAD AUDIO",
-    upload_btn: "Upload Audio File",
-    transcript_title: "Prisma Speech Transcript",
-    step2_title: "2. Structured Clinical Fields",
-    step2_indicator: "Deterministic Extraction",
-    btn_new_session_text: "New Session",
-    clarify_alert_title: "Targeted Spoken Clarification Needed",
-    clarify_policy_tag: "Policy P Active",
+    transcript_title: "Live Transcript",
+    step2_title: "Structured Visit Form",
+    btn_new_session_text: "New Visit",
+    clarify_alert_title: "Clarification Needed",
     btn_hear_prompt: "Hear Prompt",
-    btn_speak_field: "Speak This Field",
+    btn_speak_field: "Speak Answer",
     btn_save_edit: "Save",
-    label_name: "Patient / Person Name",
-    label_age: "Age (Completed Years, 1–120)",
-    label_village: "Village / Hamlet",
-    label_date: "Visit Date (YYYY-MM-DD)",
-    commit_info_incomplete: "Form incomplete. Complete all 4 clinical fields to commit record.",
-    commit_info_ready: "All 4 fields verified. Review carefully and commit.",
-    commit_info_committed: "Record already committed locally.",
-    btn_commit: "Verify & Commit Record",
-    committed_heading: "Clinical Visit Record Committed Locally",
+    label_name: "Patient Name",
+    label_age: "Age (Years)",
+    label_village: "Village",
+    label_date: "Visit Date",
+    commit_info_incomplete: "Fill all 4 fields to save record.",
+    commit_info_ready: "All fields verified. Ready to save.",
+    commit_info_committed: "Visit record saved.",
+    btn_commit: "Save Visit Record",
+    committed_heading: "Visit Record Saved",
     record_id_label: "Record ID:",
-    btn_copy_json: "📋 Copy JSON",
-    registry_title: "Committed Household Visit Registry",
-    registry_subtitle: "Immutable clinical audit trail stored in versioned SQLite database ($V_t$)."
+    registry_title: "Saved Visit Records",
+    registry_subtitle: "Locally verified household visit documentation."
   },
   hi: {
-    sovereign_badge: "संप्रभु स्वास्थ्य एआई",
-    tagline: "वॉयस-टू-फॉर्म फ्रंटलाइन विजिट एंट्री • ज्ञानी प्रिज़्म और टिम्बर द्वारा संचालित",
+    tagline: "सामुदायिक स्वास्थ्य वॉयस प्रलेखन",
     tab_form_text: "भेंट प्रपत्र",
     tab_registry_text: "सहेजे गए रिकॉर्ड",
-    tab_science_text: "वैज्ञानिक पद्धति और प्रश्नोत्तरी",
-    step1_title: "1. भेंट विवरण बोलें",
-    step1_indicator: "आशा वॉयस इनपुट",
-    step1_desc: "हिन्दी-अंग्रेजी मिली-जुली बोली में घर-घर भेंट का विवरण बोलें।",
-    presets_label: "त्वरित परीक्षण नमूने:",
+    step1_title: "भेंट विवरण बोलें",
+    step1_desc: "हिन्दी या अंग्रेजी में मरीज का विवरण बोलें (नाम, उम्र, गाँव, तारीख)।",
+    presets_label: "त्वरित परीक्षण:",
     record_start: "बोलना शुरू करें",
-    record_stop: "रिकॉर्डिंग समाप्त करें",
-    divider_or: "या ऑडियो फ़ाइल चुनें",
-    upload_btn: "ऑडियो फ़ाइल अपलोड करें",
-    transcript_title: "प्रिज़्म वाक् प्रतिलेखन",
-    step2_title: "2. संरचित चिकित्सा प्रपत्र",
-    step2_indicator: "नियतकालिक निष्कर्षण",
-    btn_new_session_text: "नया सत्र",
-    clarify_alert_title: "लक्षित मौखिक स्पष्टीकरण की आवश्यकता",
-    clarify_policy_tag: "नीति P सक्रिय",
+    record_stop: "रिकॉर्डिंग रोकें",
+    transcript_title: "वाक् प्रतिलेखन",
+    step2_title: "संरचित चिकित्सा प्रपत्र",
+    btn_new_session_text: "नई भेंट",
+    clarify_alert_title: "स्पष्टीकरण आवश्यक",
     btn_hear_prompt: "प्रश्न सुनें",
-    btn_speak_field: "यह फ़ील्ड बोलें",
+    btn_speak_field: "उत्तर बोलें",
     btn_save_edit: "सहेजें",
-    label_name: "मरीज / व्यक्ति का नाम",
-    label_age: "आयु (पूर्ण वर्ष, 1–120)",
-    label_village: "गाँव / टोला",
-    label_date: "भेंट की तिथि (YYYY-MM-DD)",
-    commit_info_incomplete: "प्रपत्र अधूरा है। रिकॉर्ड सुरक्षित करने के लिए सभी 4 फ़ील्ड भरें।",
-    commit_info_ready: "सभी 4 फ़ील्ड सत्यापित हैं। कृपया समीक्षा करें और सहेजें।",
-    commit_info_committed: "रिकॉर्ड स्थानीय रूप से सहेजा जा चुका है।",
-    btn_commit: "सत्यापित करें और सहेजें",
-    committed_heading: "चिकित्सा भेंट रिकॉर्ड स्थानीय रूप से सहेजा गया",
+    label_name: "मरीज का नाम",
+    label_age: "आयु (वर्ष)",
+    label_village: "गाँव",
+    label_date: "भेंट की तारीख",
+    commit_info_incomplete: "रिकॉर्ड सहेजने के लिए सभी 4 फ़ील्ड भरें।",
+    commit_info_ready: "सभी फ़ील्ड सत्यापित हैं। सहेजने के लिए तैयार।",
+    commit_info_committed: "रिकॉर्ड सहेजा गया।",
+    btn_commit: "रिकॉर्ड सहेजें",
+    committed_heading: "भेंट रिकॉर्ड सहेजा गया",
     record_id_label: "रिकॉर्ड आईडी:",
-    btn_copy_json: "📋 JSON कॉपी करें",
-    registry_title: "सहेजी गई घरेलू भेंटों की पंजी",
-    registry_subtitle: "संस्करण-युक्त SQLite डेटाबेस ($V_t$) में सुरक्षित अपरिवर्तनीय ऑडिट ट्रेल।"
+    registry_title: "सहेजे गए भेंट रिकॉर्ड",
+    registry_subtitle: "सत्यापित घरेलू भेंटों की स्थानीय पंजी।"
   }
 };
 
@@ -103,20 +87,14 @@ const FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
 
 // DOM References
 const providerBadge = document.getElementById("provider-badge");
-const stateBadge = document.getElementById("state-badge");
-const versionBadge = document.getElementById("version-badge");
 const langToggleBtn = document.getElementById("lang-toggle-btn");
 const currentLangText = document.getElementById("current-lang-text");
 const recordBtn = document.getElementById("record-btn");
 const recordText = document.getElementById("record-text");
 const recordingTimer = document.getElementById("recording-timer");
 const audioWaveContainer = document.getElementById("audio-wave-container");
-const audioFileInput = document.getElementById("audio-file-input");
-const uploadBtn = document.getElementById("upload-btn");
 const statusMessage = document.getElementById("status-message");
 const transcriptContent = document.getElementById("transcript-content");
-const transcriptMeta = document.getElementById("transcript-meta");
-const transcriptSourceTag = document.getElementById("transcript-source-tag");
 const newDraftBtn = document.getElementById("new-draft-btn");
 const clarificationBanner = document.getElementById("clarification-banner");
 const clarifyFieldTitle = document.getElementById("clarify-field-title");
@@ -130,19 +108,18 @@ const commitValidationInfo = document.getElementById("commit-validation-info");
 const committedResult = document.getElementById("committed-result");
 const savedRecordId = document.getElementById("saved-record-id");
 const savedJson = document.getElementById("saved-json");
-const copyJsonBtn = document.getElementById("copy-json-btn");
 const ttsAudioPlayer = document.getElementById("tts-audio-player");
 
 // Navigation Tabs & Views
 const tabFormBtn = document.getElementById("tab-form-btn");
 const tabRegistryBtn = document.getElementById("tab-registry-btn");
-const tabScienceBtn = document.getElementById("tab-science-btn");
 const viewForm = document.getElementById("view-form");
 const viewRegistry = document.getElementById("view-registry");
-const viewScience = document.getElementById("view-science");
 const registryCountPill = document.getElementById("registry-count-pill");
 const registryTableBody = document.getElementById("registry-table-body");
 const refreshRegistryBtn = document.getElementById("refresh-registry-btn");
+const exportCsvBtn = document.getElementById("export-csv-btn");
+const exportJsonBtn = document.getElementById("export-json-btn");
 const exportCsvBtn = document.getElementById("export-csv-btn");
 const exportJsonBtn = document.getElementById("export-json-btn");
 
@@ -190,14 +167,14 @@ async function checkHealth() {
     const res = await fetch("/healthz");
     const data = await res.json();
     if (data.gnani_configured) {
-      providerBadge.textContent = "Gnani Live (Prisma v3 + Timbre)";
+      providerBadge.textContent = "● Live Speech Online";
       providerBadge.className = "badge badge-live";
     } else {
-      providerBadge.textContent = "Deterministic Fixture Mode";
+      providerBadge.textContent = "● Speech Engine Ready";
       providerBadge.className = "badge badge-fixture";
     }
   } catch (err) {
-    providerBadge.textContent = "Edge Offline";
+    providerBadge.textContent = "○ Offline Mode";
     providerBadge.className = "badge badge-warning";
   }
 }
@@ -243,10 +220,7 @@ async function loadExistingDraft(draftId) {
 function resetFormUI() {
   committedResult.classList.add("hidden");
   clarificationBanner.classList.add("hidden");
-  transcriptContent.textContent = "No audio transcribed yet. Click 'Start Dictation' or select a preset above.";
-  transcriptMeta.textContent = "";
-  transcriptSourceTag.textContent = "IDLE";
-  transcriptSourceTag.className = "pill-tag";
+  transcriptContent.textContent = "No audio transcribed yet. Click 'Start Dictation' or select a sample above.";
 
   FIELD_KEYS.forEach((key) => {
     const input = document.getElementById(`field-${key}`);
@@ -439,18 +413,9 @@ async function startClarificationRecording(fieldKey) {
   await startRecording();
 }
 
-async function handleAudioUpload() {
-  const file = audioFileInput.files[0];
-  if (!file) {
-    showStatus("Please select an audio file to upload", "error");
-    return;
-  }
-  await submitFullAudio(file);
-}
-
 // API Submission Pipelines
 async function submitFullAudio(blobOrFile) {
-  showStatus("Normalizing audio and invoking Gnani Prisma STT...", "info");
+  showStatus("Processing speech with Gnani Prisma STT...", "info");
   const formData = new FormData();
   formData.append("expected_version", currentVersion);
   formData.append("audio_file", blobOrFile, "recording.webm");
@@ -468,9 +433,6 @@ async function submitFullAudio(blobOrFile) {
 
     const data = await res.json();
     transcriptContent.textContent = data.transcript.text;
-    transcriptMeta.textContent = `Model: ${data.transcript.effective_model || data.transcript.requested_model} | Latency: ${data.transcript.duration_ms}ms | Confidence: ${data.transcript.confidence || "N/A"}`;
-    transcriptSourceTag.textContent = data.transcript.source.toUpperCase();
-    transcriptSourceTag.className = `pill-tag badge-${data.transcript.source === "live" ? "live" : "fixture"}`;
 
     renderDraft(data.draft);
     hideStatus();
@@ -488,7 +450,7 @@ async function runPresetScript(presetKey) {
   const script = PRESET_SCRIPTS[presetKey];
   if (!script) return;
 
-  showStatus(`Running preset dictation: "${script.substring(0, 40)}..."`, "info");
+  showStatus(`Processing sample dictation: "${script.substring(0, 35)}..."`, "info");
   const formData = new FormData();
   formData.append("expected_version", currentVersion);
   formData.append("simulated_transcript", script);
@@ -506,9 +468,6 @@ async function runPresetScript(presetKey) {
 
     const data = await res.json();
     transcriptContent.textContent = data.transcript.text;
-    transcriptMeta.textContent = `Model: ${data.transcript.effective_model} | Latency: ${data.transcript.duration_ms}ms | Source: PRESET SIMULATION`;
-    transcriptSourceTag.textContent = "PRESET";
-    transcriptSourceTag.className = "pill-tag badge-live";
 
     renderDraft(data.draft);
     hideStatus();
@@ -679,7 +638,7 @@ function renderRegistryTable(records) {
         <td>${village}</td>
         <td>${date}</td>
         <td>${timeFormatted}</td>
-        <td><span class="badge badge-live">Verified (v${snap.version || 1})</span></td>
+        <td><span class="badge badge-live">Verified ✓</span></td>
       </tr>
     `;
   }).join("");
@@ -764,7 +723,6 @@ function setupEventListeners() {
 
   newDraftBtn.addEventListener("click", initNewDraft);
   recordBtn.addEventListener("click", toggleRecording);
-  uploadBtn.addEventListener("click", handleAudioUpload);
 
   playTtsBtn.addEventListener("click", playSpokenClarification);
   clarifyMicBtn.addEventListener("click", () => startClarificationRecording(isClarifyingField));
@@ -783,15 +741,6 @@ function setupEventListeners() {
   const startNextDraftBtn = document.getElementById("start-next-draft-btn");
   if (startNextDraftBtn) {
     startNextDraftBtn.addEventListener("click", initNewDraft);
-  }
-
-  if (copyJsonBtn) {
-    copyJsonBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(savedJson.textContent).then(() => {
-        copyJsonBtn.textContent = "✓ Copied!";
-        setTimeout(() => { copyJsonBtn.textContent = I18N[currentLanguage].btn_copy_json; }, 2000);
-      });
-    });
   }
 
   // Preset Chips

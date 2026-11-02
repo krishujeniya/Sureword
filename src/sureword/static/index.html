@@ -170,20 +170,12 @@
               <div id="recording-timer" class="timer hidden" aria-live="off">00:00 / 00:20</div>
             </div>
 
-            <!-- Secondary Audio File Upload -->
-            <div class="upload-compact">
-              <input type="file" id="audio-file-input" accept="audio/*" class="file-input" aria-label="Upload visit audio recording">
-              <button id="upload-btn" class="btn btn-secondary btn-sm" data-i18n="upload_btn">Upload File</button>
-            </div>
-
             <!-- Live Transcript Card -->
             <div class="transcript-box" aria-live="polite">
               <div class="transcript-box-header">
-                <h3 data-i18n="transcript_title">Transcript</h3>
-                <span id="transcript-source-tag" class="pill-tag">IDLE</span>
+                <h3 data-i18n="transcript_title">Live Transcript</h3>
               </div>
               <div id="transcript-content" class="transcript-text">No audio transcribed yet. Click 'Start Dictation' or select a sample above.</div>
-              <div id="transcript-meta" class="transcript-meta"></div>
             </div>
           </section>
 
@@ -212,7 +204,7 @@
               <!-- Clarification Response Actions -->
               <div class="clarification-action">
                 <button id="clarify-mic-btn" class="btn btn-sm btn-accent" title="Record single-field spoken repeat">
-                  🎙️ <span data-i18n="btn_speak_field">Speak This Field</span>
+                  🎙️ <span data-i18n="btn_speak_field">Speak Answer</span>
                 </button>
                 <div class="manual-input-inline">
                   <label for="clarify-manual-input" class="visually-hidden">Manually enter corrected field value</label>
@@ -239,7 +231,7 @@
               <!-- 2. Age -->
               <div class="form-group" id="group-age">
                 <div class="field-label-row">
-                  <label for="field-age" data-i18n="label_age">Age (Completed Years)</label>
+                  <label for="field-age" data-i18n="label_age">Age (Years)</label>
                   <span class="status-tag tag-missing" id="tag-age">Missing</span>
                 </div>
                 <div class="input-with-reasons">
@@ -278,7 +270,7 @@
                   Complete all 4 fields to save record.
                 </div>
                 <button type="button" id="commit-btn" class="btn btn-success btn-commit" disabled>
-                  ✓ <span data-i18n="btn_commit">Verify &amp; Save Record</span>
+                  ✓ <span data-i18n="btn_commit">Save Visit Record</span>
                 </button>
               </div>
             </form>
@@ -309,7 +301,7 @@
           <div class="registry-header-row">
             <div>
               <h2 data-i18n="registry_title">Saved Visit Records</h2>
-              <p class="subtitle" data-i18n="registry_subtitle">Locally committed household visit documentation.</p>
+              <p class="subtitle" data-i18n="registry_subtitle">Locally verified household visit documentation.</p>
             </div>
             <div class="registry-actions">
               <button id="refresh-registry-btn" class="btn btn-sm btn-ghost" title="Reload records">↻ Refresh</button>
@@ -329,11 +321,12 @@
                   <th scope="col">Village</th>
                   <th scope="col">Visit Date</th>
                   <th scope="col">Saved At</th>
+                  <th scope="col">Status</th>
                 </tr>
               </thead>
               <tbody id="registry-table-body">
                 <tr>
-                  <td colspan="6" class="table-empty">No saved visit records yet. Complete a form to save.</td>
+                  <td colspan="7" class="table-empty">No saved visit records yet. Complete a form to save.</td>
                 </tr>
               </tbody>
             </table>
