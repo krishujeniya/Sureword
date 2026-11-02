@@ -6,7 +6,7 @@
   <title>Sureword — Frontline Healthcare Voice Documentation</title>
   
   <!-- SEO & AEO Primary Metadata -->
-  <meta name="description" content="Sureword is an Indian frontline voice-to-form medical documentation system with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
+  <meta name="description" content="Sureword is an Indian frontline voice-to-form medical documentation system supporting 11 Indic languages with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
   <meta name="keywords" content="Sureword, Sovereign AI, Gnani.ai, Frontline Healthcare, ASHA worker voice assistant, Prisma STT, Timbre TTS, Indic ASR, selective clarification, voice to form">
   <meta name="author" content="Krish Ujeniya">
   <meta name="robots" content="index, follow">
@@ -60,7 +60,7 @@
             "name": "What is Sureword?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sureword is a voice-to-form documentation assistant for frontline healthcare workers. It captures visit narratives in Hindi-English and structures them into clinical records, asking targeted clarification questions only when uncertainty exceeds risk thresholds."
+              "text": "Sureword is a voice-to-form documentation assistant for frontline healthcare workers. It captures visit narratives in 11 Indic languages including Hindi, English, Marathi, Bengali, Gujarati, Punjabi, Tamil, Telugu, Kannada, Malayalam, and Odia, structuring them into clinical records with targeted clarification questions only when uncertainty exceeds risk thresholds."
             }
           },
           {
@@ -69,6 +69,14 @@
             "acceptedAnswer": {
               "@type": "Answer",
               "text": "Rather than reprompting every field or accepting raw ASR unverified, Sureword calculates field-level risk and prompts workers to repeat only high-risk ambiguous fields under a strict budget, cutting error by 50% relative."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What languages does Sureword support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sureword supports 11 Indian languages: Hindi (hi-IN), English (en-IN), Marathi (mr-IN), Bengali (bn-IN), Gujarati (gu-IN), Punjabi (pa-IN), Tamil (ta-IN), Telugu (te-IN), Kannada (kn-IN), Malayalam (ml-IN), and Odia (or-IN), all powered by Gnani.ai Prisma speech-to-text and Timbre text-to-speech engines."
             }
           }
         ]
@@ -87,7 +95,7 @@
       <div class="container header-container">
         <div class="brand">
           <div class="logo-wrapper" aria-hidden="true">
-            <img src="/static/logo.svg" alt="Sureword Logo" width="42" height="42" class="brand-logo-img">
+            <img src="/static/logo.svg" alt="" width="42" height="42" class="brand-logo-img">
           </div>
           <div>
             <div class="brand-title-row">
@@ -135,7 +143,7 @@
     <!-- Main Container -->
     <main id="main-content" class="container main-content" role="main">
       <!-- Live Status / Announcement Banner -->
-      <div id="status-message" class="status-box hidden" role="status" aria-live="polite"></div>
+      <div id="status-message" class="status-box hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
       <!-- VIEW 1: Clinical Dictation & Form Entry -->
       <div id="view-form" class="view-panel active" role="tabpanel" aria-labelledby="tab-form-btn">
@@ -186,7 +194,7 @@
               <div class="transcript-box-header">
                 <h3 data-i18n="transcript_title">Live Transcript</h3>
               </div>
-              <div id="transcript-content" class="transcript-text">No audio transcribed yet. Click 'Start Dictation' or select a sample above.</div>
+              <div id="transcript-content" class="transcript-text" data-i18n="transcript_empty">No audio transcribed yet. Click 'Start Dictation' or select a sample above.</div>
             </div>
           </section>
 
@@ -239,7 +247,7 @@
                 </button>
                 <div class="manual-input-inline">
                   <label for="clarify-manual-input" class="visually-hidden">Manually enter corrected field value</label>
-                  <input type="text" id="clarify-manual-input" placeholder="Or type corrected value" aria-label="Manually enter corrected field value">
+                  <input type="text" id="clarify-manual-input" placeholder="Or type corrected value" aria-describedby="clarify-prompt-text">
                   <button id="clarify-save-btn" class="btn btn-sm btn-primary" data-i18n="btn_save_edit">Save</button>
                 </div>
               </div>
@@ -365,7 +373,7 @@
               </thead>
               <tbody id="registry-table-body">
                 <tr>
-                  <td colspan="7" class="table-empty">No saved visit records yet. Complete a form to save.</td>
+                  <td colspan="7" class="table-empty" data-i18n="registry_empty">No saved visit records yet. Complete a form to save.</td>
                 </tr>
               </tbody>
             </table>

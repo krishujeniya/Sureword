@@ -281,26 +281,6 @@ body {
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
 }
 
-.lang-switch-btn {
-  background: #ffffff;
-  border: 1.5px solid var(--border-subtle);
-  color: var(--text-main);
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  transition: all 0.15s ease;
-}
-.lang-switch-btn:hover {
-  background: var(--bg-surface);
-  border-color: var(--border-strong);
-}
-
 .badge {
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-full);
@@ -691,6 +671,12 @@ body {
   gap: 0.35rem;
 }
 
+.form-group:focus-within {
+  border-left: 3px solid var(--border-focus);
+  padding-left: 0.75rem;
+  transition: border-left 0.15s ease, padding-left 0.15s ease;
+}
+
 .field-label-row {
   display: flex;
   justify-content: space-between;
@@ -968,6 +954,75 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--border-subtle);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn:disabled .loading-spinner {
+  border-top-color: var(--text-muted);
+}
+
+/* Print Stylesheet */
+@media print {
+  .app-header,
+  .app-footer,
+  .mic-controls,
+  .presets-row,
+  .clarification-box,
+  .commit-bar,
+  .committed-box,
+  .recording-state-indicator,
+  .skip-link,
+  .nav-tabs,
+  .system-status-group,
+  .registry-actions {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff;
+    color: #000000;
+    font-size: 12pt;
+  }
+
+  .app-wrapper {
+    min-height: auto;
+  }
+
+  .card {
+    border: 1px solid #999;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .registry-table {
+    font-size: 10pt;
+  }
+
+  .registry-table th,
+  .registry-table td {
+    border: 1px solid #ccc;
+    padding: 0.4rem;
+  }
 }
 
 /* Reduced Motion Preference (WCAG 2.3.3) */

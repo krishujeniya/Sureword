@@ -49,7 +49,13 @@ const I18N = {
     committed_heading: "Visit Record Saved",
     record_id_label: "Record ID:",
     registry_title: "Saved Visit Records",
-    registry_subtitle: "Locally verified household visit documentation."
+    registry_subtitle: "Locally verified household visit documentation.",
+    transcript_empty: "No audio transcribed yet. Click 'Start Dictation' or select a sample above.",
+    registry_empty: 'No saved visit records yet. Complete a form to save.',
+    status_processing: 'Processing speech with Gnani Prisma STT…',
+    status_init: 'Initializing frontline visit session…',
+    mic_denied: 'Microphone access denied or unsupported.',
+    status_clarify_processing: 'Processing spoken clarification…'
   },
   "hi-IN": {
     context_pill: "सामुदायिक स्वास्थ्य",
@@ -84,7 +90,13 @@ const I18N = {
     committed_heading: "भेंट रिकॉर्ड सहेजा गया",
     record_id_label: "रिकॉर्ड आईडी:",
     registry_title: "सहेजे गए भेंट रिकॉर्ड",
-    registry_subtitle: "सत्यापित घरेलू भेंटों की स्थानीय पंजी।"
+    registry_subtitle: "सत्यापित घरेलू भेंटों की स्थानीय पंजी।",
+    transcript_empty: "अभी तक कोई ऑडियो नहीं सुना। 'बोलना शुरू करें' पर क्लिक करें या ऊपर नमूना चुनें।",
+    registry_empty: 'अभी तक कोई रिकॉर्ड नहीं सहेजा गया। फॉर्म भरकर सहेजें।',
+    status_processing: 'वाक् प्रसंस्करण चल रहा है…',
+    status_init: 'भेंट सत्र प्रारंभ हो रहा है…',
+    mic_denied: 'माइक्रोफ़ोन अनुमति अस्वीकृत या असमर्थित।',
+    status_clarify_processing: 'स्पष्टीकरण प्रसंस्करण चल रहा है…'
   },
   "mr-IN": {
     context_pill: "आरोग्य केंद्र",
@@ -119,7 +131,13 @@ const I18N = {
     committed_heading: "नोंद जतन झाली",
     record_id_label: "रेकॉर्ड आयडी:",
     registry_title: "नोंदवलेले रेकॉर्ड्स",
-    registry_subtitle: "सत्यापित स्थानिक नोंदणी."
+    registry_subtitle: "सत्यापित स्थानिक नोंदणी.",
+    transcript_empty: "अद्याप ऑडिओ नाही. 'बोलणे सुरू करा' वर क्लिक करा.",
+    registry_empty: 'अद्याप कोणतीही नोंद नाही. फॉर्म भरा.',
+    status_processing: 'वाक् प्रक्रिया सुरू आहे…',
+    status_init: 'भेट सत्र सुरू होत आहे…',
+    mic_denied: 'मायक्रोफोन परवानगी नाकारली.',
+    status_clarify_processing: 'स्पष्टीकरण प्रक्रिया सुरू आहे…'
   },
   "bn-IN": {
     context_pill: "স্বাস্থ্য কেন্দ্র",
@@ -154,7 +172,13 @@ const I18N = {
     committed_heading: "রেকর্ড সংরক্ষিত",
     record_id_label: "রেকর্ড আইডি:",
     registry_title: "সংরক্ষিত ভিজিট রেকর্ড",
-    registry_subtitle: "স্থানীয়ভাবে যাচাইকৃত নথিভুক্তকরণ।"
+    registry_subtitle: "স্থানীয়ভাবে যাচাইকৃত নথিভুক্তকরণ।",
+    transcript_empty: "এখনও কোনো অডিও নেই। 'বলা শুরু করুন' ক্লিক করুন।",
+    registry_empty: 'এখনও কোনো রেকর্ড সংরক্ষিত নেই।',
+    status_processing: 'বাক্ প্রক্রিয়াকরণ চলছে…',
+    status_init: 'সাক্ষাৎ সেশন শুরু হচ্ছে…',
+    mic_denied: 'মাইক্রোফোন অনুমতি প্রত্যাখ্যাত।',
+    status_clarify_processing: 'স্পষ্টীকরণ প্রক্রিয়াকরণ…'
   },
   "gu-IN": {
     context_pill: "આરોગ્ય કેન્દ્ર",
@@ -189,7 +213,13 @@ const I18N = {
     committed_heading: "રેકોર્ડ સાચવ્યો",
     record_id_label: "રેકોર્ડ આઈડી:",
     registry_title: "સાચવેલા દર્દી રેકોર્ડ",
-    registry_subtitle: "ચકાસાયેલ સ્થાનિક રજિસ્ટ્રી."
+    registry_subtitle: "ચકાસાયેલ સ્થાનિક રજિસ્ટ્રી.",
+    transcript_empty: "હજુ સુધી કોઈ ઓડિયો નથી. 'બોલવાનું શરૂ કરો' ક્લિક કરો.",
+    registry_empty: 'હજુ સુધી કોઈ રેકોર્ડ સાચવ્યો નથી.',
+    status_processing: 'વાણી પ્રક્રિયા ચાલુ છે…',
+    status_init: 'મુલાકાત સત્ર શરૂ થઈ રહ્યું છે…',
+    mic_denied: 'માઇક્રોફોન પરવાનગી નકારાઈ.',
+    status_clarify_processing: 'સ્પષ્ટીકરણ પ્રક્રિયા ચાલુ…'
   },
   "pa-IN": {
     context_pill: "ਸਿਹਤ ਕੇਂਦਰ",
@@ -224,7 +254,13 @@ const I18N = {
     committed_heading: "ਰਿਕਾਰਡ ਸੰਭਾਲਿਆ ਗਿਆ",
     record_id_label: "ਰਿਕਾਰਡ ਆਈਡੀ:",
     registry_title: "ਸੰਭਾਲੇ ਮੁਲਾਕਾਤ ਰਿਕਾਰਡ",
-    registry_subtitle: "ਸਥਾਨਕ ਤਸਦੀਕਸ਼ੁਦਾ ਰਜਿਸਟਰੀ।"
+    registry_subtitle: "ਸਥਾਨਕ ਤਸਦੀਕਸ਼ੁਦਾ ਰਜਿਸਟਰੀ।",
+    transcript_empty: "ਅਜੇ ਕੋਈ ਆਡੀਓ ਨਹੀਂ। 'ਬੋਲਣਾ ਸ਼ੁਰੂ ਕਰੋ' ਕਲਿੱਕ ਕਰੋ।",
+    registry_empty: 'ਅਜੇ ਕੋਈ ਰਿਕਾਰਡ ਸੰਭਾਲਿਆ ਨਹੀਂ ਗਿਆ।',
+    status_processing: 'ਬੋਲੀ ਪ੍ਰਕਿਰਿਆ ਚੱਲ ਰਹੀ ਹੈ…',
+    status_init: 'ਮੁਲਾਕਾਤ ਸੈਸ਼ਨ ਸ਼ੁਰੂ ਹੋ ਰਿਹਾ ਹੈ…',
+    mic_denied: 'ਮਾਈਕ੍ਰੋਫੋਨ ਇਜਾਜ਼ਤ ਨਕਾਰੀ ਗਈ।',
+    status_clarify_processing: 'ਸਪੱਸ਼ਟੀਕਰਨ ਪ੍ਰਕਿਰਿਆ…'
   },
   "ta-IN": {
     context_pill: "சுகாதார மையம்",
@@ -259,7 +295,13 @@ const I18N = {
     committed_heading: "வருகைப் பதிவு சேமிக்கப்பட்டது",
     record_id_label: "பதிவு எண்:",
     registry_title: "சேமிக்கப்பட்ட வருகைப் பதிவுகள்",
-    registry_subtitle: "சரிபார்க்கப்பட்ட கள ஆவணங்கள்."
+    registry_subtitle: "சரிபார்க்கப்பட்ட கள ஆவணங்கள்.",
+    transcript_empty: "இதுவரை ஆடியோ இல்லை. 'பேசத் தொடங்கு' கிளிக் செய்யவும்.",
+    registry_empty: 'இதுவரை பதிவு எதுவும் சேமிக்கப்படவில்லை.',
+    status_processing: 'பேச்சு செயலாக்கம் நடைபெறுகிறது…',
+    status_init: 'வருகை அமர்வு தொடங்குகிறது…',
+    mic_denied: 'மைக்ரோஃபோன் அனுமதி மறுக்கப்பட்டது.',
+    status_clarify_processing: 'விளக்க செயலாக்கம்…'
   },
   "te-IN": {
     context_pill: "ఆరోగ్య కేంద్రం",
@@ -294,7 +336,13 @@ const I18N = {
     committed_heading: "సందర్శన రికార్డు సేవ్ చేయబడింది",
     record_id_label: "రికార్డు ఐడీ:",
     registry_title: "సేవ్ చేయబడిన రికార్డులు",
-    registry_subtitle: "ధృవీకరించబడిన రిజిస్ట్రీ."
+    registry_subtitle: "ధృవీకరించబడిన రిజిస్ట్రీ.",
+    transcript_empty: "ఇంకా ఆడియో లేదు. 'మాట్లాడటం ప్రారంభించండి' క్లిక్ చేయండి.",
+    registry_empty: 'ఇంకా రికార్డు సేవ్ చేయబడలేదు.',
+    status_processing: 'వాక్ ప్రాసెసింగ్ జరుగుతోంది…',
+    status_init: 'సందర్శన సెషన్ ప్రారంభమవుతోంది…',
+    mic_denied: 'మైక్రోఫోన్ అనుమతి తిరస్కరించబడింది.',
+    status_clarify_processing: 'స్పష్టత ప్రాసెసింగ్…'
   },
   "kn-IN": {
     context_pill: "ಆರೋಗ್ಯ ಕೇಂದ್ರ",
@@ -329,7 +377,13 @@ const I18N = {
     committed_heading: "ದಾಖಲೆ ಉಳಿಸಲಾಗಿದೆ",
     record_id_label: "ದಾಖಲೆ ಐಡಿ:",
     registry_title: "ಉಳಿಸಿದ ಭೇಟಿ ದಾಖಲೆಗಳು",
-    registry_subtitle: "ಪರಿಶೀಲಿಸಿದ ದಾಖಲಾತಿ."
+    registry_subtitle: "ಪರಿಶೀಲಿಸಿದ ದಾಖಲಾತಿ.",
+    transcript_empty: "ಇನ್ನೂ ಆಡಿಯೋ ಇಲ್ಲ. 'ಮಾತನಾಡಲು ಪ್ರಾರಂಭಿಸಿ' ಕ್ಲಿಕ್ ಮಾಡಿ.",
+    registry_empty: 'ಇನ್ನೂ ದಾಖಲೆ ಉಳಿಸಲಾಗಿಲ್ಲ.',
+    status_processing: 'ವಾಕ್ ಸಂಸ್ಕರಣೆ ನಡೆಯುತ್ತಿದೆ…',
+    status_init: 'ಭೇಟಿ ಅಧಿವೇಶನ ಪ್ರಾರಂಭವಾಗುತ್ತಿದೆ…',
+    mic_denied: 'ಮೈಕ್ರೊಫೋನ್ ಅನುಮತಿ ನಿರಾಕರಿಸಲಾಗಿದೆ.',
+    status_clarify_processing: 'ಸ್ಪಷ್ಟೀಕರಣ ಸಂಸ್ಕರಣೆ…'
   },
   "ml-IN": {
     context_pill: "ആരോഗ്യ കേന്ദ്രം",
@@ -364,7 +418,13 @@ const I18N = {
     committed_heading: "സന്ദർശന രേഖ സൂക്ഷിച്ചു",
     record_id_label: "റെക്കോർഡ് ഐഡി:",
     registry_title: "സൂക്ഷിച്ച സന്ദർശന രേഖകൾ",
-    registry_subtitle: "സ്ഥിരീകരിച്ച രജിസ്ട്രി."
+    registry_subtitle: "സ്ഥിരീകരിച്ച രജിസ്ട്രി.",
+    transcript_empty: "ഇതുവരെ ഓഡിയോ ഇല്ല. 'സംസാരിക്കുക' ക്ലിക്ക് ചെയ്യുക.",
+    registry_empty: 'ഇതുവരെ രേഖ സൂക്ഷിച്ചിട്ടില്ല.',
+    status_processing: 'വാക്ക് പ്രോസസ്സിംഗ് നടക്കുന്നു…',
+    status_init: 'സന്ദർശന സെഷൻ ആരംഭിക്കുന്നു…',
+    mic_denied: 'മൈക്രോഫോൺ അനുമതി നിരസിച്ചു.',
+    status_clarify_processing: 'വ്യക്തത പ്രോസസ്സിംഗ്…'
   },
   "or-IN": {
     context_pill: "ସ୍ୱାସ୍ଥ୍ୟ କେନ୍ଦ୍ର",
@@ -399,7 +459,13 @@ const I18N = {
     committed_heading: "ରେକର୍ଡ ସଞ୍ଚିତ ହେଲା",
     record_id_label: "ରେକର୍ଡ ଆଇଡି:",
     registry_title: "ସଂରକ୍ଷିତ ଭେଟି ରେକର୍ଡ",
-    registry_subtitle: "ଯାଞ୍ଚ ହୋଇଥିବା ପଞ୍ଜୀ।"
+    registry_subtitle: "ଯାଞ୍ଚ ହୋଇଥିବା ପଞ୍ଜୀ।",
+    transcript_empty: "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ଅଡିଓ ନାହିଁ। 'କୁହିବା ଆରମ୍ଭ କରନ୍ତୁ' କ୍ଲିକ୍ କରନ୍ତୁ।",
+    registry_empty: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ରେକର୍ଡ ସଞ୍ଚିତ ହୋଇନାହିଁ।',
+    status_processing: 'ବାକ୍ ପ୍ରକ୍ରିୟାକରଣ ଚାଲୁଛି…',
+    status_init: 'ଭେଟି ସେସନ୍ ଆରମ୍ଭ ହେଉଛି…',
+    mic_denied: 'ମାଇକ୍ରୋଫୋନ ଅନୁମତି ପ୍ରତ୍ୟାଖ୍ୟାନ।',
+    status_clarify_processing: 'ସ୍ପଷ୍ଟୀକରଣ ପ୍ରକ୍ରିୟାକରଣ…'
   }
 };
 
@@ -571,7 +637,12 @@ function setLanguage(lang) {
     });
   }
 
-  document.documentElement.lang = lang.split("-")[0];
+  // Update empty state transcript if not yet transcribed
+  if (transcriptContent && (!currentDraftId || transcriptContent.hasAttribute("data-i18n"))) {
+    transcriptContent.textContent = strings.transcript_empty || transcriptContent.textContent;
+  }
+
+  document.documentElement.lang = lang;
 }
 
 // System Health Check
@@ -594,7 +665,8 @@ async function checkHealth() {
 
 // Draft Session Lifecycle
 async function initNewDraft() {
-  showStatus("Initializing frontline visit session...", "info");
+  const initDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
+  showStatus(initDict.status_init || "Initializing frontline visit session...", "info");
   try {
     const res = await fetch("/api/drafts", {
       method: "POST",
@@ -642,7 +714,8 @@ function resetFormUI() {
   committedResult.classList.add("hidden");
   clarificationBanner.classList.add("hidden");
   if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
-  transcriptContent.textContent = "No audio transcribed yet. Click 'Start Dictation' or select a sample above.";
+  const transDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
+  transcriptContent.textContent = transDict.transcript_empty || "No audio transcribed yet. Click 'Start Dictation' or select a sample above.";
 
   updateEncounterSummary({ person_name: {}, age: {}, village: {}, visit_date: {} });
 
@@ -822,7 +895,8 @@ async function startRecording() {
     }, 500);
 
   } catch (err) {
-    showStatus("Microphone access denied or unsupported: " + err.message, "error");
+    const micDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
+    showStatus((micDict.mic_denied || "Microphone access denied or unsupported.") + " (" + err.message + ")", "error");
   }
 }
 
@@ -840,7 +914,8 @@ async function startClarificationRecording(fieldKey) {
 
 // API Submission Pipelines
 async function submitFullAudio(blobOrFile) {
-  showStatus("Processing speech with Gnani Prisma STT...", "info");
+  const procDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
+  showStatus(procDict.status_processing || "Processing speech with Gnani Prisma STT...", "info");
   const formData = new FormData();
   formData.append("expected_version", currentVersion);
   formData.append("audio_file", blobOrFile, "recording.webm");
@@ -1031,15 +1106,22 @@ async function loadCommittedRecords() {
     registryCountPill.textContent = records.length;
     renderRegistryTable(records);
   } catch (err) {
-    console.error("Failed to fetch committed records:", err);
+    // Registry fetch failed; table gracefully shows empty state
   }
 }
 
+function escapeHtml(str) {
+  if (str === null || str === undefined) return "—";
+  const s = String(str);
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
 function renderRegistryTable(records) {
+  const regDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   if (!records || records.length === 0) {
     registryTableBody.innerHTML = `
       <tr>
-        <td colspan="7" class="table-empty">No committed visit records found in session. Complete a form to commit.</td>
+        <td colspan="7" class="table-empty">${escapeHtml(regDict.registry_empty || "No saved visit records yet. Complete a form to save.")}</td>
       </tr>
     `;
     return;
@@ -1056,12 +1138,12 @@ function renderRegistryTable(records) {
 
     return `
       <tr>
-        <td><strong class="code-record-id">${r.record_id}</strong></td>
-        <td>${name}</td>
-        <td>${age}</td>
-        <td>${village}</td>
-        <td>${date}</td>
-        <td>${timeFormatted}</td>
+        <td><strong class="code-record-id">${escapeHtml(r.record_id)}</strong></td>
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(age)}</td>
+        <td>${escapeHtml(village)}</td>
+        <td>${escapeHtml(date)}</td>
+        <td>${escapeHtml(timeFormatted)}</td>
         <td><span class="badge badge-live">Verified ✓</span></td>
       </tr>
     `;
@@ -1156,6 +1238,16 @@ function setupEventListeners() {
   playTtsBtn.addEventListener("click", playSpokenClarification);
   clarifyMicBtn.addEventListener("click", () => startClarificationRecording(isClarifyingField));
   clarifySaveBtn.addEventListener("click", saveManualClarification);
+
+  // Enter key submits manual clarification (a11y keyboard enhancement)
+  if (clarifyManualInput) {
+    clarifyManualInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        saveManualClarification();
+      }
+    });
+  }
 
   commitBtn.addEventListener("click", commitCurrentDraft);
 
