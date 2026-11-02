@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+from collections.abc import AsyncGenerator
 
 import pytest
 
@@ -11,7 +12,7 @@ from fieldcheck.storage import Storage
 
 
 @pytest.fixture
-async def temp_state_machine() -> DraftStateMachine:
+async def temp_state_machine() -> AsyncGenerator[DraftStateMachine, None]:
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         db_path = f.name
 

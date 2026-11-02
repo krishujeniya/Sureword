@@ -2,6 +2,7 @@
 
 import os
 import tempfile
+from collections.abc import AsyncGenerator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -10,7 +11,7 @@ from fieldcheck.app import app, storage
 
 
 @pytest.fixture(autouse=True)
-async def init_test_db() -> None:
+async def init_test_db() -> AsyncGenerator[None, None]:
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         db_path = f.name
     storage.db_path = db_path

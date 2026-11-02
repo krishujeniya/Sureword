@@ -67,14 +67,14 @@ Keep all planning in this file. Read the following in the brief's requested orde
 
 ## 2. Input audit and precedence
 
-Order of authority: latest user scope clarification and renewed mission → `astra.txt` mission → currently verified primary sources → proposals in the three research reports. A report's label “VERIFIED” is not independent verification.
+Order of authority: latest user scope clarification and renewed mission → `docs/research/CONTEST_BRIEF.md` (formerly `astra.txt`) mission → currently verified primary sources → proposals in the three research reports. A report's label “VERIFIED” is not independent verification.
 
 | Input reviewed | What it contributes | Treatment in this tracker |
 |---|---|---|
-| `astra.txt`, 481 lines | Eight gates, evidence discipline, one project, real Gnani integration, evaluation, demo, interview and deadline | Governing brief; its embedded Gemini report is still a paste placeholder. The separate files supply the research. |
-| `Pasted text(1).txt`, 436 lines | Frontline documentation; selective field verification; telephony runner-up; broader prior-art and dataset options | Retain the narrow systems hypothesis; do not inherit its confidence estimate, ranking or account claims. |
-| `Pasted text (2).txt`, 476 lines | ASHA confirmation workflow; kirana runner-up; clinical examples; API claims and handoff | Retain implementation ideas; remove medication/dose workflows and unverified 60-second upload limit. Several bibliography URLs contain literal `...` and are not usable citations. |
-| `Gnani AI Challenge Research Dossier.pdf`, 63 pages | Crop-loss intake; hierarchical context; multi-pass transcription; abstention; financial stress tests; broad bibliography | PDF text extracted and reviewed, including tables and handoff. Retain contextual-bias failure analysis as optional research. Reject its multi-domain scope and unmeasured cost/latency guarantees. |
+| `docs/research/CONTEST_BRIEF.md` (formerly `astra.txt`), 481 lines | Eight gates, evidence discipline, one project, real Gnani integration, evaluation, demo, interview and deadline | Governing brief; its embedded Gemini report is still a paste placeholder. The separate files supply the research. |
+| `docs/research/RESEARCH_DOSSIER_PRIOR_ART.md` (formerly `Pasted text(1).txt`), 436 lines | Frontline documentation; selective field verification; telephony runner-up; broader prior-art and dataset options | Retain the narrow systems hypothesis; do not inherit its confidence estimate, ranking or account claims. |
+| `docs/research/RESEARCH_DOSSIER_SYSTEMS.md` (formerly `Pasted text (2).txt`), 476 lines | ASHA confirmation workflow; kirana runner-up; clinical examples; API claims and handoff | Retain implementation ideas; remove medication/dose workflows and unverified 60-second upload limit. Several bibliography URLs contain literal `...` and are not usable citations. |
+| `docs/research/Gnani_AI_Challenge_Research_Dossier.pdf`, 63 pages | Crop-loss intake; hierarchical context; multi-pass transcription; abstention; financial stress tests; broad bibliography | PDF text extracted and reviewed, including tables and handoff. Retain contextual-bias failure analysis as optional research. Reject its multi-domain scope and unmeasured cost/latency guarantees. |
 
 The PDF has broken `[span_...]` extraction/citation artifacts. Never copy those into URLs or code. Its ranking differs materially from both text reports; this tracker makes a fresh, explicit decision rather than merging three incompatible products. PDF review used extracted text, not a visual layout audit. No implementation source or project-specific `AGENTS.md` was found in the inspected workspace/ancestor locations.
 

@@ -20,44 +20,96 @@ In Indian frontline healthcare workflows (such as ASHA household survey visits a
 
 ---
 
-## 2. Architecture & Contracts
+## 2. Production Repository Structure
 
-FieldCheck uses an async Python service (FastAPI + Pydantic v2 + SQLite) with an accessible, lightweight web interface:
+This repository follows production-grade FAANG/Tier-1 engineering standards, using the modern PyPA `src-layout`, PEP 561 inline typing, and segregated documentation hierarchies:
 
 ```text
-Browser Mic / Audio Upload
-        │
-        ▼
-   Audio Validation (16kHz mono WAV normalization, max 20s, ffmpeg)
-        │
-        ▼
-   Gnani Prisma Adapter (live STT / cached / fixture fallback)
-        │
-        ▼
-   Deterministic Field Parser & Normalizer
-   - person_name: title-case normalization, marker extraction
-   - age: Hindi number words, Devanagari numerals, range check (1-120)
-   - village: directory lookup & context boundary
-   - visit_date: ISO 8601 validation (YYYY-MM-DD), rejection of invalid calendar dates
-        │
-        ▼
-   Selective Risk Policy (identifies single highest-uncertainty field)
-        │
-        ├─▶ Uncertain: Spoken prompt generated via Gnani Timbre TTS
-        │             User repeats field ──▶ Field updated with provenance
-        │
-        └─▶ Valid: Draft enters READY_FOR_REVIEW
-                    Explicit user confirmation ──▶ Idempotent local SQLite commit
+.
+├── Makefile                      # Developer operations & CI parity automation
+├── pyproject.toml                # Build configuration, dependency specs & tool configs
+├── Dockerfile                    # Production container image definition
+├── docker-compose.yml            # Local orchestration
+├── .dockerignore                 # Container build exclusion rules
+├── .editorconfig                 # Cross-IDE code style enforcement
+├── .gitignore                    # Version control ignore rules
+├── .env.example                  # Environment configuration template
+├── LICENSE                       # MIT License
+├── README.md                     # Project overview and entrypoint
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # Automated CI pipeline (lint, typecheck, test, benchmark)
+│
+├── configs/                      # Runtime policies and experiment configurations
+│   ├── experiment.json           # Evaluation hyperparameters & policy ablation specs
+│   ├── policy.json               # Risk thresholds & uncertainty penalty weights
+│   └── schema.json               # Canonical entity definitions & validation boundaries
+│
+├── data/                         # Evaluation manifests and datasets
+│   └── manifests/
+│       ├── dev.jsonl             # 8-sample development calibration set
+│       └── test.jsonl            # 8-sample frozen held-out evaluation set
+│
+├── docs/                         # Structured technical documentation
+│   ├── README.md                 # Documentation catalog and navigation map
+│   ├── architecture/
+│   │   └── SYSTEM_DESIGN.md      # Architecture diagrams, state machines, and contracts
+│   ├── specifications/
+│   │   ├── SUBMISSION_PACK.md    # Contest submission answers & interview defense
+│   │   └── WORKFLOW_VALIDATION.md# ASHA/ANM operational guidelines & usability trial protocol
+│   ├── research/
+│   │   ├── CONTEST_BRIEF.md      # Governing challenge specifications & operational boundaries
+│   │   ├── RESEARCH_DOSSIER_PRIOR_ART.md # Prior art analysis & Indian frontline speech context
+│   │   ├── RESEARCH_DOSSIER_SYSTEMS.md   # Systems-level research formulation & hypotheses
+│   │   └── Gnani_AI_Challenge_Research_Dossier.pdf # Original 63-page research dossier
+│   └── planning/
+│       └── TRACKER.md            # Execution tracker, task milestones, and evidence ledger
+│
+├── src/                          # Application source code (PyPA src-layout)
+│   └── fieldcheck/
+│       ├── py.typed              # PEP 561 inline type indicator
+│       ├── __init__.py           # Package initialization
+│       ├── app.py                # FastAPI endpoints, lifespan, and static mounting
+│       ├── audio.py              # Audio normalization (16kHz mono WAV) & duration guards
+│       ├── contracts.py          # Pydantic v2 domain schemas, FieldValue, & Transcript
+│       ├── parser.py             # Deterministic Hindi-English entity parser & normalizer
+│       ├── policy.py             # Uncertainty ranking engine (Policies B0, B1, B2, B3, P)
+│       ├── state.py              # Finite state machine (EMPTY -> COMMITTED)
+│       ├── storage.py            # Async SQLite transactional storage (aiosqlite)
+│       ├── providers/
+│       │   └── gnani.py          # Gnani Prisma STT and Timbre TTS provider adapter
+│       └── static/
+│           ├── index.html        # Accessible frontline web interface
+│           ├── styles.css        # Responsive styling
+│           └── app.js            # Client-side state machine and audio recorder
+│
+├── tests/                        # Comprehensive test suite (pytest)
+│   ├── conftest.py               # Shared pytest fixtures and configuration
+│   ├── unit/                     # Unit test suite
+│   │   ├── test_audio.py         # Audio converter and validation tests
+│   │   ├── test_contracts.py     # Schema boundary and constraint tests
+│   │   ├── test_parser.py        # Entity extraction and numeral parsing tests
+│   │   ├── test_policy.py        # Uncertainty ranking and policy selection tests
+│   │   └── test_state.py         # State machine lifecycle and transition tests
+│   └── integration/              # Integration test suite
+│       ├── test_app.py           # FastAPI endpoint integration tests
+│       └── test_gnani_client.py  # Gnani API provider adapter & fallback tests
+│
+├── scripts/                      # Operational automation & benchmarking tools
+│   ├── capture_demo_walkthrough.py # Playwright automated visual walkthrough capture
+│   ├── demo_runner.py            # Local CLI demo runner
+│   ├── evaluate.py               # Benchmark evaluation engine across 5 policies
+│   ├── generate_charts.py        # Evaluation visualization generator (matplotlib)
+│   ├── smoke_gnani.py            # Live/offline Gnani API probe
+│   ├── validate_manifest.py      # Split leakage & schema integrity validator
+│   └── verify_deployment.py      # Deployment health & capability verification
+│
+└── artifacts/                    # Frozen evaluation artifacts & demonstration media
+    ├── demo/                     # UI walkthrough screenshots and preview HTML
+    ├── evaluation/               # Policy comparison figures and benchmark results JSON
+    └── smoke/                    # Audio smoke probe outputs
 ```
-
-### Core API Endpoints
-
-- `POST /api/drafts`: Initialize a new draft session.
-- `POST /api/drafts/{id}/audio`: Process raw audio through Prisma STT and field parser.
-- `POST /api/drafts/{id}/clarify`: Submit spoken or typed clarification for a targeted field.
-- `POST /api/drafts/{id}/speech`: Retrieve spoken clarification audio via Timbre TTS.
-- `POST /api/drafts/{id}/commit`: Explicitly review and save the final draft.
-- `GET /healthz`: Service health and capability check.
 
 ---
 
@@ -65,19 +117,17 @@ Browser Mic / Audio Upload
 
 ### Prerequisites
 - Python 3.11+
-- `ffmpeg` installed on the system path
+- `ffmpeg` installed on system path
 - `uv` package manager (recommended) or standard `pip`
 
-### Setup
+### Developer Setup
 
 ```bash
 # Clone and enter directory
 cd /path/to/gnani
 
-# Create virtual environment and install dependencies
-uv venv --python python3.11
-source .venv/bin/activate
-uv pip install -e ".[dev]"
+# Quick setup with Makefile (creates venv and installs all dependencies)
+make install
 
 # Configure environment
 cp .env.example .env
@@ -87,7 +137,11 @@ cp .env.example .env
 ### Run the Application
 
 ```bash
-python -m uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000 --reload
+# Using Makefile
+make dev
+
+# Or directly with Uvicorn
+uv run python -m uvicorn fieldcheck.app:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 Open `http://127.0.0.1:8000` in your web browser.
@@ -99,15 +153,20 @@ Open `http://127.0.0.1:8000` in your web browser.
 FieldCheck adheres to strict verification discipline:
 
 ```bash
-# Unit tests (parser, risk ranking, state machine, audio normalizer)
-pytest tests/unit -v
+# Run unit and integration tests
+make test
 
-# Integration tests (Gnani adapter, failure handling, timeouts, retries)
-pytest tests/integration -v
+# Static analysis and linting (Ruff)
+make lint
 
-# Static analysis and type checking
-ruff check src tests scripts
-mypy src/fieldcheck
+# Strict static type analysis (Mypy)
+make typecheck
+
+# Validate dataset manifest integrity
+make validate
+
+# Run deterministic benchmark evaluation
+make evaluate
 ```
 
 ---
@@ -117,7 +176,7 @@ mypy src/fieldcheck
 - **Primary Research Question:** At an equal clarification budget (maximum 1 prompt per form), does selective uncertainty-ranked clarification reduce accepted critical-field errors compared to simple sequential verification?
 - **Baselines Evaluated:**
   - `B0`: Raw Prisma transcript without verification.
-  - `B1`: Schema violations first, then fixed field order.
+  - `B1`: Schema violations first, then fixed alphabetical field order.
   - `B2`: Seeded random field selection.
   - `B3`: Full confirmation of every field (unconstrained upper bound).
   - `P`: Proposed field-aware risk ranking.

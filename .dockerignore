@@ -1,0 +1,40 @@
+# Git
+.git
+.github
+.gitignore
+
+# Python & Build
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+dist/
+build/
+*.egg-info/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+
+# Test & Caches
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Local & Secrets
+.env
+.env.local
+*.db
+*.sqlite3
+fieldcheck.db
+
+# Documentation & Raw Assets
+docs/
+artifacts/
+graphify-out/
+.agents/
+.aws/
+.codex/

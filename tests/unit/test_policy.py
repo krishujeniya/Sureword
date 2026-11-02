@@ -44,7 +44,7 @@ def test_select_clarification_p() -> None:
         "village": FieldValue(key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED),
         "visit_date": FieldValue(key="visit_date", canonical_value="2026-10-30", status=FieldStatus.USER_CONFIRMED),
     }
-    attempts = {}
+    attempts: dict[str, int] = {}
 
     prompt = select_clarification_field_p(fields, attempts, max_attempts=2, risk_threshold=0.3)
     assert prompt is not None
@@ -58,7 +58,7 @@ def test_select_clarification_b1() -> None:
         "village": FieldValue(key="village", canonical_value="Rampur", status=FieldStatus.PROPOSED),
         "visit_date": FieldValue(key="visit_date", canonical_value="2026-10-30", status=FieldStatus.PROPOSED),
     }
-    attempts = {}
+    attempts: dict[str, int] = {}
 
     prompt = select_clarification_field_b1(fields, attempts, max_attempts=1)
     assert prompt is not None
@@ -70,7 +70,7 @@ def test_select_clarification_b2() -> None:
         "person_name": FieldValue(key="person_name", canonical_value="Kamla Devi", status=FieldStatus.PROPOSED),
         "age": FieldValue(key="age", canonical_value="45", status=FieldStatus.PROPOSED),
     }
-    attempts = {}
+    attempts: dict[str, int] = {}
 
     prompt = select_clarification_field_b2(fields, attempts, seed=42, max_attempts=1)
     assert prompt is not None
