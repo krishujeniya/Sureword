@@ -13,6 +13,13 @@ import time
 
 import httpx
 
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 from sureword.contracts import Transcript
 
 logger = logging.getLogger("sureword.providers.gnani")
@@ -43,22 +50,50 @@ class GnaniClient:
         api_key: str | None = None,
         stt_url: str | None = None,
         tts_url: str | None = None,
-        stt_model: str = "prisma-v3",
-        tts_model: str = "timbre-2.5",
-        default_language: str = "hi-IN",
-        allow_fixture_fallback: bool = True,
+        stt_model: str | None = None,
+        tts_model: str | None = None,
+        tts_voice: str | None = None,
+        default_language: str | None = None,
+        allow_fixture_fallback: bool | None = None,
     ) -> None:
-        self.api_key: str = str(api_key or os.getenv("GNANI_API_KEY") or "")
-        self.stt_url: str = str(
-            stt_url or os.getenv("GNANI_STT_URL") or "https://api.vachana.ai/stt/v3"
+        self.api_key: str = (
+            api_key if api_key is not None else (os.getenv("GNANI_API_KEY") or "")
         )
-        self.tts_url: str = str(
-            tts_url or os.getenv("GNANI_TTS_URL") or "https://api.vachana.ai/api/v1/tts/inference"
+        self.stt_url: str = (
+            stt_url
+            if stt_url is not None
+            else (os.getenv("GNANI_STT_URL") or "https://api.vachana.ai/stt/v3")
         )
-        self.stt_model: str = stt_model or os.getenv("GNANI_STT_MODEL", "prisma-v3")
-        self.tts_model: str = tts_model or os.getenv("GNANI_TTS_MODEL", "timbre-2.5")
-        self.default_language: str = default_language or os.getenv("GNANI_LANGUAGE", "hi-IN")
-        self.allow_fixture_fallback = allow_fixture_fallback
+        self.tts_url: str = (
+            tts_url
+            if tts_url is not None
+            else (os.getenv("GNANI_TTS_URL") or "https://api.vachana.ai/api/v1/tts/inference")
+        )
+        self.stt_model: str = (
+            stt_model
+            if stt_model is not None
+            else (os.getenv("GNANI_STT_MODEL") or "prisma-v3.0")
+        )
+        self.tts_model: str = (
+            tts_model
+            if tts_model is not None
+            else (os.getenv("GNANI_TTS_MODEL") or "timbre-v2.5")
+        )
+        self.tts_voice: str = (
+            tts_voice
+            if tts_voice is not None
+            else (os.getenv("GNANI_TTS_VOICE") or "Bhavna")
+        )
+        self.default_language: str = (
+            default_language
+            if default_language is not None
+            else (os.getenv("GNANI_LANGUAGE") or "hi-IN")
+        )
+        self.allow_fixture_fallback: bool = (
+            allow_fixture_fallback
+            if allow_fixture_fallback is not None
+            else (os.getenv("ALLOW_FIXTURE_FALLBACK", "true").lower() in ("true", "1", "yes"))
+        )
 
     def has_credentials(self) -> bool:
         """Check whether valid non-placeholder API key is set."""
@@ -108,7 +143,7 @@ class GnaniClient:
             "audio_file": ("audio.wav", wav_bytes, "audio/wav"),
         }
         data = {
-            "language": lang,
+            "language_code": lang,
             "model": self.stt_model,
         }
 
@@ -207,7 +242,7 @@ class GnaniClient:
                         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as f:
                             tmp_wav = f.name
                         res = subprocess.run(
-                            [espeak_bin, "-w", tmp_wav, "-v", "hi", text],
+                            [espeak_bin, "-w", tmp_wav, "-v", lang[:2], text],
                             capture_output=True,
                             stdin=subprocess.DEVNULL,
                             timeout=5,
@@ -248,8 +283,15 @@ class GnaniClient:
         }
         payload = {
             "text": text,
-            "language": lang,
             "model": self.tts_model,
+            "voice": self.tts_voice,
+            "audio_config": {
+                "encoding": "linear_pcm",
+                "container": "wav",
+                "num_channels": 1,
+                "sample_rate": 16000,
+                "sample_width": 2,
+            },
         }
 
         async with _PROVIDER_LOCK:
