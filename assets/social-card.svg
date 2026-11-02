@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+    <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0b0f19" />
+            <stop offset="100%" stop-color="#020617" />
+        </linearGradient>
+        <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f59e0b" />
+            <stop offset="100%" stop-color="#ef4444" />
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="60" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+    </defs>
+
+    <!-- Background -->
+    <rect width="1280" height="640" fill="url(#bg)" />
+
+    <!-- Ambient Glow Orbs -->
+    <circle cx="1100" cy="120" r="180" fill="#f59e0b" opacity="0.12" filter="url(#glow)" />
+    <circle cx="180" cy="520" r="140" fill="#ef4444" opacity="0.08" filter="url(#glow)" />
+
+    <!-- Inner Border Card -->
+    <rect x="32" y="32" width="1216" height="576" rx="24" fill="none" stroke="#1e293b" stroke-width="2" />
+
+    <!-- Author Badge -->
+    <g transform="translate(80, 96)">
+        <text x="0" y="24" fill="#f59e0b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" letter-spacing="3">HEALTHCARE SPEECH AI</text>
+    </g>
+
+    <!-- Title -->
+    <text x="80" y="240" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="76" font-weight="800" letter-spacing="-1">Sureword</text>
+
+    <!-- Subtitle -->
+    <text x="80" y="320" fill="#cbd5e1" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="400">Frontline Voice-to-Form Entry with Selective Clarification using Gnani Prisma</text>
+
+    <!-- Maintainer Attribution -->
+    <g transform="translate(80, 390)">
+        <text x="0" y="20" fill="#64748b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18">Engineered by <tspan fill="#f1f5f9" font-weight="600">Krish Ujeniya</tspan> (@krishujeniya)</text>
+    </g>
+
+    <!-- Feature Tags -->
+    
+        <g transform="translate(80, 470)">
+            <rect width="175" height="42" rx="21" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+            <text x="87.5" y="26" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" text-anchor="middle">Healthcare AI</text>
+        </g>
+        
+        <g transform="translate(271, 470)">
+            <rect width="65" height="42" rx="21" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+            <text x="32.5" y="26" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" text-anchor="middle">ASR</text>
+        </g>
+        
+        <g transform="translate(352, 470)">
+            <rect width="164" height="42" rx="21" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+            <text x="82.0" y="26" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" text-anchor="middle">Gnani Prisma</text>
+        </g>
+        
+        <g transform="translate(532, 470)">
+            <rect width="285" height="42" rx="21" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+            <text x="142.5" y="26" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" text-anchor="middle">Selective Clarification</text>
+        </g>
+        
+        <g transform="translate(833, 470)">
+            <rect width="109" height="42" rx="21" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+            <text x="54.5" y="26" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="16" font-weight="600" text-anchor="middle">FastAPI</text>
+        </g>
+        
+</svg>
