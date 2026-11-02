@@ -419,3 +419,58 @@ async def test_audio_endpoint_with_simulated_transcript() -> None:
         assert data["draft"]["fields"]["person_name"]["canonical_value"] == "Kamla Devi"
         assert data["draft"]["fields"]["age"]["canonical_value"] == "45"
 
+
+@pytest.mark.asyncio
+async def test_get_languages_endpoint() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        res = await client.get("/api/languages")
+        assert res.status_code == 200
+        data = res.json()
+        assert isinstance(data, list)
+        assert len(data) == 11
+        codes = [item["code"] for item in data]
+        expected_codes = [
+            "hi-IN",
+            "en-IN",
+            "mr-IN",
+            "bn-IN",
+            "gu-IN",
+            "pa-IN",
+            "ta-IN",
+            "te-IN",
+            "kn-IN",
+            "ml-IN",
+            "or-IN",
+        ]
+        for c in expected_codes:
+            assert c in codes
+
+
+@pytest.mark.asyncio
+async def test_multilingual_draft_lifecycle_and_clarification() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Create draft in Tamil
+        res_create = await client.post("/api/drafts", data={"language": "ta-IN"})
+        assert res_create.status_code == 200
+        draft_info = res_create.json()
+        draft_id = draft_info["draft_id"]
+
+        res_get = await client.get(f"/api/drafts/{draft_id}")
+        assert res_get.status_code == 200
+        assert res_get.json()["language"] == "ta-IN"
+
+        # Submit simulated transcript missing age to trigger clarification
+        res_sim = await client.post(
+            f"/api/drafts/{draft_id}/audio",
+            data={
+                "expected_version": draft_info["version"],
+                "simulated_transcript": "நோயாளி பெயர் கமலா தேவி, கிராமம் ராம்பூர், வருகை தேதி 30 அக்டோபர் 2026",
+            },
+        )
+        assert res_sim.status_code == 200
+        data = res_sim.json()
+        # Prompt should be localized in Tamil for missing age
+        assert data["draft"]["state"] == "NEEDS_CLARIFICATION"
+        assert "வயதை" in data["draft"]["active_prompt"]["prompt_text"]

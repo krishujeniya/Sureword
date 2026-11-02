@@ -1,12 +1,12 @@
 /**
  * Sureword — Sovereign Frontline Voice Documentation Engine
- * Production Client Application Logic
+ * Production Client Application Logic with 11-Language Support
  */
 
 // Application State
 let currentDraftId = null;
 let currentVersion = 1;
-let currentLanguage = "en"; // "en" | "hi"
+let currentLanguage = localStorage.getItem("sureword_lang") || "hi-IN";
 let mediaRecorder = null;
 let audioChunks = [];
 let recordTimerInterval = null;
@@ -14,15 +14,15 @@ let recordStartTime = 0;
 let isClarifyingField = null;
 let committedRecordsCache = [];
 
-// Bilingual Localization Dictionary
+// Localization Dictionaries for All 11 Supported Indic & Regional Languages
 const I18N = {
-  en: {
+  "en-IN": {
     context_pill: "Frontline Health",
     tagline: "Bilingual Voice-to-Form Visit Documentation",
     tab_form_text: "Visit Entry",
     tab_registry_text: "Saved Registry",
     step1_title: "Dictate Visit",
-    step1_desc: "Speak visit details in Hindi or English (Name, Age, Village, Visit Date).",
+    step1_desc: "Speak visit details in your language (Name, Age, Village, Visit Date).",
     presets_label: "Quick Test:",
     record_start: "Start Dictation",
     record_stop: "Stop Dictation",
@@ -51,13 +51,13 @@ const I18N = {
     registry_title: "Saved Visit Records",
     registry_subtitle: "Locally verified household visit documentation."
   },
-  hi: {
+  "hi-IN": {
     context_pill: "सामुदायिक स्वास्थ्य",
     tagline: "द्विभाषी वॉयस-टू-फॉर्म भेंट दस्तावेज़ीकरण",
     tab_form_text: "भेंट प्रपत्र",
     tab_registry_text: "सहेजे गए रिकॉर्ड",
     step1_title: "भेंट विवरण बोलें",
-    step1_desc: "हिन्दी या अंग्रेजी में मरीज का विवरण बोलें (नाम, उम्र, गाँव, तारीख)।",
+    step1_desc: "अपनी भाषा में मरीज का विवरण बोलें (नाम, उम्र, गाँव, तारीख)।",
     presets_label: "त्वरित परीक्षण:",
     record_start: "बोलना शुरू करें",
     record_stop: "रिकॉर्डिंग रोकें",
@@ -85,22 +85,403 @@ const I18N = {
     record_id_label: "रिकॉर्ड आईडी:",
     registry_title: "सहेजे गए भेंट रिकॉर्ड",
     registry_subtitle: "सत्यापित घरेलू भेंटों की स्थानीय पंजी।"
+  },
+  "mr-IN": {
+    context_pill: "आरोग्य केंद्र",
+    tagline: "व्हॉइस-टू-फॉर्म रुग्ण नोंदणी प्रणाली",
+    tab_form_text: "रुग्ण नोंदणी",
+    tab_registry_text: "नोंदवलेले रेकॉर्ड",
+    step1_title: "तपशील बोला",
+    step1_desc: "रुग्णाचे नाव, वय, गाव आणि भेटीची तारीख बोला.",
+    presets_label: "चाचणी नमुने:",
+    record_start: "बोलणे सुरू करा",
+    record_stop: "थांबवा",
+    rec_live: "ऐकत आहे",
+    transcript_title: "प्रतिलेखन",
+    step2_title: "वैद्यकीय प्रपत्र",
+    btn_new_session_text: "नवीन भेट",
+    summary_patient_k: "रुग्ण",
+    summary_age_k: "वय",
+    summary_village_k: "गाव",
+    summary_date_k: "भेट तारीख",
+    clarify_alert_title: "स्पष्टीकरण आवश्यक",
+    btn_hear_prompt: "प्रश्न ऐका",
+    btn_speak_field: "उत्तर बोला",
+    btn_save_edit: "जतन करा",
+    label_name: "रुग्णाचे नाव",
+    label_age: "वय (वर्षे)",
+    label_village: "गाव",
+    label_date: "भेट तारीख",
+    commit_info_incomplete: "नोंद जतन करण्यासाठी सर्व ४ माहिती भरा.",
+    commit_info_ready: "सर्व माहिती पडताळली आहे. जतन करा.",
+    commit_info_committed: "नोंद जतन झाली.",
+    btn_commit: "रेकॉर्ड जतन करा",
+    committed_heading: "नोंद जतन झाली",
+    record_id_label: "रेकॉर्ड आयडी:",
+    registry_title: "नोंदवलेले रेकॉर्ड्स",
+    registry_subtitle: "सत्यापित स्थानिक नोंदणी."
+  },
+  "bn-IN": {
+    context_pill: "স্বাস্থ্য কেন্দ্র",
+    tagline: "ভয়েস-টু-ফর্ম রোগী নথিভুক্তকরণ",
+    tab_form_text: "সাক্ষাৎ এন্ট্রি",
+    tab_registry_text: "সংরক্ষিত রেকর্ড",
+    step1_title: "বিবরণ বলুন",
+    step1_desc: "রোগীর নাম, বয়স, গ্রাম এবং সাক্ষাতের তারিখ বলুন।",
+    presets_label: "নমুনা পরীক্ষা:",
+    record_start: "বলা শুরু করুন",
+    record_stop: "থামুন",
+    rec_live: "শুনছি",
+    transcript_title: "লাইভ প্রতিলিপি",
+    step2_title: "চিকিৎসা ফর্ম",
+    btn_new_session_text: "নতুন সাক্ষাৎ",
+    summary_patient_k: "রোগী",
+    summary_age_k: "বয়স",
+    summary_village_k: "গ্রাম",
+    summary_date_k: "সাক্ষাতের তারিখ",
+    clarify_alert_title: "স্পষ্টীকরণ প্রয়োজন",
+    btn_hear_prompt: "প্রশ্ন শুনুন",
+    btn_speak_field: "উত্তর বলুন",
+    btn_save_edit: "সংরক্ষণ",
+    label_name: "রোগীর নাম",
+    label_age: "বয়স (বছর)",
+    label_village: "গ্রাম",
+    label_date: "সাক্ষাতের তারিখ",
+    commit_info_incomplete: "সংরক্ষণের জন্য ৪টি তথ্য পূরণ করুন।",
+    commit_info_ready: "সকল তথ্য যাচাই করা হয়েছে। সংরক্ষণ করুন।",
+    commit_info_committed: "রেকর্ড সংরক্ষিত হয়েছে।",
+    btn_commit: "রেকর্ড সংরক্ষণ করুন",
+    committed_heading: "রেকর্ড সংরক্ষিত",
+    record_id_label: "রেকর্ড আইডি:",
+    registry_title: "সংরক্ষিত ভিজিট রেকর্ড",
+    registry_subtitle: "স্থানীয়ভাবে যাচাইকৃত নথিভুক্তকরণ।"
+  },
+  "gu-IN": {
+    context_pill: "આરોગ્ય કેન્દ્ર",
+    tagline: "વોઇસ-ટુ-ફોર્મ મુલાકાત નોંધણી",
+    tab_form_text: "દર્દી નોંધણી",
+    tab_registry_text: "સેવ કરેલા રેકોર્ડ",
+    step1_title: "વિગત બોલો",
+    step1_desc: "દર્દીનું નામ, ઉંમર, ગામ અને મુલાકાતની તારીખ બોલો.",
+    presets_label: "નમૂના ચકાસણી:",
+    record_start: "બોલવાનું શરૂ કરો",
+    record_stop: "બંધ કરો",
+    rec_live: "સાંભળી રહ્યા છીએ",
+    transcript_title: "ટ્રાન્સક્રિપ્ટ",
+    step2_title: "મેડિકલ ફોર્મ",
+    btn_new_session_text: "નવી મુલાકાત",
+    summary_patient_k: "દર્દી",
+    summary_age_k: "ઉંમર",
+    summary_village_k: "ગામ",
+    summary_date_k: "મુલાકાત તારીખ",
+    clarify_alert_title: "સ્પષ્ટીકરણ જરૂરી",
+    btn_hear_prompt: "પ્રશ્ન સાંભળો",
+    btn_speak_field: "જવાબ બોલો",
+    btn_save_edit: "સાચવો",
+    label_name: "દર્દીનું નામ",
+    label_age: "ઉંમર (વર્ષ)",
+    label_village: "ગામ",
+    label_date: "મુલાકાત તારીખ",
+    commit_info_incomplete: "સેવ કરવા માટે બધી ૪ વિગતો ભરો.",
+    commit_info_ready: "બધી વિગતો ચકાસાયેલ છે. સેવ કરો.",
+    commit_info_committed: "રેકોર્ડ સાચવવામાં આવ્યો છે.",
+    btn_commit: "રેકોર્ડ સેવ કરો",
+    committed_heading: "રેકોર્ડ સાચવ્યો",
+    record_id_label: "રેકોર્ડ આઈડી:",
+    registry_title: "સાચવેલા દર્દી રેકોર્ડ",
+    registry_subtitle: "ચકાસાયેલ સ્થાનિક રજિસ્ટ્રી."
+  },
+  "pa-IN": {
+    context_pill: "ਸਿਹਤ ਕੇਂਦਰ",
+    tagline: "ਵਾਇਸ-ਟੂ-ਫਾਰਮ ਮਰੀਜ਼ ਦਸਤਾਵੇਜ਼ੀਕਰਨ",
+    tab_form_text: "ਮੁਲਾਕਾਤ ਐਂਟਰੀ",
+    tab_registry_text: "ਸੰਭਾਲੇ ਰਿਕਾਰਡ",
+    step1_title: "ਵੇਰਵਾ ਬੋਲੋ",
+    step1_desc: "ਮਰੀਜ਼ ਦਾ ਨਾਮ, ਉਮਰ, ਪਿੰਡ ਅਤੇ ਮੁਲਾਕਾਤ ਦੀ ਮਿਤੀ ਬੋਲੋ।",
+    presets_label: "ਨਮੂਨਾ ਟੈਸਟ:",
+    record_start: "ਬੋਲਣਾ ਸ਼ੁਰੂ ਕਰੋ",
+    record_stop: "ਰੋਕੋ",
+    rec_live: "ਸੁਣ ਰਿਹਾ ਹੈ",
+    transcript_title: "ਟ੍ਰਾਂਸਕ੍ਰਿਪਟ",
+    step2_title: "ਮੈਡੀਕਲ ਫਾਰਮ",
+    btn_new_session_text: "ਨਵੀਂ ਮੁਲਾਕਾਤ",
+    summary_patient_k: "ਮਰੀਜ਼",
+    summary_age_k: "ਉਮਰ",
+    summary_village_k: "ਪਿੰਡ",
+    summary_date_k: "ਮੁਲਾਕਾਤ ਮਿਤੀ",
+    clarify_alert_title: "ਸਪੱਸ਼ਟੀਕਰਨ ਲੋੜੀਂਦਾ",
+    btn_hear_prompt: "ਸਵਾਲ ਸੁਣੋ",
+    btn_speak_field: "ਜਵਾਬ ਬੋਲੋ",
+    btn_save_edit: "ਸੰਭਾਲੋ",
+    label_name: "ਮਰੀਜ਼ ਦਾ ਨਾਮ",
+    label_age: "ਉਮਰ (ਸਾਲ)",
+    label_village: "ਪਿੰਡ",
+    label_date: "ਮੁਲਾਕਾਤ ਮਿਤੀ",
+    commit_info_incomplete: "ਸੰਭਾਲਣ ਲਈ ਸਾਰੇ 4 ਖੇਤਰ ਭਰੋ।",
+    commit_info_ready: "ਸਾਰੇ ਖੇਤਰ ਤਸਦੀਕ ਹੋ ਗਏ ਹਨ। ਸੰਭਾਲੋ।",
+    commit_info_committed: "ਰਿਕਾਰਡ ਸੰਭਾਲਿਆ ਗਿਆ।",
+    btn_commit: "ਰਿਕਾਰਡ ਸੰਭਾਲੋ",
+    committed_heading: "ਰਿਕਾਰਡ ਸੰਭਾਲਿਆ ਗਿਆ",
+    record_id_label: "ਰਿਕਾਰਡ ਆਈਡੀ:",
+    registry_title: "ਸੰਭਾਲੇ ਮੁਲਾਕਾਤ ਰਿਕਾਰਡ",
+    registry_subtitle: "ਸਥਾਨਕ ਤਸਦੀਕਸ਼ੁਦਾ ਰਜਿਸਟਰੀ।"
+  },
+  "ta-IN": {
+    context_pill: "சுகாதார மையம்",
+    tagline: "குரல் வழி படிவ ஆவணமாக்கல்",
+    tab_form_text: "வருகை பதிவு",
+    tab_registry_text: "சேமிக்கப்பட்ட பதிவேடு",
+    step1_title: "விவரம் பேசுக",
+    step1_desc: "நோயாளியின் பெயர், வயது, கிராமம், வருகை தேதியை பேசவும்.",
+    presets_label: "மாதிரி சோதனை:",
+    record_start: "பேசத் தொடங்கு",
+    record_stop: "நிறுத்து",
+    rec_live: "கேட்கிறது",
+    transcript_title: "நேரலை உரை",
+    step2_title: "மருத்துவப் படிவம்",
+    btn_new_session_text: "புதிய வருகை",
+    summary_patient_k: "நோயாளி",
+    summary_age_k: "வயது",
+    summary_village_k: "கிராமம்",
+    summary_date_k: "வருகை தேதி",
+    clarify_alert_title: "விளக்கம் தேவை",
+    btn_hear_prompt: "கேள்வி கேட்க",
+    btn_speak_field: "பதில் பேச",
+    btn_save_edit: "சேமி",
+    label_name: "நோயாளி பெயர்",
+    label_age: "வயது (ஆண்டுகள்)",
+    label_village: "கிராமம்",
+    label_date: "வருகை தேதி",
+    commit_info_incomplete: "சேமிக்க 4 புலங்களையும் நிரப்பவும்.",
+    commit_info_ready: "அனைத்து புலங்களும் சரிபார்க்கப்பட்டன.",
+    commit_info_committed: "பதிவு சேமிக்கப்பட்டது.",
+    btn_commit: "பதிவைச் சேமிக்கவும்",
+    committed_heading: "வருகைப் பதிவு சேமிக்கப்பட்டது",
+    record_id_label: "பதிவு எண்:",
+    registry_title: "சேமிக்கப்பட்ட வருகைப் பதிவுகள்",
+    registry_subtitle: "சரிபார்க்கப்பட்ட கள ஆவணங்கள்."
+  },
+  "te-IN": {
+    context_pill: "ఆరోగ్య కేంద్రం",
+    tagline: "వాయిస్-టు-ఫారం సందర్శన నమోదు",
+    tab_form_text: "సందర్శన నమోదు",
+    tab_registry_text: "సేవ్ చేసిన రికార్డులు",
+    step1_title: "వివరాలు మాట్లాడండి",
+    step1_desc: "రోగి పేరు, వయస్సు, గ్రామం మరియు సందర్శన తేదీ చెప్పండి.",
+    presets_label: "నమూనా పరీక్ష:",
+    record_start: "మాట్లాడటం ప్రారంభించండి",
+    record_stop: "ఆపు",
+    rec_live: "వింటోంది",
+    transcript_title: "లైవ్ ట్రాన్స్క్రిప్ట్",
+    step2_title: "వైద్య ఫారము",
+    btn_new_session_text: "కొత్త సందర్శన",
+    summary_patient_k: "రోగి",
+    summary_age_k: "వయస్సు",
+    summary_village_k: "గ్రామం",
+    summary_date_k: "సందర్శన తేదీ",
+    clarify_alert_title: "స్పష్టత అవసరం",
+    btn_hear_prompt: "ప్రశ్న వినండి",
+    btn_speak_field: "సమాధానం చెప్పండి",
+    btn_save_edit: "సేవ్",
+    label_name: "రోగి పేరు",
+    label_age: "వయస్సు (సంవత్సరాలు)",
+    label_village: "గ్రామం",
+    label_date: "సందర్శన తేదీ",
+    commit_info_incomplete: "సేవ్ చేయడానికి 4 వివరాలను నమోదు చేయండి.",
+    commit_info_ready: "అన్ని వివరాలు ధృవీకరించబడ్డాయి. సేవ్ చేయండి.",
+    commit_info_committed: "రికార్డు సేవ్ చేయబడింది.",
+    btn_commit: "రికార్డును సేవ్ చేయండి",
+    committed_heading: "సందర్శన రికార్డు సేవ్ చేయబడింది",
+    record_id_label: "రికార్డు ఐడీ:",
+    registry_title: "సేవ్ చేయబడిన రికార్డులు",
+    registry_subtitle: "ధృవీకరించబడిన రిజిస్ట్రీ."
+  },
+  "kn-IN": {
+    context_pill: "ಆರೋಗ್ಯ ಕೇಂದ್ರ",
+    tagline: "ಧ್ವನಿ-ಆಧಾರಿತ ಭೇಟಿ ದಾಖಲೀಕರಣ",
+    tab_form_text: "ಭೇಟಿ ನಮೂದು",
+    tab_registry_text: "ಉಳಿಸಿದ ದಾಖಲೆಗಳು",
+    step1_title: "ವಿವರಗಳನ್ನು ಮಾತನಾಡಿ",
+    step1_desc: "ರೋಗಿಯ ಹೆಸರು, ವಯಸ್ಸು, ಗ್ರಾಮ ಮತ್ತು ಭೇಟಿಯ ದಿನಾಂಕ ಹೇಳಿ.",
+    presets_label: "ಮಾದರಿ ಪರೀಕ್ಷೆ:",
+    record_start: "ಮಾತನಾಡಲು ಪ್ರಾರಂಭಿಸಿ",
+    record_stop: "ನಿಲ್ಲಿಸಿ",
+    rec_live: "ಕೇಳುತ್ತಿದೆ",
+    transcript_title: "ಪ್ರತಿಲಿಪಿ",
+    step2_title: "ವೈದ್ಯಕೀಯ ನಮೂನೆ",
+    btn_new_session_text: "ಹೊಸ ಭೇಟಿ",
+    summary_patient_k: "ರೋಗಿ",
+    summary_age_k: "ವಯಸ್ಸು",
+    summary_village_k: "ಗ್ರಾಮ",
+    summary_date_k: "ಭೇಟಿ ದಿನಾಂಕ",
+    clarify_alert_title: "ಸ್ಪಷ್ಟೀಕರಣ ಅಗತ್ಯ",
+    btn_hear_prompt: "ಪ್ರಶ್ನೆ ಕೇಳಿ",
+    btn_speak_field: "ಉತ್ತರ ನೀಡಿ",
+    btn_save_edit: "ಉಳಿಸಿ",
+    label_name: "ರೋಗಿಯ ಹೆಸರು",
+    label_age: "ವಯಸ್ಸು (ವರ್ಷ)",
+    label_village: "ಗ್ರಾಮ",
+    label_date: "ಭೇಟಿ ದಿನಾಂಕ",
+    commit_info_incomplete: "ಉಳಿಸಲು ಎಲ್ಲಾ ೪ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.",
+    commit_info_ready: "ಎಲ್ಲಾ ಕ್ಷೇತ್ರಗಳು ಪರಿಶೀಲಿಸಲ್ಪಟ್ಟಿವೆ.",
+    commit_info_committed: "ದಾಖಲೆ ಉಳಿಸಲಾಗಿದೆ.",
+    btn_commit: "ದಾಖಲೆಯನ್ನು ಉಳಿಸಿ",
+    committed_heading: "ದಾಖಲೆ ಉಳಿಸಲಾಗಿದೆ",
+    record_id_label: "ದಾಖಲೆ ಐಡಿ:",
+    registry_title: "ಉಳಿಸಿದ ಭೇಟಿ ದಾಖಲೆಗಳು",
+    registry_subtitle: "ಪರಿಶೀಲಿಸಿದ ದಾಖಲಾತಿ."
+  },
+  "ml-IN": {
+    context_pill: "ആരോഗ്യ കേന്ദ്രം",
+    tagline: "വോയ്‌സ്-ടു-ഫോം സന്ദർശന രേഖപ്പെടുത്തൽ",
+    tab_form_text: "സന്ദർശന എൻട്രി",
+    tab_registry_text: "സൂക്ഷിച്ച രേഖകൾ",
+    step1_title: "വിവരങ്ങൾ പറയുക",
+    step1_desc: "രോഗിയുടെ പേര്, പ്രായം, ഗ്രാമം, സന്ദർശന തീയതി പറയുക.",
+    presets_label: "മാതൃകാ പരിശോധന:",
+    record_start: "സംസാരിക്കുക",
+    record_stop: "നിർത്തുക",
+    rec_live: "കേൾക്കുന്നു",
+    transcript_title: "ട്രാൻസ്ക്രിപ്റ്റ്",
+    step2_title: "മെഡിക്കൽ ഫോം",
+    btn_new_session_text: "പുതിയ സന്ദർശനം",
+    summary_patient_k: "രോഗി",
+    summary_age_k: "പ്രായം",
+    summary_village_k: "ഗ്രാമം",
+    summary_date_k: "സന്ദർശന തീയതി",
+    clarify_alert_title: "വ്യക്തത ആവശ്യമാണ്",
+    btn_hear_prompt: "ചോദ്യം കേൾക്കുക",
+    btn_speak_field: "മറുപടി പറയുക",
+    btn_save_edit: "സൂക്ഷിക്കുക",
+    label_name: "രോഗിയുടെ പേര്",
+    label_age: "പ്രായം (വർഷം)",
+    label_village: "ഗ്രാമം",
+    label_date: "സന്ദർശന തീയതി",
+    commit_info_incomplete: "സൂക്ഷിക്കാൻ 4 വിവരങ്ങളും പൂരിപ്പിക്കുക.",
+    commit_info_ready: "എല്ലാ വിവരങ്ങളും ശരിയാണെന്ന് സ്ഥിരീകരിച്ചു.",
+    commit_info_committed: "രേഖ സൂക്ഷിച്ചു.",
+    btn_commit: "രേഖ സൂക്ഷിക്കുക",
+    committed_heading: "സന്ദർശന രേഖ സൂക്ഷിച്ചു",
+    record_id_label: "റെക്കോർഡ് ഐഡി:",
+    registry_title: "സൂക്ഷിച്ച സന്ദർശന രേഖകൾ",
+    registry_subtitle: "സ്ഥിരീകരിച്ച രജിസ്ട്രി."
+  },
+  "or-IN": {
+    context_pill: "ସ୍ୱାସ୍ଥ୍ୟ କେନ୍ଦ୍ର",
+    tagline: "ଭଏସ୍-ଟୁ-ଫର୍ମ ଭେଟି ପଞ୍ଜୀକରଣ",
+    tab_form_text: "ଭେଟି ଏଣ୍ଟ୍ରି",
+    tab_registry_text: "ସଂରକ୍ଷିତ ରେକର୍ଡ",
+    step1_title: "ବିବରଣୀ କୁହନ୍ତୁ",
+    step1_desc: "ରୋଗୀଙ୍କ ନାମ, ବୟସ, ଗ୍ରାମ ଏବଂ ଭେଟି ତାରିଖ କୁହନ୍ତୁ।",
+    presets_label: "ନମୁନା ପରୀକ୍ଷା:",
+    record_start: "କୁହିବା ଆରମ୍ଭ କରନ୍ତୁ",
+    record_stop: "ବନ୍ଦ କରନ୍ତୁ",
+    rec_live: "ଶୁଣୁଛି",
+    transcript_title: "ପ୍ରତିଲିପି",
+    step2_title: "ଚିକିତ୍ସା ଫର୍ମ",
+    btn_new_session_text: "ନୂତନ ଭେଟି",
+    summary_patient_k: "ରୋଗୀ",
+    summary_age_k: "ବୟସ",
+    summary_village_k: "ଗ୍ରାମ",
+    summary_date_k: "ଭେଟି ତାରିଖ",
+    clarify_alert_title: "ସ୍ପଷ୍ଟୀକରଣ ଆବଶ୍ୟକ",
+    btn_hear_prompt: "ପ୍ରଶ୍ନ ଶୁଣନ୍ତୁ",
+    btn_speak_field: "ଉତ୍ତର କୁହନ୍ତୁ",
+    btn_save_edit: "ସଞ୍ଚୟ କରନ୍ତୁ",
+    label_name: "ରୋଗୀଙ୍କ ନାମ",
+    label_age: "ବୟସ (ବର୍ଷ)",
+    label_village: "ଗ୍ରାମ",
+    label_date: "ଭେଟି ତାରିଖ",
+    commit_info_incomplete: "ସଞ୍ଚୟ କରିବାକୁ ସମସ୍ତ ୪ ତଥ୍ୟ ପୂରଣ କରନ୍ତୁ।",
+    commit_info_ready: "ସମସ୍ତ ତଥ୍ୟ ଯାଞ୍ଚ ହୋଇଛି। ସଞ୍ଚୟ କରନ୍ତୁ।",
+    commit_info_committed: "ରେକର୍ଡ ସଞ୍ଚିତ ହେଲା।",
+    btn_commit: "ରେକର୍ଡ ସଞ୍ଚୟ କରନ୍ତୁ",
+    committed_heading: "ରେକର୍ଡ ସଞ୍ଚିତ ହେଲା",
+    record_id_label: "ରେକର୍ଡ ଆଇଡି:",
+    registry_title: "ସଂରକ୍ଷିତ ଭେଟି ରେକର୍ଡ",
+    registry_subtitle: "ଯାଞ୍ଚ ହୋଇଥିବା ପଞ୍ଜୀ।"
   }
 };
 
-// Preset Dictations
+// Preset Dictations Across All 11 Supported Gnani Languages
 const PRESET_SCRIPTS = {
-  kamla: "मरीज का नाम कमला देवी है, उम्र 150 साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026",
-  sunita: "पेशेंट नेम सुनीता बाई, एज अडतीस साल, गांव बिलासपुर, विजिट डेट आज",
-  ramesh: "patient name Ramesh Kumar, age 52 years, village Sonpur, visit date 15 August 2026"
+  "hi-IN": {
+    kamla: "मरीज का नाम कमला देवी है, उम्र 45 साल, गाँव रामपुर, विजिट डेट 30 अक्टूबर 2026",
+    sunita: "पेशेंट नेम सुनीता बाई, एज अडतीस साल, गांव बिलासपुर, विजिट डेट आज",
+    ramesh: "मरीज का नाम रमेश कुमार, उम्र 52 वर्ष, गाँव सोनपुर, विजिट डेट 15 अगस्त 2026"
+  },
+  "en-IN": {
+    kamla: "Patient name Kamla Devi, age 45 years, village Rampur, visit date 30 October 2026",
+    sunita: "Patient name Sunita Bai, age 38 years, village Bilaspur, visit date today",
+    ramesh: "Patient name Ramesh Kumar, age 52 years, village Sonpur, visit date 15 August 2026"
+  },
+  "mr-IN": {
+    kamla: "रुग्णाचे नाव कमला देवी, वय 45 वर्षे, गाव रामपूर, भेट दिनांक 30 ऑक्टोबर 2026",
+    sunita: "रुग्णाचे नाव सुनीता बाई, वय 38 वर्षे, गाव बिलासपूर, भेट दिनांक आज",
+    ramesh: "रुग्णाचे नाव रमेश कुमार, वय 52 वर्षे, गाव सोनपूर, भेट दिनांक 15 ऑगस्ट 2026"
+  },
+  "bn-IN": {
+    kamla: "রোগীর নাম কমলা দেবী, বয়স 45 বছর, গ্রাম রামপুর, সাক্ষাতের তারিখ 30 অক্টোবর 2026",
+    sunita: "রোগীর নাম সুনীতা বাই, বয়স 38 বছর, গ্রাম বিলাসপুর, সাক্ষাতের তারিখ আজ",
+    ramesh: "রোগীর নাম রমেশ কুমার, বয়স 52 বছর, গ্রাম সোনপুর, সাক্ষাতের তারিখ 15 আগস্ট 2026"
+  },
+  "gu-IN": {
+    kamla: "દર્દીનું નામ કમલા દેવી, ઉંમર 45 વર્ષ, ગામ રામપુર, મુલાકાત તારીખ 30 ઓક્ટોબર 2026",
+    sunita: "દર્દીનું નામ સુનીતા બાઈ, ઉંમર 38 વર્ષ, ગામ બિલાસપુર, મુલાકાત તારીખ આજે",
+    ramesh: "દર્દીનું નામ રમેશ કુમાર, ઉંમર 52 વર્ષ, ગામ સોનપુર, મુલાકાત તારીખ 15 ઓગસ્ટ 2026"
+  },
+  "pa-IN": {
+    kamla: "ਮਰੀਜ਼ ਦਾ ਨਾਮ ਕਮਲਾ ਦੇਵੀ, ਉਮਰ 45 ਸਾਲ, ਪਿੰਡ ਰਾਮਪੁਰ, ਮੁਲਾਕਾਤ ਤਾਰੀਖ 30 ਅਕਤੂਬਰ 2026",
+    sunita: "ਮਰੀਜ਼ ਦਾ ਨਾਮ ਸੁਨੀਤਾ ਬਾਈ, ਉਮਰ 38 ਸਾਲ, ਪਿੰਡ ਬਿਲਾਸਪੁਰ, ਮੁਲਾਕਾਤ ਤਾਰੀਖ ਅੱਜ",
+    ramesh: "ਮਰੀਜ਼ ਦਾ ਨਾਮ ਰਮੇਸ਼ ਕੁਮਾਰ, ਉਮਰ 52 ਸਾਲ, ਪਿੰਡ ਸੋਨਪੁਰ, ਮੁਲਾਕਾਤ ਤਾਰੀਖ 15 ਅਗਸਤ 2026"
+  },
+  "ta-IN": {
+    kamla: "நோயாளி பெயர் கமலா தேவி, வயது 45 ஆண்டுகள், கிராமம் ராம்பூர், வருகை தேதி 30 அக்டோபர் 2026",
+    sunita: "நோயாளி பெயர் சுனிதா பாய், வயது 38 ஆண்டுகள், கிராமம் பிலாஸ்பூர், வருகை தேதி இன்று",
+    ramesh: "நோயாளி பெயர் ரமேஷ் குமார், வயது 52 ஆண்டுகள், கிராமம் சோன்பூர், வருகை தேதி 15 ஆகஸ்ட் 2026"
+  },
+  "te-IN": {
+    kamla: "రోగి పేరు కమలా దేవి, వయస్సు 45 సంవత్సరాలు, గ్రామం రాంపూర్, సందర్శన తేదీ 30 అక్టోబర్ 2026",
+    sunita: "రోగి పేరు సునీతా బాయి, వయస్సు 38 సంవత్సరాలు, గ్రామం బిలాస్పూర్, సందర్శన తేదీ ఈరోజు",
+    ramesh: "రోగి పేరు రమేష్ కుమార్, వయస్సు 52 సంవత్సరాలు, గ్రామం సోన్పూర్, సందర్శన తేదీ 15 ఆగస్టు 2026"
+  },
+  "kn-IN": {
+    kamla: "ರೋಗಿಯ ಹೆಸರು ಕಮಲಾ ದೇವಿ, ವಯಸ್ಸು 45 ವರ್ಷ, ಗ್ರಾಮ ರಾಂಪುರ, ಭೇಟಿ ದಿನಾಂಕ 30 ಅಕ್ಟೋಬರ್ 2026",
+    sunita: "ರೋಗಿಯ ಹೆಸರು ಸುನೀತಾ ಬಾಯಿ, ವಯಸ್ಸು 38 ವರ್ಷ, ಗ್ರಾಮ ಬಿಲಾಸ್ಪುರ, ಭೇಟಿ ದಿನಾಂಕ ಇಂದು",
+    ramesh: "ರೋಗಿಯ ಹೆಸರು ರಮೇಶ್ ಕುಮಾರ್, ವಯಸ್ಸು 52 ವರ್ಷ, ಗ್ರಾಮ ಸೋನಪುರ, ಭೇಟಿ ದಿನಾಂಕ 15 ಆಗಸ್ಟ್ 2026"
+  },
+  "ml-IN": {
+    kamla: "രോഗിയുടെ പേര് കമലാ ദേവി, പ്രായം 45 വർഷം, ഗ്രാമം രാംപൂർ, സന്ദർശന തീയതി 30 ഒക്ടോബർ 2026",
+    sunita: "രോഗിയുടെ പേര് സുനിത ഭായ്, പ്രായം 38 വർഷം, ഗ്രാമം ബിലാസ്പൂർ, സന്ദർശന തീയതി ഇന്ന്",
+    ramesh: "രോഗിയുടെ പേര് രമേഷ് കുമാർ, പ്രായം 52 വർഷം, ഗ്രാമം സോൺപൂർ, സന്ദർശന തീയതി 15 ഓഗസ്റ്റ് 2026"
+  },
+  "or-IN": {
+    kamla: "ରୋଗୀଙ୍କ ନାମ କମଳା ଦେବୀ, ବୟସ 45 ବର୍ଷ, ଗ୍ରାମ ରାମପୁର, ପରିଦର୍ଶନ ତାରିଖ 30 ଅକ୍ଟୋବର 2026",
+    sunita: "ରୋଗୀଙ୍କ ନାମ ସୁନୀତା ବାଇ, ବୟସ 38 ବର୍ଷ, ଗ୍ରାମ ବିଲାସପୁର, ପରିଦର୍ଶନ ତାରିଖ ଆଜି",
+    ramesh: "ରୋଗୀଙ୍କ ନାମ ରମେଶ କୁମାର, ବୟସ 52 ବର୍ଷ, ଗ୍ରାମ ସୋନପୁର, ପରିଦର୍ଶନ ତାରିଖ 15 ଅଗଷ୍ଟ 2026"
+  }
+};
+
+// Localized Chip Labels for Fast Visual Orientation
+const CHIP_LABELS = {
+  "en-IN": { kamla: "Kamla Devi (45y)", sunita: "Sunita Bai (38y)", ramesh: "Ramesh Kumar (52y)" },
+  "hi-IN": { kamla: "कमला देवी (45 वर्ष)", sunita: "सुनीता बाई (38 वर्ष)", ramesh: "रमेश कुमार (52 वर्ष)" },
+  "mr-IN": { kamla: "कमला देवी (45 वर्ष)", sunita: "सुनीता बाई (38 वर्ष)", ramesh: "रमेश कुमार (52 वर्ष)" },
+  "bn-IN": { kamla: "কমলা দেবী (45 বছর)", sunita: "সুনীতা বাই (38 বছর)", ramesh: "রমেশ কুমার (52 বছর)" },
+  "gu-IN": { kamla: "કમલા દેવી (45 વર્ષ)", sunita: "સુનીતા બાઈ (38 વર્ષ)", ramesh: "રમેશ કુમાર (52 વર્ષ)" },
+  "pa-IN": { kamla: "ਕਮਲਾ ਦੇਵੀ (45 ਸਾਲ)", sunita: "ਸੁਨੀਤਾ ਬਾਈ (38 ਸਾਲ)", ramesh: "ਰਮੇਸ਼ ਕੁਮਾਰ (52 ਸਾਲ)" },
+  "ta-IN": { kamla: "கமலா தேவி (45)", sunita: "சுனிதா பாய் (38)", ramesh: "ரமேஷ் குமார் (52)" },
+  "te-IN": { kamla: "కమలా దేవి (45)", sunita: "సునీతా బాయి (38)", ramesh: "రమేష్ కుమార్ (52)" },
+  "kn-IN": { kamla: "ಕಮಲಾ ದೇವಿ (45)", sunita: "ಸುನೀತಾ ಬಾಯಿ (38)", ramesh: "ರಮೇಶ್ ಕುಮಾರ್ (52)" },
+  "ml-IN": { kamla: "കമലാ ദേവി (45)", sunita: "സുനിത ഭായ് (38)", ramesh: "രമേഷ് കുമാർ (52)" },
+  "or-IN": { kamla: "କମଳା ଦେବୀ (45)", sunita: "ସୁନୀତା ବାଇ (38)", ramesh: "ରମେଶ କୁମାର (52)" }
 };
 
 const FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
 
 // DOM References
 const providerBadge = document.getElementById("provider-badge");
-const langToggleBtn = document.getElementById("lang-toggle-btn");
-const currentLangText = document.getElementById("current-lang-text");
+const langSelect = document.getElementById("lang-select");
 const recordBtn = document.getElementById("record-btn");
 const recordText = document.getElementById("record-text");
 const recordingTimer = document.getElementById("recording-timer");
@@ -144,6 +525,11 @@ window.addEventListener("DOMContentLoaded", async () => {
   await checkHealth();
   await loadCommittedRecords();
 
+  if (langSelect) {
+    langSelect.value = currentLanguage;
+  }
+  setLanguage(currentLanguage);
+
   const urlParams = new URLSearchParams(window.location.search);
   const existingDraftId = urlParams.get("draft_id");
   if (existingDraftId) {
@@ -159,22 +545,33 @@ window.addEventListener("DOMContentLoaded", async () => {
 // Localization Engine
 function setLanguage(lang) {
   currentLanguage = lang;
-  currentLangText.textContent = lang === "en" ? "हिन्दी" : "English";
+  try {
+    localStorage.setItem("sureword_lang", lang);
+  } catch (e) {}
 
-  const strings = I18N[lang] || I18N.en;
+  if (langSelect && langSelect.value !== lang) {
+    langSelect.value = lang;
+  }
+
+  const strings = I18N[lang] || I18N["hi-IN"] || I18N["en-IN"];
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.getAttribute("data-i18n");
-    if (strings[key]) {
+    if (strings && strings[key]) {
       el.textContent = strings[key];
     }
   });
 
-  document.documentElement.lang = lang;
-}
+  const chips = document.querySelectorAll(".preset-chip");
+  if (CHIP_LABELS[lang]) {
+    chips.forEach((chip) => {
+      const presetKey = chip.getAttribute("data-preset");
+      if (CHIP_LABELS[lang][presetKey]) {
+        chip.textContent = CHIP_LABELS[lang][presetKey];
+      }
+    });
+  }
 
-function toggleLanguage() {
-  const nextLang = currentLanguage === "en" ? "hi" : "en";
-  setLanguage(nextLang);
+  document.documentElement.lang = lang.split("-")[0];
 }
 
 // System Health Check
@@ -202,7 +599,7 @@ async function initNewDraft() {
     const res = await fetch("/api/drafts", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `language=${encodeURIComponent(currentLanguage === "hi" ? "hi-IN" : "hi-IN")}`
+      body: `language=${encodeURIComponent(currentLanguage)}`
     });
     const data = await res.json();
     currentDraftId = data.draft_id;
@@ -264,8 +661,9 @@ function resetFormUI() {
     if (reasons) reasons.innerHTML = "";
   });
 
+  const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   commitBtn.disabled = true;
-  commitValidationInfo.textContent = I18N[currentLanguage].commit_info_incomplete;
+  commitValidationInfo.textContent = dict.commit_info_incomplete;
 }
 
 function updateStateUI(state, version) {
@@ -309,11 +707,13 @@ function renderDraft(draft) {
     }
   });
 
+  const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
+
   // Handle Clarification Banner (Policy P)
   if (draft.state === "NEEDS_CLARIFICATION" && draft.active_prompt) {
     clarificationBanner.classList.remove("hidden");
     isClarifyingField = draft.active_prompt.target_field;
-    clarifyFieldTitle.textContent = `${I18N[currentLanguage].clarify_alert_title}: ${formatFieldName(isClarifyingField)}`;
+    clarifyFieldTitle.textContent = `${dict.clarify_alert_title}: ${formatFieldName(isClarifyingField)}`;
     clarifyPromptText.textContent = draft.active_prompt.prompt_text;
     clarifyManualInput.value = "";
     clarifyManualInput.focus();
@@ -325,13 +725,13 @@ function renderDraft(draft) {
   // Handle Commit button & validation feedback
   if (draft.state === "READY_FOR_REVIEW" && allValid) {
     commitBtn.disabled = false;
-    commitValidationInfo.textContent = I18N[currentLanguage].commit_info_ready;
+    commitValidationInfo.textContent = dict.commit_info_ready;
   } else if (draft.state === "COMMITTED") {
     commitBtn.disabled = true;
-    commitValidationInfo.textContent = I18N[currentLanguage].commit_info_committed;
+    commitValidationInfo.textContent = dict.commit_info_committed;
   } else {
     commitBtn.disabled = true;
-    commitValidationInfo.textContent = I18N[currentLanguage].commit_info_incomplete;
+    commitValidationInfo.textContent = dict.commit_info_incomplete;
   }
 }
 
@@ -347,11 +747,12 @@ function formatStatus(status) {
 }
 
 function formatFieldName(key) {
+  const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   switch (key) {
-    case "person_name": return currentLanguage === "hi" ? "मरीज का नाम" : "Person Name";
-    case "age": return currentLanguage === "hi" ? "आयु" : "Age";
-    case "village": return currentLanguage === "hi" ? "गाँव" : "Village";
-    case "visit_date": return currentLanguage === "hi" ? "भेंट की तिथि" : "Visit Date";
+    case "person_name": return dict.label_name || "Patient Name";
+    case "age": return dict.label_age || "Age";
+    case "village": return dict.label_village || "Village";
+    case "visit_date": return dict.label_date || "Visit Date";
     default: return key;
   }
 }
@@ -386,11 +787,12 @@ async function startRecording() {
     };
 
     mediaRecorder.onstop = async () => {
+      const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
       const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
       clearInterval(recordTimerInterval);
       if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
       recordBtn.classList.remove("btn-recording");
-      recordText.textContent = I18N[currentLanguage].record_start;
+      recordText.textContent = dict.record_start;
 
       stream.getTracks().forEach((track) => track.stop());
 
@@ -401,10 +803,11 @@ async function startRecording() {
       }
     };
 
+    const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
     mediaRecorder.start();
     recordStartTime = Date.now();
     recordBtn.classList.add("btn-recording");
-    recordText.textContent = I18N[currentLanguage].record_stop;
+    recordText.textContent = dict.record_stop;
     if (recordingStateIndicator) recordingStateIndicator.classList.remove("hidden");
 
     recordTimerInterval = setInterval(() => {
@@ -469,7 +872,8 @@ async function submitFullAudio(blobOrFile) {
 
 // Preset Chip Pipeline: Allows Immediate Frictionless Testing
 async function runPresetScript(presetKey) {
-  const script = PRESET_SCRIPTS[presetKey];
+  const langPresets = PRESET_SCRIPTS[currentLanguage] || PRESET_SCRIPTS["hi-IN"] || PRESET_SCRIPTS["en-IN"];
+  const script = langPresets[presetKey] || PRESET_SCRIPTS["hi-IN"][presetKey];
   if (!script) return;
 
   showStatus(`Processing sample dictation: "${script.substring(0, 35)}..."`, "info");
@@ -558,6 +962,7 @@ async function saveFieldManualEdit(fieldKey, val) {
 
 // Spoken Clarification Synthesis via Gnani Timbre
 async function playSpokenClarification() {
+  const dict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   try {
     playTtsBtn.disabled = true;
     playTtsBtn.textContent = "🔊 Synthesizing...";
@@ -573,11 +978,11 @@ async function playSpokenClarification() {
     playTtsBtn.textContent = "🔊 Playing...";
     ttsAudioPlayer.onended = () => {
       playTtsBtn.disabled = false;
-      playTtsBtn.textContent = `🔊 ${I18N[currentLanguage].btn_hear_prompt}`;
+      playTtsBtn.textContent = `🔊 ${dict.btn_hear_prompt}`;
     };
   } catch (err) {
     playTtsBtn.disabled = false;
-    playTtsBtn.textContent = `🔊 ${I18N[currentLanguage].btn_hear_prompt}`;
+    playTtsBtn.textContent = `🔊 ${dict.btn_hear_prompt}`;
     showStatus("Could not play spoken prompt: " + err.message, "error");
   }
 }
@@ -735,7 +1140,12 @@ function switchTab(targetView) {
 
 // Event Listeners
 function setupEventListeners() {
-  langToggleBtn.addEventListener("click", toggleLanguage);
+  if (langSelect) {
+    langSelect.addEventListener("change", async (e) => {
+      setLanguage(e.target.value);
+      await initNewDraft();
+    });
+  }
 
   if (tabFormBtn) tabFormBtn.addEventListener("click", () => switchTab("form"));
   if (tabRegistryBtn) tabRegistryBtn.addEventListener("click", () => switchTab("registry"));

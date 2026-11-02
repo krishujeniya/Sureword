@@ -247,6 +247,40 @@ body {
   gap: 0.5rem;
 }
 
+.lang-selector-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lang-select {
+  background: #ffffff;
+  border: 2px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.45rem 2rem 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-height: 40px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23475569%22%20d%3D%22M2%204l4%204%204-4z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 10px;
+  transition: all 0.15s ease;
+}
+.lang-select:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-surface);
+}
+.lang-select:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+}
+
 .lang-switch-btn {
   background: #ffffff;
   border: 1.5px solid var(--border-subtle);

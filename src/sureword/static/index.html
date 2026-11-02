@@ -110,9 +110,22 @@
           </nav>
 
           <div class="system-status-group">
-            <button id="lang-toggle-btn" class="lang-switch-btn" title="Switch language / भाषा बदलें" aria-label="Toggle language between English and Hindi">
-              🌐 <span id="current-lang-text">हिन्दी</span>
-            </button>
+            <div class="lang-selector-wrapper">
+              <label for="lang-select" class="visually-hidden">Documentation Language</label>
+              <select id="lang-select" class="lang-select" aria-label="Select documentation language">
+                <option value="hi-IN" selected>🌐 हिन्दी (Hindi)</option>
+                <option value="en-IN">🌐 English (India)</option>
+                <option value="mr-IN">🌐 मराठी (Marathi)</option>
+                <option value="bn-IN">🌐 বাংলা (Bengali)</option>
+                <option value="gu-IN">🌐 ગુજરાતી (Gujarati)</option>
+                <option value="pa-IN">🌐 ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="ta-IN">🌐 தமிழ் (Tamil)</option>
+                <option value="te-IN">🌐 తెలుగు (Telugu)</option>
+                <option value="kn-IN">🌐 ಕನ್ನಡ (Kannada)</option>
+                <option value="ml-IN">🌐 മലയാളം (Malayalam)</option>
+                <option value="or-IN">🌐 ଓଡ଼ିଆ (Odia)</option>
+              </select>
+            </div>
             <span id="provider-badge" class="badge badge-neutral" role="status" title="Speech Provider Status">Connecting...</span>
           </div>
         </div>

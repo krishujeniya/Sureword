@@ -65,6 +65,20 @@ def run_deployment_check(base_url: str) -> None:
     except Exception as ex:
         checks.append(("GET / (UI)", False, 0.0, f"Failed: {ex}"))
 
+    # 2b. Multilingual Languages Catalog
+    t0 = time.perf_counter()
+    try:
+        res = client.get("/api/languages")
+        elapsed = (time.perf_counter() - t0) * 1000.0
+        if res.status_code == 200 and len(res.json()) == 11:
+            checks.append(("GET /api/languages", True, elapsed, "OK (11 Gnani languages verified)"))
+        else:
+            checks.append(
+                ("GET /api/languages", False, elapsed, f"Failed (HTTP {res.status_code})")
+            )
+    except Exception as ex:
+        checks.append(("GET /api/languages", False, 0.0, f"Failed: {ex}"))
+
     # 3. Create Draft Session
     draft_id = ""
     curr_v = 1

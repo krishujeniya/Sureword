@@ -24,6 +24,7 @@ from sureword.contracts import (
     FieldValue,
     Transcript,
 )
+from sureword.languages import GNANI_LANGUAGES
 from sureword.parser import (
     parse_age,
     parse_date,
@@ -87,9 +88,38 @@ async def health_check() -> dict[str, str | bool]:
 
 
 @app.post("/api/drafts", response_model=DraftCreateResponse)
-async def create_draft(language: str = "hi-IN") -> DraftCreateResponse:
+async def create_draft(
+    request: Request,
+    language: str | None = None,
+) -> DraftCreateResponse:
     """Create a new visit draft session."""
-    draft = await state_machine.create_draft(language=language)
+    selected_lang = language
+    if not selected_lang:
+        content_type = request.headers.get("content-type", "")
+        if (
+            "application/x-www-form-urlencoded" in content_type
+            or "multipart/form-data" in content_type
+        ):
+            try:
+                form = await request.form()
+                val = form.get("language")
+                if val and isinstance(val, str):
+                    selected_lang = val
+            except Exception:
+                pass
+        elif "application/json" in content_type:
+            try:
+                body = await request.json()
+                val = body.get("language")
+                if val and isinstance(val, str):
+                    selected_lang = val
+            except Exception:
+                pass
+
+    if not selected_lang or not isinstance(selected_lang, str):
+        selected_lang = "hi-IN"
+
+    draft = await state_machine.create_draft(language=selected_lang)
     return DraftCreateResponse(
         draft_id=draft.draft_id,
         version=draft.version,
@@ -114,6 +144,10 @@ async def process_draft_audio(
     simulated_transcript: str | None = Form(None),
 ) -> AudioProcessResponse:
     """Process dictated speech: normalize audio -> Prisma STT -> parse fields -> update state."""
+    draft = await storage.get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
     if simulated_transcript and simulated_transcript.strip():
         transcript = Transcript(
             text=simulated_transcript.strip(),
@@ -137,10 +171,14 @@ async def process_draft_audio(
             raise HTTPException(status_code=400, detail=str(ave)) from ave
 
         try:
-            transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
+            transcript = await gnani_client.transcribe_audio(
+                audio_info.wav_bytes, language=draft.language
+            )
         except GnaniProviderError as gpe:
             status_code = gpe.status_code if gpe.status_code and gpe.status_code >= 400 else 502
-            raise HTTPException(status_code=status_code, detail=f"Speech-to-text error: {gpe}") from gpe
+            raise HTTPException(
+                status_code=status_code, detail=f"Speech-to-text error: {gpe}"
+            ) from gpe
 
     # Deterministic extraction of the 4 fields
     parsed_fields = parse_visit_form(transcript.text)
@@ -175,6 +213,10 @@ async def clarify_field(
     audio_file: UploadFile | None = File(None),
 ) -> Draft:
     """Apply targeted clarification via typed manual edit or repeated voice."""
+    draft = await storage.get_draft(draft_id)
+    if not draft:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
     if not manual_value and not audio_file:
         raise HTTPException(
             status_code=400, detail="Must provide either manual_value or audio_file"
@@ -199,7 +241,9 @@ async def clarify_field(
             raise HTTPException(status_code=400, detail=str(ave)) from ave
 
         try:
-            transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
+            transcript = await gnani_client.transcribe_audio(
+                audio_info.wav_bytes, language=draft.language
+            )
         except GnaniProviderError as gpe:
             raise HTTPException(
                 status_code=502, detail=f"Speech clarification error: {gpe}"
@@ -291,6 +335,21 @@ async def delete_draft(draft_id: str) -> None:
 async def get_committed_records() -> list[dict[str, Any]]:
     """List recent committed visit records for frontline audit and reporting."""
     return await storage.list_committed_records()
+
+
+@app.get("/api/languages")
+async def get_supported_languages() -> list[dict[str, str]]:
+    """Return all 11 Indic and English languages supported by Gnani Prisma & Timbre."""
+    return [
+        {
+            "code": meta.code,
+            "name": meta.name,
+            "native_name": meta.native_name,
+            "script": meta.script,
+            "sample_script": meta.sample_script,
+        }
+        for meta in GNANI_LANGUAGES.values()
+    ]
 
 
 # Mount static assets

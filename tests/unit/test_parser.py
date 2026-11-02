@@ -178,3 +178,47 @@ def test_parse_person_name_clarification_and_honorifics() -> None:
     # Missing name when only numbers/gibberish
     res_none = parse_person_name("12345 67890")
     assert res_none.status == FieldStatus.MISSING
+
+
+def test_multilingual_indic_digits_normalization() -> None:
+    # All 9 Indic scripts with category Nd map correctly to standard ASCII digits
+    from sureword.parser import convert_indic_digits
+
+    assert convert_indic_digits("४५") == "45"  # Devanagari (Hindi/Marathi)
+    assert convert_indic_digits("৪৫") == "45"  # Bengali
+    assert convert_indic_digits("૪૫") == "45"  # Gujarati
+    assert convert_indic_digits("੪੫") == "45"  # Gurmukhi (Punjabi)
+    assert convert_indic_digits("౪౫") == "45"  # Telugu
+    assert convert_indic_digits("೪೫") == "45"  # Kannada
+    assert convert_indic_digits("൪൫") == "45"  # Malayalam
+    assert convert_indic_digits("୪୫") == "45"  # Odia
+
+
+def test_multilingual_age_keywords() -> None:
+    assert parse_age("रुग्णाचे वय 45 वर्षे आहे").canonical_value == "45"
+    assert parse_age("દર્દીની ઉંમર 38 વર્ષ છે").canonical_value == "38"
+    assert parse_age("রোগীর বয়স 52 বছর").canonical_value == "52"
+    assert parse_age("ਮਰੀਜ਼ ਦੀ ਉਮਰ 45 ਸਾਲ").canonical_value == "45"
+    assert parse_age("வயது 34").canonical_value == "34"
+    assert parse_age("వయస్సు 29").canonical_value == "29"
+    assert parse_age("ವಯಸ್ಸು 41").canonical_value == "41"
+    assert parse_age("പ്രായം 36").canonical_value == "36"
+    assert parse_age("ବୟସ 25").canonical_value == "25"
+
+
+def test_multilingual_visit_form_extraction() -> None:
+    # Marathi form extraction
+    res_mr = parse_visit_form("रुग्णाचे नाव कमला देवी, वय 45 वर्षे, गाव रामपूर, भेट दिनांक 30 ऑक्टोबर 2026")
+    assert res_mr[FieldKey.PERSON_NAME].canonical_value == "Kamla Devi"
+    assert res_mr[FieldKey.AGE].canonical_value == "45"
+    assert res_mr[FieldKey.VILLAGE].canonical_value == "Rampur"
+    assert res_mr[FieldKey.VISIT_DATE].canonical_value == "2026-10-30"
+
+    # Gujarati form extraction with native digits
+    res_gu = parse_visit_form(
+        "દર્દીનું નામ રમેશ કુમાર, ઉંમર ૫૨ વર્ષ, ગામ સોનપુર, મુલાકાત તારીખ 15 ઓગસ્ટ 2026"
+    )
+    assert res_gu[FieldKey.PERSON_NAME].canonical_value == "Ramesh Kumar"
+    assert res_gu[FieldKey.AGE].canonical_value == "52"
+    assert res_gu[FieldKey.VILLAGE].canonical_value == "Sonpur"
+    assert res_gu[FieldKey.VISIT_DATE].canonical_value == "2026-08-15"

@@ -96,6 +96,7 @@ class DraftStateMachine:
             draft.attempts_by_field,
             max_attempts=2,
             risk_threshold=0.3,
+            language=draft.language,
         )
 
         if prompt:
@@ -142,6 +143,7 @@ class DraftStateMachine:
             draft.attempts_by_field,
             max_attempts=2,
             risk_threshold=0.3,
+            language=draft.language,
         )
 
         if prompt:

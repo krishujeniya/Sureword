@@ -6,6 +6,7 @@ import random
 from typing import NamedTuple
 
 from sureword.contracts import ClarificationPrompt, FieldKey, FieldStatus, FieldValue
+from sureword.languages import get_clarification_prompt
 
 
 class FieldRiskAssessment(NamedTuple):
@@ -67,6 +68,7 @@ def select_clarification_field_p(
     attempts_by_field: dict[str, int],
     max_attempts: int = 2,
     risk_threshold: float = 0.3,
+    language: str = "hi-IN",
 ) -> ClarificationPrompt | None:
     """Proposed Policy P: Select the single highest-risk field needing clarification."""
     ranked = rank_fields_by_risk(fields)
@@ -81,7 +83,7 @@ def select_clarification_field_p(
             # Reached max attempts for this field; cannot ask again
             continue
 
-        prompt_text = PROMPT_TEMPLATES.get(assessment.key, f"Please clarify {assessment.key}.")
+        prompt_text = get_clarification_prompt(assessment.key, language)
         return ClarificationPrompt(
             target_field=assessment.key,
             prompt_text=prompt_text,

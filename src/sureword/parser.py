@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from datetime import date
 
 from sureword.contracts import FieldKey, FieldStatus, FieldValue
@@ -163,57 +164,203 @@ ENGLISH_NUMBER_WORDS: dict[str, int] = {
 }
 
 MONTH_MAP: dict[str, int] = {
+    # January
     "january": 1,
     "jan": 1,
     "जनवरी": 1,
+    "जानेवारी": 1,
+    "জানুয়ারি": 1,
+    "જાન્યુઆરી": 1,
+    "ਜਨਵਰੀ": 1,
+    "ஜனவரி": 1,
+    "జనవరి": 1,
+    "ಜನವರಿ": 1,
+    "ജനുവരി": 1,
+    "ଜାନୁଆରୀ": 1,
+    # February
     "february": 2,
     "feb": 2,
     "फरवरी": 2,
+    "फेब्रुवारी": 2,
+    "ফেব্রুয়ারি": 2,
+    "ફેબ્રુઆરી": 2,
+    "ਫਰਵਰੀ": 2,
+    "பிப்ரவரி": 2,
+    "ఫిబ్రవరి": 2,
+    "ಫೆಬ್ರವರಿ": 2,
+    "ഫെബ്രുവരി": 2,
+    "ଫେବୃଆରୀ": 2,
+    # March
     "march": 3,
     "mar": 3,
     "मार्च": 3,
+    "মার্চ": 3,
+    "માર્ચ": 3,
+    "ਮਾਰਚ": 3,
+    "மார்ச்": 3,
+    "మార్చి": 3,
+    "ಮಾರ್ಚ್": 3,
+    "മാർച്ച്": 3,
+    "ମାର୍ଚ୍ଚ": 3,
+    # April
     "april": 4,
     "apr": 4,
     "अप्रैल": 4,
+    "एप्रिल": 4,
+    "এপ্রিল": 4,
+    "એપ્રિલ": 4,
+    "ਅਪ੍ਰੈਲ": 4,
+    "ஏப்ரல்": 4,
+    "ఏప్రిల్": 4,
+    "ಏಪ್ರಿಲ್": 4,
+    "ഏപ്രിൽ": 4,
+    "ଏପ୍ରିଲ": 4,
+    # May
     "may": 5,
     "मई": 5,
+    "मे": 5,
+    "মে": 5,
+    "મે": 5,
+    "ਮਈ": 5,
+    "மே": 5,
+    "మే": 5,
+    "ಮೇ": 5,
+    "മേയ്": 5,
+    "ମେ": 5,
+    # June
     "june": 6,
     "jun": 6,
     "जून": 6,
+    "জুন": 6,
+    "જૂન": 6,
+    "ਜੂਨ": 6,
+    "ஜூன்": 6,
+    "జూన్": 6,
+    "ಜೂನ್": 6,
+    "ജൂൺ": 6,
+    "ଜୁନ୍": 6,
+    # July
     "july": 7,
     "jul": 7,
     "जुलाई": 7,
+    "जुलै": 7,
+    "জুলাই": 7,
+    "જુલાઈ": 7,
+    "ਜੁਲਾਈ": 7,
+    "ஜூலை": 7,
+    "జూలై": 7,
+    "ಜುಲೈ": 7,
+    "ജൂലൈ": 7,
+    "ଜୁଲାଇ": 7,
+    # August
     "august": 8,
     "aug": 8,
     "अगस्त": 8,
+    "ऑगस्ट": 8,
+    "আগস্ট": 8,
+    "ઓગસ્ટ": 8,
+    "ਅਗਸਤ": 8,
+    "ஆகஸ்ட்": 8,
+    "ఆగస్టు": 8,
+    "ಆಗಸ್ಟ್": 8,
+    "ആഗസ്റ്റ്": 8,
+    "ଅଗଷ୍ଟ": 8,
+    # September
     "september": 9,
     "sep": 9,
     "sept": 9,
     "सितंबर": 9,
     "सितम्बर": 9,
+    "सप्टेंबर": 9,
+    "সেপ্টেম্বর": 9,
+    "સપ્ટેમ્બર": 9,
+    "ਸਤੰਬਰ": 9,
+    "செப்டம்பர்": 9,
+    "సెప్టెంబర్": 9,
+    "ಸೆಪ್ಟೆಂಬರ್": 9,
+    "സെപ്റ്റംബർ": 9,
+    "ସେପ୍ଟେମ୍ବର": 9,
+    # October
     "october": 10,
     "oct": 10,
     "अक्टूबर": 10,
     "अक्तूबर": 10,
+    "ऑक्टोबर": 10,
+    "অক্টোবর": 10,
+    "ઓક્ટોબર": 10,
+    "ਅਕਤੂਬਰ": 10,
+    "அக்டோபர்": 10,
+    "అక్టోబర్": 10,
+    "ಅಕ್ಟೋಬರ್": 10,
+    "ഒക്ടോബർ": 10,
+    "ଅକ୍ଟୋବର": 10,
+    # November
     "november": 11,
     "nov": 11,
     "नवंबर": 11,
     "नवम्बर": 11,
+    "नोव्हेंबर": 11,
+    "নভেম্বর": 11,
+    "નવેમ્બર": 11,
+    "ਨਵੰਬਰ": 11,
+    "நவம்பர்": 11,
+    "నవంబర్": 11,
+    "ನವೆಂಬರ್": 11,
+    "നവംബർ": 11,
+    "ନଭେମ୍ବର": 11,
+    # December
     "december": 12,
     "dec": 12,
     "दिसंबर": 12,
     "दिसम्बर": 12,
+    "डिसेंबर": 12,
+    "ডিসেম্বর": 12,
+    "ડિસેમ્બર": 12,
+    "ਦਸੰਬਰ": 12,
+    "டிசம்பர்": 12,
+    "డిసెంబర్": 12,
+    "ಡಿಸೆಂಬರ್": 12,
+    "ഡിസംബർ": 12,
+    "ଡିସେମ୍ବର": 12,
 }
 
 VILLAGE_MAP: dict[str, str] = {
     "rampur": "Rampur",
     "रामपुर": "Rampur",
+    "रामपूर": "Rampur",
+    "રામપુર": "Rampur",
+    "রামপুর": "Rampur",
+    "ਰਾਮਪੁਰ": "Rampur",
+    "ராம்பூர்": "Rampur",
+    "రాంపూర్": "Rampur",
+    "ರಾಂಪುರ": "Rampur",
+    "രാംപൂർ": "Rampur",
+    "ରାମପୁର": "Rampur",
     "bilaspur": "Bilaspur",
     "बिलासपुर": "Bilaspur",
+    "बिलासपूर": "Bilaspur",
+    "બિલાસપુર": "Bilaspur",
+    "বিলাসপুর": "Bilaspur",
+    "ਬਿਲਾਸਪੁਰ": "Bilaspur",
+    "பிலாஸ்பூர்": "Bilaspur",
+    "బిలాస్పూర్": "Bilaspur",
+    "ಬಿಲಾಸ್ಪುರ": "Bilaspur",
+    "ബിലാസ്പൂർ": "Bilaspur",
+    "ବିଲାସପୁର": "Bilaspur",
     "sonpur": "Sonpur",
     "सोनपुर": "Sonpur",
+    "सोनपूर": "Sonpur",
+    "સોનપુર": "Sonpur",
+    "সোনপুর": "Sonpur",
+    "ਸੋਨਪੁਰ": "Sonpur",
+    "சோன்பூர்": "Sonpur",
+    "సోన్పూర్": "Sonpur",
+    "ಸೋನಪುರ": "Sonpur",
+    "സോൺപൂർ": "Sonpur",
+    "ସୋନପୁର": "Sonpur",
     "kalyanpur": "Kalyanpur",
     "कल्याणपुर": "Kalyanpur",
+    "कल्याणपूर": "Kalyanpur",
     "chandpur": "Chandpur",
     "चांदपुर": "Chandpur",
     "चाँदपुर": "Chandpur",
@@ -242,8 +389,37 @@ VILLAGE_MAP: dict[str, str] = {
 
 NAME_MAP: dict[str, str] = {
     "कमला देवी": "Kamla Devi",
+    "কমলা দেবী": "Kamla Devi",
+    "કમલા દેવી": "Kamla Devi",
+    "ਕਮਲਾ ਦੇਵੀ": "Kamla Devi",
+    "கமலா தேவி": "Kamla Devi",
+    "కమలా దేవి": "Kamla Devi",
+    "ಕಮಲಾ ದೇವಿ": "Kamla Devi",
+    "കമലാ ദേവി": "Kamla Devi",
+    "କମଳା ଦେବୀ": "Kamla Devi",
+    "kamla devi": "Kamla Devi",
     "सुनीता बाई": "Sunita Bai",
+    "সুনীতা বাই": "Sunita Bai",
+    "સુનીતા બાઈ": "Sunita Bai",
+    "સુનિતા બાઈ": "Sunita Bai",
+    "ਸੁਨੀਤਾ ਬਾਈ": "Sunita Bai",
+    "சுனிதா பாய்": "Sunita Bai",
+    "సునీతా బాయి": "Sunita Bai",
+    "ಸುನೀತಾ ಬಾಯಿ": "Sunita Bai",
+    "സുനിത ഭായ്": "Sunita Bai",
+    "സുനിതാ ഭായ്": "Sunita Bai",
+    "ସୁନୀତା ବାଇ": "Sunita Bai",
+    "sunita bai": "Sunita Bai",
     "रमेश कुमार": "Ramesh Kumar",
+    "রমেশ কুমার": "Ramesh Kumar",
+    "રમેશ કુમાર": "Ramesh Kumar",
+    "ਰਮੇਸ਼ ਕੁਮਾਰ": "Ramesh Kumar",
+    "ரமேஷ் குமார்": "Ramesh Kumar",
+    "రమేష్ కుమార్": "Ramesh Kumar",
+    "ರಮೇಶ್ ಕುಮಾರ್": "Ramesh Kumar",
+    "രമേഷ് കുമാർ": "Ramesh Kumar",
+    "ରମେଶ କୁମାର": "Ramesh Kumar",
+    "ramesh kumar": "Ramesh Kumar",
     "पूजा पटेल": "Pooja Patel",
     "मोहन लाल": "Mohan Lal",
     "आशा देवी": "Asha Devi",
@@ -260,9 +436,21 @@ NAME_MAP: dict[str, str] = {
 }
 
 
-def convert_devanagari_digits(text: str) -> str:
-    """Convert Devanagari numerals to ASCII digits."""
-    return "".join(DEVANAGARI_DIGITS.get(ch, ch) for ch in text)
+def convert_indic_digits(text: str) -> str:
+    """Convert any Indic script numeral (Devanagari, Bengali, Gurmukhi, Gujarati, Oriya, Telugu, Kannada, Malayalam) to ASCII digits."""
+    result: list[str] = []
+    for ch in text:
+        if ch in DEVANAGARI_DIGITS:
+            result.append(DEVANAGARI_DIGITS[ch])
+        elif ch.isdigit() and unicodedata.category(ch) == "Nd":
+            result.append(str(unicodedata.digit(ch)))
+        else:
+            result.append(ch)
+    return "".join(result)
+
+
+# Alias for backward compatibility
+convert_devanagari_digits = convert_indic_digits
 
 
 def normalize_number(text: str) -> int | None:
@@ -293,11 +481,11 @@ def parse_age(transcript: str) -> FieldValue:
     """Extract and validate age in completed years (1-120)."""
     text = convert_devanagari_digits(transcript)
 
-    # Patterns matching age mentions
-    # e.g., "उम्र 42 साल", "age 35", "45 years", "उम्र बयालीस वर्ष", "30 saal", "age is 28"
+    # Patterns matching age mentions across Indic languages & English
+    # e.g., "उम्र 42 साल", "age 35", "वय 45 वर्षे", "வயது 45 ஆண்டுகள்", "వయస్సు 38", "বয়স 38 বছর"
     patterns = [
-        r"(?:उम्र|आयु|age|patient\s+age)(?:\s+(?:is|है|था))?\s*[:\-]?\s*([०-९\w\s\-]+?)(?:\s*(?:साल|वर्ष|years|year|saal|bars)|\b)",
-        r"(\d+|[०-९]+|[a-zA-Z\u0900-\u097F]+)\s*(?:साल|वर्ष|years|year|saal|bars)(?:\s*(?:की|का|old))?",
+        r"(?:उम्र|आयु|वय|বয়স|ઉંમર|ਉਮਰ|வயது|వయస్సు|ವಯಸ್ಸು|പ്രായം|ବୟସ|age|patient\s+age)(?:\s+(?:is|है|था|आहे|ആണ്|ஆகும்))?\s*[:\-]?\s*([\d\w\s\-]+?)(?:\s*(?:साल|वर्ष|वर्षे|বছর|વર્ષ|ਸਾਲ|ஆண்டு|வருடம்|సంవత్సరాలు|ವರ್ಷ|വർഷം|ବର୍ଷ|years|year|saal|bars)|\b)",
+        r"(\d+|[a-zA-Z\u0900-\u0D7F]+)\s*(?:साल|वर्ष|वर्षे|বছর|વર્ષ|ਸਾਲ|ஆண்டு|வருடம்|సంవత్సరాలు|ವರ್ಷ|വർഷം|ବର୍ଷ|years|year|saal|bars)(?:\s*(?:की|का|old))?",
     ]
 
     candidates: list[tuple[int, str]] = []
@@ -429,22 +617,30 @@ def parse_date(transcript: str, reference_date: date | None = None) -> FieldValu
                     reasons=[f"Invalid date: day {day} for month {m_word}"],
                 )
 
-    # 4. Relative dates (Devanagari boundary safe)
-    if re.search(r"(?<![\u0900-\u097F\w])(आज|today)(?![\u0900-\u097F\w])", text, re.IGNORECASE):
+    # 4. Relative dates (boundary safe across Indic scripts & English)
+    if re.search(
+        r"(?<![\u0900-\u0D7F\w])(आज|आज|आज|আজ|આજે|ਅੱਜ|இன்று|ఈరోజు|ಇಂದು|ഇന്ന്|ଆଜି|today)(?![\u0900-\u0D7F\w])",
+        text,
+        re.IGNORECASE,
+    ):
         return FieldValue(
             key=FieldKey.VISIT_DATE.value,
-            raw_span="आज/today",
+            raw_span="today",
             canonical_value=ref.isoformat(),
             status=FieldStatus.PROPOSED,
         )
 
-    if re.search(r"(?<![\u0900-\u097F\w])(कल|yesterday)(?![\u0900-\u097F\w])", text, re.IGNORECASE):
+    if re.search(
+        r"(?<![\u0900-\u0D7F\w])(कल|काल|গতকাল|ગઈકાલે|ਕੱਲ੍ਹ|நேற்று|నిన్న|ನಿನ್ನೆ|ഇന്നലെ|ଗତକାଲି|yesterday)(?![\u0900-\u0D7F\w])",
+        text,
+        re.IGNORECASE,
+    ):
         from datetime import timedelta
 
         y_date = ref - timedelta(days=1)
         return FieldValue(
             key=FieldKey.VISIT_DATE.value,
-            raw_span="कल/yesterday",
+            raw_span="yesterday",
             canonical_value=y_date.isoformat(),
             status=FieldStatus.PROPOSED,
         )
@@ -471,8 +667,8 @@ def parse_village(transcript: str) -> FieldValue:
                 status=FieldStatus.PROPOSED,
             )
 
-    # Explicit village marker: e.g., "गाँव रामपुर", "village Rampur", "स्थान सोनपुर"
-    pat_marker = r"(?:गाँव|गांव|ग्राम|village|place|location)\s*[:\-]?\s*([A-Za-z\u0900-\u097F]+)"
+    # Explicit village marker across Indian languages
+    pat_marker = r"(?:गाँव|गांव|ग्राम|गाव|গ্রাম|ગામ|ਪਿੰਡ|கிராமம்|గ్రామం|ಗ್ರಾಮ|ഗ്രാമം|ଗ୍ରାମ|village|place|location)\s*[:\-]?\s*([A-Za-z\u0900-\u0D7F]+)"
     m = re.search(pat_marker, text, re.IGNORECASE)
     if m:
         v_name = m.group(1).strip()
@@ -522,20 +718,20 @@ def parse_person_name(transcript: str) -> FieldValue:
                 status=FieldStatus.PROPOSED,
             )
 
-    # Marker patterns: "नाम कमला देवी है", "patient name Sunita Bai", "name is Ramesh Kumar"
+    # Marker patterns across Indian languages
     markers = [
-        r"(?:मरीज\s+का\s+नाम|मरीज़\s+का\s+नाम|नाम|name\s+is|patient\s+name)\s*[:\-]?\s*([A-Za-z\u0900-\u097F\s]{2,30}?)(?:\s+(?:है|hai|था|उम्र|age|village|गाँव|रहने|\d)|$)",
-        r"(?:shrimati|smt|shri|mr|mrs|sushri|श्रीमती|श्री)\s+([A-Za-z\u0900-\u097F\s]{2,25}?)(?:\s+(?:है|hai|था|उम्र|age|village|गाँव|रहने|\d)|$)",
+        r"(?:मरीज\s+का\s+नाम|मरीज़\s+का\s+नाम|नाव|নাম|નામ|ਨਾਮ|பெயர்|పేరు|ಹೆಸರು|പേര്|ନାମ|name\s+is|patient\s+name|नाम)\s*[:\-]?\s*([A-Za-z\u0900-\u0D7F\s]{2,35}?)(?:[,;]|\s+(?:है|hai|था|is|उम्र|वय|বয়স|ઉંમર|ਉਮਰ|வயது|వయస్సు|ವಯಸ್ಸು|പ്രായം|ବୟସ|age|village|गाँव|गाव|ગામ|গ্রাম|கிராமம்|గ్రామం|ಗ್ರಾಮ|ഗ്രാമം|ଗ୍ରାମ|ਪਿੰਡ|\d)|$)",
+        r"(?:shrimati|smt|shri|mr|mrs|sushri|श्रीमती|श्री)\s+([A-Za-z\u0900-\u0D7F\s]{2,25}?)(?:[,;]|\s+(?:है|hai|था|is|उम्र|वय|বয়স|ઉંમર|ਉਮਰ|வயது|వయస్సు|ವಯಸ್ಸು|പ്രായം|ବୟସ|age|village|गाँव|गाव|\d)|$)",
     ]
 
     for pat in markers:
         m = re.search(pat, text, re.IGNORECASE)
         if m:
-            raw_name = m.group(1).strip()
+            raw_name = m.group(1).strip(" ,;:-")
             # Clean up trailing words
             raw_name = re.sub(
                 r"\b(है|hai|ji|जी|ka|की|ke|के|age|उम्र)\b", "", raw_name, flags=re.IGNORECASE
-            ).strip()
+            ).strip(" ,;:-")
             if len(raw_name) >= 2 and not raw_name.isdigit():
                 canonical = NAME_MAP.get(raw_name, raw_name.title())
                 return FieldValue(
