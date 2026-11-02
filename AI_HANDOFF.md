@@ -1,14 +1,14 @@
 # AI Handoff — Sureword (Great Indian AI Internship Challenge 2026)
 
 > **Last Updated:** 2026-11-02 20:26 IST  
-> **Branch:** `main`  
+> **Branch:** `main` (commit `3af46ad`)  
 > **Status:** 10/10 (100%) Production Standard with Full 11-Language Gnani.ai API Support (Prisma STT & Timbre TTS), Principal Healthcare Frontend Engineering, WCAG 2.1 AAA Accessibility, Zero-XSS Safe Rendering, Responsive Form Ergonomics, and 66/66 tests passing (93% coverage).
 
 ---
 
 ## 1. Current State & Verification Summary
 
-- **Production Deployment:** Configured for Vercel Serverless (`https://sureword.vercel.app`) with full multi-lingual capability across all 11 Indian & regional languages supported by the Gnani.ai API:
+- **Production Deployment:** Verified live on Vercel Serverless (`https://sureword.vercel.app`, 8/8 deployment smoke steps passed) with full multi-lingual capability across all 11 Indian & regional languages supported by the Gnani.ai API:
   1. `hi-IN` — Hindi (हिन्दी)
   2. `en-IN` — Indian English (English)
   3. `mr-IN` — Marathi (मराठी)
