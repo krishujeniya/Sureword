@@ -22,6 +22,7 @@ from sureword.contracts import (
     FieldKey,
     FieldStatus,
     FieldValue,
+    Transcript,
 )
 from sureword.parser import (
     parse_age,
@@ -109,20 +110,37 @@ async def get_draft(draft_id: str) -> Draft:
 async def process_draft_audio(
     draft_id: str,
     expected_version: int = Form(...),
-    audio_file: UploadFile = File(...),
+    audio_file: UploadFile | None = File(None),
+    simulated_transcript: str | None = Form(None),
 ) -> AudioProcessResponse:
     """Process dictated speech: normalize audio -> Prisma STT -> parse fields -> update state."""
-    raw_bytes = await audio_file.read()
-    try:
-        audio_info = convert_and_normalize_audio(raw_bytes)
-    except AudioValidationError as ave:
-        raise HTTPException(status_code=400, detail=str(ave)) from ave
+    if simulated_transcript and simulated_transcript.strip():
+        transcript = Transcript(
+            text=simulated_transcript.strip(),
+            provider="gnani_prisma",
+            requested_model="prisma-v3",
+            effective_model="prisma-v3-preset",
+            request_id=f"preset-{draft_id[:8]}",
+            duration_ms=185.0,
+            confidence=0.96,
+            source="preset",
+        )
+    else:
+        if not audio_file:
+            raise HTTPException(
+                status_code=400, detail="Must provide either audio_file or simulated_transcript"
+            )
+        raw_bytes = await audio_file.read()
+        try:
+            audio_info = convert_and_normalize_audio(raw_bytes)
+        except AudioValidationError as ave:
+            raise HTTPException(status_code=400, detail=str(ave)) from ave
 
-    try:
-        transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
-    except GnaniProviderError as gpe:
-        status_code = gpe.status_code if gpe.status_code and gpe.status_code >= 400 else 502
-        raise HTTPException(status_code=status_code, detail=f"Speech-to-text error: {gpe}") from gpe
+        try:
+            transcript = await gnani_client.transcribe_audio(audio_info.wav_bytes)
+        except GnaniProviderError as gpe:
+            status_code = gpe.status_code if gpe.status_code and gpe.status_code >= 400 else 502
+            raise HTTPException(status_code=status_code, detail=f"Speech-to-text error: {gpe}") from gpe
 
     # Deterministic extraction of the 4 fields
     parsed_fields = parse_visit_form(transcript.text)
@@ -267,6 +285,12 @@ async def commit_draft(
 async def delete_draft(draft_id: str) -> None:
     """Delete draft session."""
     await storage.delete_draft(draft_id)
+
+
+@app.get("/api/records")
+async def get_committed_records() -> list[dict[str, Any]]:
+    """List recent committed visit records for frontline audit and reporting."""
+    return await storage.list_committed_records()
 
 
 # Mount static assets

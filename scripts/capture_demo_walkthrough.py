@@ -36,7 +36,7 @@ def generate_wav(duration_s: float = 0.5, sample_rate: int = 16000) -> bytes:
 
 
 def capture_screenshot(
-    chrome_bin: str, url: str, output_png: Path, window_size: str = "1280,820"
+    chrome_bin: str, url: str, output_png: Path, window_size: str = "1280,820", timeout: int = 25
 ) -> bool:
     cmd = [
         chrome_bin,
@@ -50,7 +50,7 @@ def capture_screenshot(
     ]
     try:
         res = subprocess.run(
-            cmd, capture_output=True, timeout=10, stdin=subprocess.DEVNULL, check=False
+            cmd, capture_output=True, timeout=timeout, stdin=subprocess.DEVNULL, check=False
         )
         return res.returncode == 0 and output_png.exists()
     except Exception as ex:

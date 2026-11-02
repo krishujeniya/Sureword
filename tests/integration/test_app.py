@@ -387,3 +387,35 @@ async def test_delete_and_commit_errors() -> None:
         # Verify draft is deleted -> 404
         res_get_del = await client.get(f"/api/drafts/{draft_id}")
         assert res_get_del.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_get_committed_records_endpoint() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        res = await client.get("/api/records")
+        assert res.status_code == 200
+        assert isinstance(res.json(), list)
+
+
+@pytest.mark.asyncio
+async def test_audio_endpoint_with_simulated_transcript() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        res_create = await client.post("/api/drafts")
+        draft_id = res_create.json()["draft_id"]
+        v = res_create.json()["version"]
+
+        res_sim = await client.post(
+            f"/api/drafts/{draft_id}/audio",
+            data={
+                "expected_version": v,
+                "simulated_transcript": "मरीज का नाम कमला देवी है, उम्र पैंतालीस साल, गाँव रामपुर, 30 अक्टूबर 2026",
+            },
+        )
+        assert res_sim.status_code == 200
+        data = res_sim.json()
+        assert data["transcript"]["source"] == "preset"
+        assert data["draft"]["fields"]["person_name"]["canonical_value"] == "Kamla Devi"
+        assert data["draft"]["fields"]["age"]["canonical_value"] == "45"
+

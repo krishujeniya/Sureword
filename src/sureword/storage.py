@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 from datetime import UTC, datetime
+from typing import Any
 
 import aiosqlite
 
@@ -227,3 +228,34 @@ class Storage:
             await db.execute("DELETE FROM fields WHERE draft_id = ?", (draft_id,))
             await db.execute("DELETE FROM drafts WHERE draft_id = ?", (draft_id,))
             await db.commit()
+
+    async def list_committed_records(self, limit: int = 50) -> list[dict[str, Any]]:
+        """List recently committed visit records for frontline audit."""
+        async with aiosqlite.connect(self.db_path) as db:
+            db.row_factory = aiosqlite.Row
+            async with db.execute(
+                """
+                SELECT record_id, draft_id, idempotency_key, snapshot_json, committed_at
+                FROM committed_records
+                ORDER BY committed_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ) as cursor:
+                rows = await cursor.fetchall()
+                results: list[dict[str, Any]] = []
+                for r in rows:
+                    try:
+                        snapshot = json.loads(r["snapshot_json"])
+                    except Exception:
+                        snapshot = {}
+                    results.append(
+                        {
+                            "record_id": r["record_id"],
+                            "draft_id": r["draft_id"],
+                            "idempotency_key": r["idempotency_key"],
+                            "snapshot": snapshot,
+                            "committed_at": r["committed_at"],
+                        }
+                    )
+                return results

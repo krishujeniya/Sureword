@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="favShield" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0A2540" />
+    </linearGradient>
+  </defs>
+  <!-- Background Shield -->
+  <path d="M 50 8 L 84 22 C 84 58 50 92 50 92 C 50 92 16 58 16 22 Z" fill="url(#favShield)" />
+  <!-- Medical Cross Overlay -->
+  <path d="M 44 26 H 56 V 38 H 68 V 50 H 56 V 68 H 44 V 50 H 32 V 38 H 44 Z" fill="#FFFFFF" opacity="0.25" />
+  <!-- Verified Checkmark -->
+  <path d="M 38 48 L 47 57 L 64 38" fill="none" stroke="#10B981" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
