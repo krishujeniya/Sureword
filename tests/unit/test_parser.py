@@ -26,6 +26,8 @@ def test_normalize_number() -> None:
     assert normalize_number("तीस") == 30
     assert normalize_number("forty two") == 42
     assert normalize_number("twenty five") == 25
+    assert normalize_number("ten") == 10
+    assert normalize_number("invalid_word") is None
 
 
 def test_parse_age_valid() -> None:
@@ -116,3 +118,63 @@ def test_parse_visit_form_full() -> None:
     assert fields[FieldKey.AGE.value].canonical_value == "45"
     assert fields[FieldKey.VILLAGE.value].canonical_value == "Rampur"
     assert fields[FieldKey.VISIT_DATE.value].canonical_value == "2026-10-30"
+
+
+def test_parse_age_single_word_fallback() -> None:
+    res = parse_age("42")
+    assert res.canonical_value == "42"
+    assert res.status == FieldStatus.PROPOSED
+
+
+def test_parse_date_dmy_and_invalid_branches() -> None:
+    # DD-MM-YYYY slash
+    res_slash = parse_date("विजिट डेट 15/10/2026")
+    assert res_slash.canonical_value == "2026-10-15"
+    assert res_slash.status == FieldStatus.PROPOSED
+
+    # DD-MM-YYYY dash
+    res_dash = parse_date("विजिट 25-12-2026")
+    assert res_dash.canonical_value == "2026-12-25"
+
+    # Invalid ISO date (Feb 31)
+    res_inv_iso = parse_date("विजिट डेट 2026-02-31")
+    assert res_inv_iso.status == FieldStatus.NEEDS_REPEAT
+
+    # Invalid DMY date (Feb 31)
+    res_inv_dmy = parse_date("विजिट डेट 31/02/2026")
+    assert res_inv_dmy.status == FieldStatus.NEEDS_REPEAT
+
+
+def test_parse_village_clarification_and_stopwords() -> None:
+    # Single-word clarification fallback with known and unknown village
+    res = parse_village("Rampur")
+    assert res.canonical_value == "Rampur"
+    assert res.status == FieldStatus.PROPOSED
+
+    res_single_ood = parse_village("Hoshiarpur")
+    assert res_single_ood.canonical_value == "Hoshiarpur"
+    assert res_single_ood.status == FieldStatus.PROPOSED
+
+    # Village via marker for out-of-dictionary name
+    res_marker_ood = parse_village("place Hoshiarpur")
+    assert res_marker_ood.canonical_value == "Hoshiarpur"
+    assert "Out-of-dictionary" in res_marker_ood.reasons[0]
+
+    # Stopword filtered
+    res_stop = parse_village("गाँव में")
+    assert res_stop.status == FieldStatus.MISSING
+
+
+def test_parse_person_name_clarification_and_honorifics() -> None:
+    # Single/two word clarification fallback
+    res_clarify = parse_person_name("Kamla Devi")
+    assert res_clarify.canonical_value == "Kamla Devi"
+    assert res_clarify.status == FieldStatus.PROPOSED
+
+    # Honorific marker
+    res_hon = parse_person_name("smt Rekha Devi age 29")
+    assert res_hon.canonical_value == "Rekha Devi"
+
+    # Missing name when only numbers/gibberish
+    res_none = parse_person_name("12345 67890")
+    assert res_none.status == FieldStatus.MISSING

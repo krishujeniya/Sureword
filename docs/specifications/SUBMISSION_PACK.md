@@ -63,7 +63,7 @@ In our controlled benchmark on held-out test recordings:
 
 This is an early prototype tested on fictional data, not a clinical deployment.
 
-Live Demo & Code: [Insert GitHub / Demo Link]
+Live Demo & Code: https://sureword.vercel.app | https://github.com/krishujeniya/Sureword
 
 #GnaniAI #GreatIndianAIInternshipChallenge #SovereignAI #SpeechAI #HealthTech
 ```
@@ -74,7 +74,7 @@ Sureword turns Hindi-English voice into structured visit forms using Gnani Prism
 
 Instead of re-dictating everything when audio is uncertain, it asks you to repeat only the single most uncertain field.
 
-Demo & code: [Insert Link]
+Demo & code: https://sureword.vercel.app | https://github.com/krishujeniya/Sureword
 
 #GnaniAI #GreatIndianAIInternshipChallenge
 ```

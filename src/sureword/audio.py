@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import os
+import shutil
 import subprocess
 import tempfile
+import wave
 from typing import NamedTuple
 
 
@@ -47,6 +50,36 @@ def convert_and_normalize_audio(
     """
     validate_raw_bytes(raw_data)
 
+    # Serverless fallback when FFmpeg binary is absent (e.g. Vercel Python runtime)
+    if shutil.which("ffmpeg") is None:
+        try:
+            with wave.open(io.BytesIO(raw_data), "rb") as wf:
+                channels = wf.getnchannels()
+                sample_rate = wf.getframerate()
+                frames = wf.getnframes()
+                duration = frames / float(sample_rate) if sample_rate > 0 else 0.0
+
+                if duration < 0.2:
+                    raise AudioValidationError(
+                        f"Audio duration ({duration:.2f}s) is too short or silent"
+                    )
+                if duration > max_seconds:
+                    raise AudioValidationError(
+                        f"Audio duration ({duration:.2f}s) exceeds maximum allowed limit ({max_seconds}s)"
+                    )
+
+                return AudioInfo(
+                    wav_bytes=raw_data,
+                    duration_seconds=round(duration, 3),
+                    sha256=compute_sha256(raw_data),
+                    sample_rate=sample_rate,
+                    channels=channels,
+                )
+        except wave.Error as err:
+            raise AudioValidationError(
+                f"FFmpeg binary not found on host and input is not valid linear WAV: {err}"
+            ) from err
+
     with tempfile.NamedTemporaryFile(suffix=".input", delete=False) as in_f:
         in_path = in_f.name
         in_f.write(raw_data)
@@ -83,28 +116,33 @@ def convert_and_normalize_audio(
         if not os.path.exists(out_path) or os.path.getsize(out_path) == 0:
             raise AudioValidationError("Converted audio file is empty or missing")
 
-        # Check duration using ffprobe
-        probe_cmd = [
-            "ffprobe",
-            "-v",
-            "error",
-            "-show_entries",
-            "format=duration",
-            "-of",
-            "default=noprint_wrappers=1:nokey=1",
-            out_path,
-        ]
-        probe_res = subprocess.run(
-            probe_cmd,
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            timeout=10,
-            check=False,
-        )
+        # Determine duration: read converted WAV header directly
         try:
-            duration = float(probe_res.stdout.decode().strip())
-        except ValueError:
-            duration = 0.0
+            with wave.open(out_path, "rb") as wf:
+                duration = wf.getnframes() / float(wf.getframerate())
+        except Exception:
+            # Fallback to ffprobe if wave header inspection fails
+            probe_cmd = [
+                "ffprobe",
+                "-v",
+                "error",
+                "-show_entries",
+                "format=duration",
+                "-of",
+                "default=noprint_wrappers=1:nokey=1",
+                out_path,
+            ]
+            probe_res = subprocess.run(
+                probe_cmd,
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                timeout=10,
+                check=False,
+            )
+            try:
+                duration = float(probe_res.stdout.decode().strip())
+            except ValueError:
+                duration = 0.0
 
         if duration > max_seconds:
             raise AudioValidationError(

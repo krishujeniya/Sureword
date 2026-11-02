@@ -41,15 +41,15 @@
         <div class="divider"><span>OR UPLOAD AUDIO</span></div>
 
         <div class="upload-container">
-          <input type="file" id="audio-file-input" accept="audio/*" class="file-input">
+          <input type="file" id="audio-file-input" accept="audio/*" class="file-input" aria-label="Upload visit audio recording">
           <button id="upload-btn" class="btn btn-secondary">Upload Audio File</button>
         </div>
 
-        <div id="status-message" class="status-box hidden"></div>
+        <div id="status-message" class="status-box hidden" role="status" aria-live="polite"></div>
 
         <div class="transcript-box">
           <h3>Latest Transcript</h3>
-          <div id="transcript-content" class="transcript-text">No audio transcribed yet.</div>
+          <div id="transcript-content" class="transcript-text" aria-live="polite">No audio transcribed yet.</div>
           <div id="transcript-meta" class="transcript-meta"></div>
         </div>
       </section>
@@ -62,19 +62,19 @@
         </div>
 
         <!-- Clarification Banner -->
-        <div id="clarification-banner" class="clarification-box hidden">
+        <div id="clarification-banner" class="clarification-box hidden" role="region" aria-live="assertive" aria-labelledby="clarify-field-title">
           <div class="clarification-header">
-            <span class="alert-icon">⚠️</span>
+            <span class="alert-icon" aria-hidden="true">⚠️</span>
             <div>
               <strong id="clarify-field-title">Clarification Needed</strong>
               <p id="clarify-prompt-text"></p>
             </div>
-            <button id="play-tts-btn" class="btn btn-sm btn-speech" title="Hear spoken prompt">🔊 Speak</button>
+            <button id="play-tts-btn" class="btn btn-sm btn-speech" title="Hear spoken prompt" aria-label="Hear spoken prompt">🔊 Speak</button>
           </div>
           <div class="clarification-action">
             <button id="clarify-mic-btn" class="btn btn-sm btn-accent">🎙️ Speak This Field</button>
             <div class="manual-input-inline">
-              <input type="text" id="clarify-manual-input" placeholder="Or type correct value">
+              <input type="text" id="clarify-manual-input" placeholder="Or type correct value" aria-label="Manually enter corrected field value">
               <button id="clarify-save-btn" class="btn btn-sm btn-primary">Save</button>
             </div>
           </div>

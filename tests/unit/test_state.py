@@ -112,3 +112,98 @@ async def test_successful_commit_and_idempotency(temp_state_machine: DraftStateM
     )
     assert record_id.startswith("REC-")
     assert committed_draft.state == DraftState.COMMITTED
+
+    # Modifying committed draft via audio must fail
+    with pytest.raises(StateTransitionError) as exc_committed:
+        await temp_state_machine.apply_audio_parse(
+            draft_id=draft.draft_id,
+            expected_version=committed_draft.version,
+            transcript=transcript,
+            parsed_fields={},
+        )
+    assert exc_committed.value.code == "ALREADY_COMMITTED"
+
+    # Modifying committed draft via clarify must fail
+    with pytest.raises(StateTransitionError) as exc_clarify_comm:
+        await temp_state_machine.apply_clarification(
+            draft_id=draft.draft_id,
+            expected_version=committed_draft.version,
+            target_field="person_name",
+            updated_field=FieldValue(key="person_name", canonical_value="New Name"),
+        )
+    assert exc_clarify_comm.value.code == "ALREADY_COMMITTED"
+
+
+@pytest.mark.asyncio
+async def test_apply_audio_parse_not_found(temp_state_machine: DraftStateMachine) -> None:
+    with pytest.raises(StateTransitionError) as exc:
+        await temp_state_machine.apply_audio_parse(
+            draft_id="non_existent_draft",
+            expected_version=1,
+            transcript=Transcript(text="test", source="fixture"),
+            parsed_fields={},
+        )
+    assert exc.value.code == "DRAFT_NOT_FOUND"
+
+
+@pytest.mark.asyncio
+async def test_apply_clarification_errors_and_transitions(
+    temp_state_machine: DraftStateMachine,
+) -> None:
+    # 1. Draft not found
+    with pytest.raises(StateTransitionError) as exc_nf:
+        await temp_state_machine.apply_clarification(
+            draft_id="non_existent_id",
+            expected_version=1,
+            target_field="person_name",
+            updated_field=FieldValue(key="person_name", canonical_value="Kamla Devi"),
+        )
+    assert exc_nf.value.code == "DRAFT_NOT_FOUND"
+
+    # 2. Version mismatch
+    draft = await temp_state_machine.create_draft()
+    with pytest.raises(StateTransitionError) as exc_v:
+        await temp_state_machine.apply_clarification(
+            draft_id=draft.draft_id,
+            expected_version=999,
+            target_field="person_name",
+            updated_field=FieldValue(key="person_name", canonical_value="Kamla Devi"),
+        )
+    assert exc_v.value.code == "STALE_VERSION"
+
+    # 3. Successful clarification transition to NEEDS_CLARIFICATION for remaining fields
+    updated = await temp_state_machine.apply_clarification(
+        draft_id=draft.draft_id,
+        expected_version=draft.version,
+        target_field="person_name",
+        updated_field=FieldValue(
+            key="person_name",
+            canonical_value="Kamla Devi",
+            status=FieldStatus.USER_CONFIRMED,
+        ),
+    )
+    assert updated.version == 2
+    assert updated.fields["person_name"].status == FieldStatus.USER_CONFIRMED
+    assert updated.state == DraftState.NEEDS_CLARIFICATION
+
+
+@pytest.mark.asyncio
+async def test_commit_draft_errors(temp_state_machine: DraftStateMachine) -> None:
+    # Draft not found
+    with pytest.raises(StateTransitionError) as exc_nf:
+        await temp_state_machine.commit_draft(
+            draft_id="non_existent_id",
+            expected_version=1,
+            idempotency_key="idemp_1",
+        )
+    assert exc_nf.value.code == "DRAFT_NOT_FOUND"
+
+    # Version mismatch
+    draft = await temp_state_machine.create_draft()
+    with pytest.raises(StateTransitionError) as exc_v:
+        await temp_state_machine.commit_draft(
+            draft_id=draft.draft_id,
+            expected_version=999,
+            idempotency_key="idemp_1",
+        )
+    assert exc_v.value.code == "STALE_VERSION"

@@ -1,0 +1,14 @@
+.venv
+.git
+.github
+.pytest_cache
+.ruff_cache
+.mypy_cache
+tests
+data/
+artifacts/ci_eval
+artifacts/evaluation_dev
+sureword.db
+*.pyc
+__pycache__
+*.db

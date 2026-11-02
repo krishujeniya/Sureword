@@ -56,9 +56,7 @@ class GnaniClient:
         default_language: str | None = None,
         allow_fixture_fallback: bool | None = None,
     ) -> None:
-        self.api_key: str = (
-            api_key if api_key is not None else (os.getenv("GNANI_API_KEY") or "")
-        )
+        self.api_key: str = api_key if api_key is not None else (os.getenv("GNANI_API_KEY") or "")
         self.stt_url: str = (
             stt_url
             if stt_url is not None
@@ -70,19 +68,13 @@ class GnaniClient:
             else (os.getenv("GNANI_TTS_URL") or "https://api.vachana.ai/api/v1/tts/inference")
         )
         self.stt_model: str = (
-            stt_model
-            if stt_model is not None
-            else (os.getenv("GNANI_STT_MODEL") or "prisma-v3.0")
+            stt_model if stt_model is not None else (os.getenv("GNANI_STT_MODEL") or "prisma-v3.0")
         )
         self.tts_model: str = (
-            tts_model
-            if tts_model is not None
-            else (os.getenv("GNANI_TTS_MODEL") or "timbre-v2.5")
+            tts_model if tts_model is not None else (os.getenv("GNANI_TTS_MODEL") or "timbre-v2.5")
         )
         self.tts_voice: str = (
-            tts_voice
-            if tts_voice is not None
-            else (os.getenv("GNANI_TTS_VOICE") or "Bhavna")
+            tts_voice if tts_voice is not None else (os.getenv("GNANI_TTS_VOICE") or "Bhavna")
         )
         self.default_language: str = (
             default_language

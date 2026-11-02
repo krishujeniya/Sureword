@@ -362,27 +362,7 @@ def parse_date(transcript: str, reference_date: date | None = None) -> FieldValu
     ref = reference_date or date.today()
     text = convert_devanagari_digits(transcript)
 
-    # Relative dates
-    if re.search(r"\b(आज|today)\b", text, re.IGNORECASE):
-        return FieldValue(
-            key=FieldKey.VISIT_DATE.value,
-            raw_span="आज/today",
-            canonical_value=ref.isoformat(),
-            status=FieldStatus.PROPOSED,
-        )
-
-    if re.search(r"\b(कल|yesterday)\b", text, re.IGNORECASE):
-        from datetime import timedelta
-
-        y_date = ref - timedelta(days=1)
-        return FieldValue(
-            key=FieldKey.VISIT_DATE.value,
-            raw_span="कल/yesterday",
-            canonical_value=y_date.isoformat(),
-            status=FieldStatus.PROPOSED,
-        )
-
-    # ISO format YYYY-MM-DD
+    # 1. ISO format YYYY-MM-DD (checked before relative to avoid substrings)
     iso_match = re.search(r"\b(202\d)[\-/](0?[1-9]|1[0-2])[\-/](0?[1-9]|[12]\d|3[01])\b", text)
     if iso_match:
         y, m, d = int(iso_match.group(1)), int(iso_match.group(2)), int(iso_match.group(3))
@@ -403,8 +383,8 @@ def parse_date(transcript: str, reference_date: date | None = None) -> FieldValu
                 reasons=[f"Invalid calendar date {iso_match.group(0)}"],
             )
 
-    # DD-MM-YYYY format
-    dmy_match = re.search(r"\b(0?[1-9]|[12]\d|3[01])[\-/](0?[1-9]|1[0-2])[\-/(202\d)]\b", text)
+    # 2. DD-MM-YYYY format
+    dmy_match = re.search(r"\b(0?[1-9]|[12]\d|3[01])[\-/](0?[1-9]|1[0-2])(?:[\-/](202\d))?\b", text)
     if dmy_match:
         d_str, m_str, y_str = dmy_match.group(1), dmy_match.group(2), dmy_match.group(3)
         y = int(y_str) if y_str else ref.year
@@ -425,7 +405,7 @@ def parse_date(transcript: str, reference_date: date | None = None) -> FieldValu
                 reasons=[f"Invalid calendar date {dmy_match.group(0)}"],
             )
 
-    # Worded dates: e.g. "30 October 2026", "15 अगस्त 2026", "28 oct"
+    # 3. Worded dates: e.g. "30 October 2026", "15 अगस्त 2026", "28 oct"
     for m_word, m_num in MONTH_MAP.items():
         pat = rf"(\d{{1,2}})\s+{m_word}(?:\s+(\d{{4}}))?"
         m_word_match = re.search(pat, text, re.IGNORECASE)
@@ -448,6 +428,26 @@ def parse_date(transcript: str, reference_date: date | None = None) -> FieldValu
                     status=FieldStatus.NEEDS_REPEAT,
                     reasons=[f"Invalid date: day {day} for month {m_word}"],
                 )
+
+    # 4. Relative dates (Devanagari boundary safe)
+    if re.search(r"(?<![\u0900-\u097F\w])(आज|today)(?![\u0900-\u097F\w])", text, re.IGNORECASE):
+        return FieldValue(
+            key=FieldKey.VISIT_DATE.value,
+            raw_span="आज/today",
+            canonical_value=ref.isoformat(),
+            status=FieldStatus.PROPOSED,
+        )
+
+    if re.search(r"(?<![\u0900-\u097F\w])(कल|yesterday)(?![\u0900-\u097F\w])", text, re.IGNORECASE):
+        from datetime import timedelta
+
+        y_date = ref - timedelta(days=1)
+        return FieldValue(
+            key=FieldKey.VISIT_DATE.value,
+            raw_span="कल/yesterday",
+            canonical_value=y_date.isoformat(),
+            status=FieldStatus.PROPOSED,
+        )
 
     return FieldValue(
         key=FieldKey.VISIT_DATE.value,
@@ -524,8 +524,8 @@ def parse_person_name(transcript: str) -> FieldValue:
 
     # Marker patterns: "नाम कमला देवी है", "patient name Sunita Bai", "name is Ramesh Kumar"
     markers = [
-        r"(?:मरीज\s+का\s+नाम|मरीज़\s+का\s+नाम|नाम|name\s+is|patient\s+name)\s*[:\-]?\s*([A-Za-z\u0900-\u097F\s]{2,30}?)(?:\s+(?:है|hai|था|उम्र|age|village|गाँव|रहने)|$)",
-        r"(?:shrimati|smt|shri|mr|mrs|sushri|श्रीमती|श्री)\s+([A-Za-z\u0900-\u097F\s]{2,25})",
+        r"(?:मरीज\s+का\s+नाम|मरीज़\s+का\s+नाम|नाम|name\s+is|patient\s+name)\s*[:\-]?\s*([A-Za-z\u0900-\u097F\s]{2,30}?)(?:\s+(?:है|hai|था|उम्र|age|village|गाँव|रहने|\d)|$)",
+        r"(?:shrimati|smt|shri|mr|mrs|sushri|श्रीमती|श्री)\s+([A-Za-z\u0900-\u097F\s]{2,25}?)(?:\s+(?:है|hai|था|उम्र|age|village|गाँव|रहने|\d)|$)",
     ]
 
     for pat in markers:
@@ -534,7 +534,7 @@ def parse_person_name(transcript: str) -> FieldValue:
             raw_name = m.group(1).strip()
             # Clean up trailing words
             raw_name = re.sub(
-                r"\b(है|hai|ji|जी|ka|की|ke|के)\b", "", raw_name, flags=re.IGNORECASE
+                r"\b(है|hai|ji|जी|ka|की|ke|के|age|उम्र)\b", "", raw_name, flags=re.IGNORECASE
             ).strip()
             if len(raw_name) >= 2 and not raw_name.isdigit():
                 canonical = NAME_MAP.get(raw_name, raw_name.title())

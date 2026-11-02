@@ -41,6 +41,7 @@ def capture_screenshot(
     cmd = [
         chrome_bin,
         "--headless",
+        "--no-sandbox",
         "--disable-gpu",
         "--hide-scrollbars",
         f"--window-size={window_size}",

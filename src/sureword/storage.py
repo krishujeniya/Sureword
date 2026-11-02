@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from datetime import UTC, datetime
 
 import aiosqlite
@@ -16,6 +17,9 @@ class Storage:
 
     async def init_db(self) -> None:
         """Create tables for drafts, fields, audit events, and committed records."""
+        parent_dir = os.path.dirname(os.path.abspath(self.db_path))
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
         async with aiosqlite.connect(self.db_path) as db:
             await db.execute("""
                 CREATE TABLE IF NOT EXISTS drafts (

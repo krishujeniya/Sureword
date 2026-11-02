@@ -12,7 +12,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -40,11 +42,28 @@ def canonicalize(val: str | None) -> str:
     return val.strip().lower()
 
 
+def wilson_score_interval(
+    successes: int, trials: int, confidence: float = 0.95
+) -> tuple[float, float]:
+    """Calculate Wilson score interval for binomial proportion."""
+    if trials == 0:
+        return (0.0, 0.0)
+    z = 1.95996  # 95% confidence
+    p = successes / trials
+    denom = 1.0 + z**2 / trials
+    center = (p + z**2 / (2.0 * trials)) / denom
+    spread = z * math.sqrt(p * (1.0 - p) / trials + z**2 / (4.0 * trials**2)) / denom
+    lower = max(0.0, center - spread)
+    upper = min(1.0, center + spread)
+    return (round(lower, 4), round(upper, 4))
+
+
 def evaluate_policy(
     policy_name: str,
     samples: list[dict[str, Any]],
     budget_max_prompts: int = 1,
     seed: int = 42,
+    reference_date: date | None = None,
 ) -> dict[str, Any]:
     critical_keys = [
         FieldKey.PERSON_NAME.value,
@@ -61,10 +80,12 @@ def evaluate_policy(
 
     error_rows = []
 
+    ref_d = reference_date or date(2026, 10, 31)
+
     for sample in samples:
         transcript = sample["transcript"]
         gold = sample["gold_fields"]
-        parsed = parse_visit_form(transcript)
+        parsed = parse_visit_form(transcript, reference_date=ref_d)
 
         attempts_by_field: dict[str, int] = {}
         prompts_this_sample = 0
@@ -177,11 +198,15 @@ def evaluate_policy(
         "samples_evaluated": len(samples),
         "primary_accepted_field_error": round(primary_err, 4),
         "primary_error_fraction": f"{wrong_auto_accepted}/{total_auto_accepted}",
+        "wilson_ci_95_primary_error": wilson_score_interval(
+            wrong_auto_accepted, total_auto_accepted
+        ),
         "automatic_coverage": round(coverage, 4),
         "automatic_coverage_fraction": f"{total_auto_accepted}/{total_expected_critical_fields}",
         "uncaught_error_rate": round(uncaught_err, 4),
         "whole_record_correctness": round(record_accuracy, 4),
         "whole_record_fraction": f"{records_all_correct}/{len(samples)}",
+        "wilson_ci_95_record_accuracy": wilson_score_interval(records_all_correct, len(samples)),
         "realized_clarification_burden": round(burden, 2),
         "total_prompts": total_prompts,
         "error_rows": error_rows,
@@ -193,6 +218,12 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/experiment.json"))
     parser.add_argument("--manifest", type=Path, default=Path("data/manifests/test.jsonl"))
     parser.add_argument("--output", type=Path, default=Path("artifacts/evaluation"))
+    parser.add_argument(
+        "--reference-date",
+        type=str,
+        default="2026-10-31",
+        help="Reference calendar date for relative expressions (default: 2026-10-31)",
+    )
     args = parser.parse_args()
 
     args.output.mkdir(parents=True, exist_ok=True)
@@ -200,6 +231,10 @@ def main() -> None:
 
     policies = ["B0", "B1", "B2", "P", "B3"]
     results = {}
+
+    ref_date = (
+        date.fromisoformat(args.reference_date) if args.reference_date else date(2026, 10, 31)
+    )
 
     print(
         "========================================================================================="
@@ -210,14 +245,14 @@ def main() -> None:
     )
 
     for pol in policies:
-        res = evaluate_policy(pol, samples, budget_max_prompts=1, seed=42)
+        res = evaluate_policy(pol, samples, budget_max_prompts=1, seed=42, reference_date=ref_date)
         results[pol] = res
 
     # Print Markdown Summary Table
     headers = [
         "Policy",
         "Description",
-        "Primary Error",
+        "Primary Error (95% CI)",
         "Auto Coverage",
         "Uncaught Error",
         "Record Correctness",
@@ -235,9 +270,11 @@ def main() -> None:
     print(f"|{'---|' * len(headers)}")
     for pol in policies:
         r = results[pol]
+        ci = r["wilson_ci_95_primary_error"]
+        ci_str = f"[{ci[0]:.1%}, {ci[1]:.1%}]"
         print(
             f"| **{pol}** | {descriptions[pol]} "
-            f"| {r['primary_accepted_field_error']:.1%} ({r['primary_error_fraction']}) "
+            f"| {r['primary_accepted_field_error']:.1%} ({r['primary_error_fraction']}, {ci_str}) "
             f"| {r['automatic_coverage']:.1%} ({r['automatic_coverage_fraction']}) "
             f"| {r['uncaught_error_rate']:.1%} "
             f"| {r['whole_record_correctness']:.1%} ({r['whole_record_fraction']}) "
