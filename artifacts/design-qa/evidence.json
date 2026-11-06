@@ -1,0 +1,89 @@
+{
+  "contract": "docs/DESIGN_SYSTEM.md: fictional voice entry, clarification, review, real save and export; light blue/navy single-product app",
+  "targetViewports": [
+    "320",
+    "360",
+    "390",
+    "768",
+    "1024",
+    "1280",
+    "1440",
+    "1920"
+  ],
+  "accessibility": {
+    "status": "pass",
+    "evidence": "Keyboard workspace/stage arrow keys and Home/End; FAQ Enter; visible focus; Lighthouse accessibility 100; reduced-motion stops canvas and disables pause control. Screen reader speech not run."
+  },
+  "responsive": {
+    "status": "pass",
+    "evidence": "Full page screenshots at eight widths; all scrollWidth <= innerWidth; short landscape and 200% root-font check."
+  },
+  "contentStates": {
+    "loading": {
+      "status": "pass",
+      "evidence": "Initializing session and processing sample status regions observed during real requests."
+    },
+    "empty": {
+      "status": "pass",
+      "evidence": "Empty recognized fields and transcript observed after new draft."
+    },
+    "error": {
+      "status": "pass",
+      "evidence": "Injected HTTP 503 session creation gives recoverable error; states-error.png."
+    },
+    "partial": {
+      "status": "pass",
+      "evidence": "Fictional sample recognized fields and actual name clarification; sample answer uses real API."
+    },
+    "success": {
+      "status": "pass",
+      "evidence": "Real fixture database commit, registry row and downloaded CSV/JSON; states-success.png."
+    },
+    "permission": {
+      "status": "pass",
+      "evidence": "Mocked getUserMedia NotAllowedError gives localized microphone-denied feedback; extra-results.json."
+    }
+  },
+  "renderedEvidence": [
+    {
+      "viewport": "320",
+      "artifact": "320.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "360",
+      "artifact": "360.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "390",
+      "artifact": "390.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "768",
+      "artifact": "768.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "1024",
+      "artifact": "1024.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "1280",
+      "artifact": "1280.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "1440",
+      "artifact": "1440.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    },
+    {
+      "viewport": "1920",
+      "artifact": "1920.png",
+      "observation": "Full page layout: visible primary CTA, single-column mobile workspace or wider split, no horizontal page overflow."
+    }
+  ]
+}

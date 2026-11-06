@@ -134,3 +134,23 @@ def test_native_wav_fallback_when_ffmpeg_absent(monkeypatch: pytest.MonkeyPatch)
     # Native WAV fallback too long (> max_seconds)
     with pytest.raises(AudioValidationError, match="exceeds maximum"):
         convert_and_normalize_audio(wav_bytes, max_seconds=0.2)
+
+
+def test_canonical_wav_does_not_launch_converter(monkeypatch: pytest.MonkeyPatch) -> None:
+    import io
+    import wave
+
+    def reject_subprocess(*args: object, **kwargs: object) -> None:
+        raise AssertionError("Canonical PCM must not require a subprocess")
+
+    monkeypatch.setattr("subprocess.run", reject_subprocess)
+    buffer = io.BytesIO()
+    with wave.open(buffer, "wb") as output:
+        output.setnchannels(1)
+        output.setsampwidth(2)
+        output.setframerate(16000)
+        output.writeframes(b"\x00" * 16000)
+    raw = buffer.getvalue()
+    result = convert_and_normalize_audio(raw)
+    assert result.wav_bytes == raw
+    assert result.duration_seconds == 0.5

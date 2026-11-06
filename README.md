@@ -194,3 +194,27 @@ make evaluate
 1. **Simulated Workflow:** The prototype uses fictional role-play data. It is not approved for actual clinical diagnosis, triage, or live medical records.
 2. **Privacy by Design:** Temporary audio is normalized, processed, and immediately removed. No raw audio is retained in public logs or persistent storage.
 3. **No Fabricated Performance:** Live API calls require a valid `GNANI_API_KEY`. When running in offline or fixture mode, provenance is clearly labeled in both the UI and JSON responses.
+
+## Site and workspace
+
+The FastAPI app now serves a light, blue/navy product introduction and the working visit workspace at `/`. Use **Open workspace** or `/#workspace` to start; `/docs` and `/redoc` remain generated API documentation. The page includes a labeled SVG/Canvas illustration, optional particle motion, a keyboard-operable Speak / Clarify / Review explanation, and a native FAQ. No frontend bundler or Node production runtime is required.
+
+Use **fictional details only**. Sample chips supply simulated transcripts, and **Use fictional sample answer** resolves a sample question through the real clarification API. Recording and spoken prompts require browser permissions and configured speech infrastructure. Prompts play only after an explicit request. Saved demo records are unauthenticated; the app page is deliberately `noindex`. Vercel's `/tmp` SQLite is ephemeral, not durable storage.
+
+Design and content: [design system and 93-effect audit](docs/DESIGN_SYSTEM.md), [product inventory](docs/PRODUCT_INVENTORY.md), [QA results and remaining limits](docs/QA_REPORT.md). Current local captures: `artifacts/design-qa/`.
+
+```bash
+# Build the Python source distribution and wheel, including static assets
+uv build
+# Existing checks
+make lint
+make typecheck
+make test
+# Optional local browser QA: install Playwright in the dev environment first
+uv pip install playwright
+.venv/bin/python scripts/qa_site.py
+```
+
+Browser QA expects an isolated fixture server on port 8000 and Chrome at `/opt/google/chrome/chrome`; it saves fictional records to that server. Run the server with `GNANI_API_KEY=` and a disposable `DATABASE_PATH` to avoid provider calls and existing records. The Playwright package is optional tooling, not a production dependency.
+
+Deployment: use the existing Dockerfile/Compose on a Python runtime with ffmpeg, or the existing `vercel.json` Python adapter. Install the project requirements, configure server-only Gnani credentials for authorized live testing, and supply durable storage/authentication before any real-data deployment. No push or deployment was performed for this redesign. Follow local QA before an explicitly approved deployment; do not infer deployment acceptance from the wheel build.

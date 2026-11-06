@@ -6,7 +6,8 @@
 // Application State
 let currentDraftId = null;
 let currentVersion = 1;
-let currentLanguage = localStorage.getItem("sureword_lang") || "hi-IN";
+let currentLanguage = "hi-IN";
+try { currentLanguage = localStorage.getItem("sureword_lang") || "hi-IN"; } catch {}
 let mediaRecorder = null;
 let audioChunks = [];
 let recordTimerInterval = null;
@@ -700,7 +701,7 @@ function setLanguage(lang) {
     transcriptContent.textContent = strings.transcript_empty || transcriptContent.textContent;
   }
 
-  document.documentElement.lang = lang;
+  document.querySelector(".main-content").lang = lang;
 }
 
 // System Health Check
@@ -712,7 +713,7 @@ async function checkHealth() {
       providerBadge.textContent = "● Live Speech Online";
       providerBadge.className = "badge badge-live";
     } else {
-      providerBadge.textContent = "● Speech Engine Ready";
+      providerBadge.textContent = data.allow_fixture_fallback ? "● Demo fixtures enabled" : "○ Speech not configured";
       providerBadge.className = "badge badge-fixture";
     }
   } catch (err) {
@@ -731,6 +732,7 @@ async function initNewDraft() {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `language=${encodeURIComponent(currentLanguage)}`
     });
+    if (!res.ok) throw new Error("Server could not create a session. Please retry.");
     const data = await res.json();
     currentDraftId = data.draft_id;
     currentVersion = data.version;
@@ -771,6 +773,9 @@ function updateEncounterSummary(fields) {
 }
 
 function resetFormUI() {
+  document.getElementById("sample-answer-btn").hidden = true;
+  ttsAudioPlayer.pause();
+  ttsAudioPlayer.hidden = true;
   committedResult.classList.add("hidden");
   clarificationBanner.classList.add("hidden");
   if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
@@ -804,6 +809,11 @@ function updateStateUI(state, version) {
 }
 
 function renderDraft(draft) {
+  const sampleAnswer = document.getElementById("sample-answer-btn");
+  const sampleField = draft.active_prompt?.target_field;
+  const sampleValue = sampleField && draft.fields[sampleField]?.canonical_value;
+  sampleAnswer.hidden = !(draft.latest_transcript?.source === "preset" && sampleValue && draft.state === "NEEDS_CLARIFICATION");
+  sampleAnswer.onclick = () => saveFieldManualEdit(sampleField, sampleValue);
   currentDraftId = draft.draft_id;
   currentVersion = draft.version;
   updateStateUI(draft.state, currentVersion);
@@ -826,7 +836,7 @@ function renderDraft(draft) {
         tag.className = `status-tag tag-${f.status}`;
       }
       if (reasonsDiv) {
-        reasonsDiv.innerHTML = f.reasons.length ? f.reasons.join("<br>") : "";
+        reasonsDiv.innerHTML = f.reasons.length ? f.reasons.map(escapeHtml).join("<br>") : "";
       }
       if (input) {
         input.setAttribute("aria-invalid", (f.status === "needs_repeat" || (f.status === "missing" && !f.canonical_value)) ? "true" : "false");
@@ -1007,9 +1017,7 @@ async function submitFullAudio(blobOrFile) {
     renderDraft(data.draft);
     hideStatus();
 
-    if (data.draft.state === "NEEDS_CLARIFICATION") {
-      playSpokenClarification();
-    }
+    // Spoken prompts play only on explicit user request.
   } catch (err) {
     showStatus("Audio processing failed: " + err.message, "error");
   }
@@ -1043,9 +1051,7 @@ async function runPresetScript(presetKey) {
     renderDraft(data.draft);
     hideStatus();
 
-    if (data.draft.state === "NEEDS_CLARIFICATION") {
-      playSpokenClarification();
-    }
+    // Spoken prompts play only on explicit user request.
   } catch (err) {
     showStatus("Preset run failed: " + err.message, "error");
   }
@@ -1117,11 +1123,13 @@ async function playSpokenClarification() {
 
     const audioBlob = await res.blob();
     const audioUrl = URL.createObjectURL(audioBlob);
+    if (ttsAudioPlayer.src.startsWith("blob:")) URL.revokeObjectURL(ttsAudioPlayer.src);
     ttsAudioPlayer.src = audioUrl;
-    ttsAudioPlayer.play();
+    ttsAudioPlayer.hidden = false;
+    await ttsAudioPlayer.play();
 
     playTtsBtn.textContent = "🔊 Playing...";
-    ttsAudioPlayer.onended = () => {
+    ttsAudioPlayer.onpause = ttsAudioPlayer.onended = () => {
       playTtsBtn.disabled = false;
       playTtsBtn.textContent = `🔊 ${dict.btn_hear_prompt}`;
     };
@@ -1277,10 +1285,12 @@ function switchTab(targetView) {
   if (tabFormBtn) {
     tabFormBtn.classList.toggle("active", targetView === "form");
     tabFormBtn.setAttribute("aria-selected", targetView === "form" ? "true" : "false");
+    tabFormBtn.tabIndex = targetView === "form" ? 0 : -1;
   }
   if (tabRegistryBtn) {
     tabRegistryBtn.classList.toggle("active", targetView === "registry");
     tabRegistryBtn.setAttribute("aria-selected", targetView === "registry" ? "true" : "false");
+    tabRegistryBtn.tabIndex = targetView === "registry" ? 0 : -1;
   }
 
   if (viewForm) {

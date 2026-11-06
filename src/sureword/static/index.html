@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sureword — Frontline Healthcare Voice Documentation</title>
-  
+
   <!-- SEO & AEO Primary Metadata -->
   <meta name="description" content="Sureword is an Indian frontline voice-to-form medical documentation system supporting 11 Indic languages with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
   <meta name="keywords" content="Sureword, Sovereign AI, Gnani.ai, Frontline Healthcare, ASHA worker voice assistant, Prisma STT, Timbre TTS, Indic ASR, selective clarification, voice to form">
   <meta name="author" content="Krish Ujeniya">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="canonical" href="https://sureword.vercel.app/">
-  
+
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://sureword.vercel.app/">
@@ -20,70 +20,22 @@
   <meta property="og:image" content="https://sureword.vercel.app/static/logo.svg">
   <meta property="og:site_name" content="Sureword">
   <meta property="og:locale" content="en_IN">
-  
+
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sureword — Frontline Healthcare Voice Documentation">
   <meta name="twitter:description" content="Frontline voice-to-form documentation with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
   <meta name="twitter:image" content="https://sureword.vercel.app/static/logo.svg">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="apple-touch-icon" href="/static/favicon.svg">
   <meta name="theme-color" content="#0A2540">
-  
+
   <!-- Stylesheet -->
   <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/design.css">
 
-  <!-- AEO Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://sureword.vercel.app/#software",
-        "name": "Sureword",
-        "applicationCategory": "HealthApplication",
-        "operatingSystem": "All modern browsers",
-        "description": "Frontline voice-to-form visit documentation with selective spoken clarification, powered by Gnani Prisma STT and Timbre TTS.",
-        "url": "https://sureword.vercel.app/",
-        "author": { "@type": "Person", "name": "Krish Ujeniya" },
-        "publisher": { "@type": "Organization", "name": "Gnani.ai Great Indian AI Internship Challenge 2026" }
-      },
-      {
-        "@type": "FAQPage",
-        "@id": "https://sureword.vercel.app/#faq",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is Sureword?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sureword is a voice-to-form documentation assistant for frontline healthcare workers. It captures visit narratives in 11 Indic languages including Hindi, English, Marathi, Bengali, Gujarati, Punjabi, Tamil, Telugu, Kannada, Malayalam, and Odia, structuring them into clinical records with targeted clarification questions only when uncertainty exceeds risk thresholds."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How does selective spoken clarification work?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Rather than reprompting every field or accepting raw ASR unverified, Sureword calculates field-level risk and prompts workers to repeat only high-risk ambiguous fields under a strict budget, cutting error by 50% relative."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What languages does Sureword support?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Sureword supports 11 Indian languages: Hindi (hi-IN), English (en-IN), Marathi (mr-IN), Bengali (bn-IN), Gujarati (gu-IN), Punjabi (pa-IN), Tamil (ta-IN), Telugu (te-IN), Kannada (kn-IN), Malayalam (ml-IN), and Odia (or-IN), all powered by Gnani.ai Prisma speech-to-text and Timbre text-to-speech engines."
-            }
-          }
-        ]
-      }
-    ]
-  }
-  </script>
 </head>
 <body>
   <!-- Accessible Skip Link -->
@@ -99,14 +51,43 @@
           </div>
           <div>
             <div class="brand-title-row">
-              <h1 class="brand-name">Sureword</h1>
-              <span class="context-pill" data-i18n="context_pill">Frontline Health</span>
+              <a class="brand-name" href="#overview">Sureword<span class="brand-period">.</span></a>
+
             </div>
-            <p class="brand-tagline" data-i18n="tagline">Bilingual Voice-to-Form Visit Documentation</p>
+
           </div>
         </div>
 
-        <!-- Navigation Tabs & Language / Status -->
+        <nav class="site-nav" aria-label="Site navigation"><a href="#workflow">How it works</a><a href="#questions">Good to know</a><a class="btn nav-cta" href="#workspace">Open workspace <span aria-hidden="true">↗</span></a></nav>
+      </div>
+    </header>
+
+    <section class="hero container" id="overview" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="tiny-dot"></span> A little more listening. A lot more clarity.</p>
+        <h1 id="hero-title" data-reveal>Every visit.<br>Every word.<br><span>More certain.</span></h1>
+        <p class="hero-description">Speak naturally. Turn a household visit into a structured record. Clarify what matters, then review before you save.</p>
+        <div class="hero-actions"><a class="btn hero-primary" href="#workspace">Start a visit <span aria-hidden="true">↗</span></a><a class="quiet-link" href="#workflow">Meet your new workflow <span aria-hidden="true">↓</span></a></div>
+        <p class="hero-note">Built for frontline care. Designed around your voice.</p>
+      </div>
+      <div class="voice-art" aria-label="Illustration: spoken words resolve into structured visit fields" role="img">
+        <canvas id="particle-field" aria-hidden="true"></canvas>
+        <svg class="voice-orbit" viewBox="0 0 520 480" aria-hidden="true"><circle cx="260" cy="240" r="183"/><ellipse cx="260" cy="240" rx="220" ry="110" transform="rotate(-32 260 240)"/><ellipse cx="260" cy="240" rx="145" ry="210" transform="rotate(-32 260 240)"/><circle class="orbit-core" cx="260" cy="240" r="76"/><g class="voice-bars"><path d="M224 231v18m12-35v52m12-65v78m12-94v110m12-89v68m12-53v38m12-29v20"/></g></svg>
+        <span class="art-label art-label-top">01 / YOUR VOICE</span><span class="art-label art-label-bottom">02 / A CLEARER RECORD</span>
+        <span class="art-chip chip-name">Name <b>Recognized</b></span><span class="art-chip chip-visit">Visit date <b>Ready to review</b></span>
+        <span class="illustration-label">Voice-to-form · conceptual illustration</span>
+      </div>
+      <div class="art-controls" aria-label="Illustration controls"><button id="particle-mode" class="text-control" aria-pressed="false">Orbital formation</button><button id="particle-pause" class="text-control" aria-pressed="false">Pause motion</button></div>
+    </section>
+    <div class="proof-strip"><div class="container proof-inner"><span>YOUR WORDS. YOUR LANGUAGE.</span><p>11 speech languages</p><span class="strip-divider"></span><p>One field at a time</p><span class="strip-divider"></span><p>You make the final call</p></div></div>
+    <!-- Main Container -->
+    <main id="main-content" class="container main-content" role="main">
+      <!-- Live Status / Announcement Banner -->
+      <div id="status-message" class="status-box hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+
+      <div class="workspace-heading" id="workspace"><div><p class="eyebrow">THE WORKSPACE</p><h2>A visit starts with a conversation.</h2></div><p>Use fictional details only.<br>This is a research prototype, not a clinical record system.</p></div>
+      <noscript><p class="notice">The overview and workflow are available without JavaScript. Recording and saving visits require JavaScript and the running Sureword server.</p></noscript>
+      <div class="workspace-toolbar">        <!-- Navigation Tabs & Language / Status -->
         <div class="header-actions">
           <nav class="nav-tabs" role="tablist" aria-label="Main Navigation">
             <button id="tab-form-btn" class="nav-tab active" role="tab" aria-selected="true" aria-controls="view-form">
@@ -137,14 +118,8 @@
             <span id="provider-badge" class="badge badge-neutral" role="status" title="Speech Provider Status">Connecting...</span>
           </div>
         </div>
-      </div>
-    </header>
-
-    <!-- Main Container -->
-    <main id="main-content" class="container main-content" role="main">
-      <!-- Live Status / Announcement Banner -->
-      <div id="status-message" class="status-box hidden" role="status" aria-live="polite" aria-atomic="true"></div>
-
+</div>
+      <p class="sample-disclosure">Samples are fictional, simulated transcripts. They demonstrate parsing and review, not live speech recognition.</p>
       <!-- VIEW 1: Clinical Dictation & Form Entry -->
       <div id="view-form" class="view-panel active" role="tabpanel" aria-labelledby="tab-form-btn">
         <div class="grid-layout">
@@ -153,14 +128,14 @@
             <div class="card-header">
               <h2 id="dictate-heading" data-i18n="step1_title">Dictate Visit</h2>
             </div>
-            
+
             <p class="instruction" data-i18n="step1_desc">
               Speak visit details in Hindi or English (Name, Age, Village, Visit Date).
             </p>
 
             <!-- Compact Quick Presets -->
             <div class="presets-row">
-              <span class="presets-label" data-i18n="presets_label">Quick Test:</span>
+              <span class="presets-label" data-i18n="presets_label">Fictional samples:</span>
               <div class="preset-chips">
                 <button type="button" class="preset-chip" data-preset="kamla" title="Sample visit: Kamla Devi">
                   Kamla Devi (45y)
@@ -176,11 +151,11 @@
 
             <!-- Primary Microphone Recording Control -->
             <div class="mic-controls">
-              <button id="record-btn" class="btn btn-primary btn-record" aria-label="Start voice dictation recording">
+              <button id="record-btn" class="btn btn-primary btn-record">
                 <span class="mic-icon-pulse" aria-hidden="true">🎙️</span>
                 <span id="record-text" data-i18n="record_start">Start Dictation</span>
               </button>
-              
+
               <!-- Authentic Recording State (No Fake Waves) -->
               <div id="recording-state-indicator" class="recording-state-indicator hidden" aria-live="polite">
                 <span class="rec-dot" aria-hidden="true">●</span>
@@ -248,6 +223,7 @@
                 </button>
               </div>
 
+              <button type="button" id="sample-answer-btn" class="btn btn-sm btn-secondary" hidden>Use fictional sample answer</button>
               <!-- Clarification Response Actions (Pure Voice Repeat) -->
               <div class="clarification-action">
                 <button id="clarify-mic-btn" class="btn btn-sm btn-accent" title="Record single-field spoken repeat">
@@ -415,6 +391,19 @@
       </div>
     </main>
 
+    <section class="workflow container" id="workflow" aria-labelledby="workflow-title"><div class="section-intro"><p class="eyebrow">LESS REPETITION. MORE ATTENTION.</p><h2 id="workflow-title" data-reveal>From a spoken visit<br>to a considered record.</h2><p>Recognition is a beginning. Review is what makes it useful.</p></div>
+      <div class="stage-controls" role="tablist" aria-label="Visit workflow" hidden><button role="tab" id="stage-speak" aria-controls="panel-speak" aria-selected="true">01 Speak</button><button role="tab" id="stage-clarify" aria-controls="panel-clarify" aria-selected="false" tabindex="-1">02 Clarify</button><button role="tab" id="stage-review" aria-controls="panel-review" aria-selected="false" tabindex="-1">03 Review</button></div>
+      <div class="stage-panel" id="panel-speak" aria-labelledby="stage-speak"><span class="stage-word">Speak.</span><div><p class="eyebrow">START WITH WHAT YOU KNOW</p><h3>Your language. Your natural pace.</h3><p>Record up to 20 seconds of visit details. Sureword uses Gnani Prisma to transcribe your voice and extracts name, age, village, and visit date, with optional gender and symptoms.</p><a class="quiet-link" href="#workspace">Try a fictional sample ↗</a></div></div>
+      <div class="stage-panel" id="panel-clarify" aria-labelledby="stage-clarify"><span class="stage-word">Clarify.</span><div><p class="eyebrow">FOCUS ON THE UNCERTAIN</p><h3>Repeat a detail, not the whole visit.</h3><p>The policy ranks missing or ambiguous fields and selects a focused question within its clarification budget. Spoken prompts use Gnani Timbre when configured.</p><a class="quiet-link" href="#workspace">Open the workspace ↗</a></div></div>
+      <div class="stage-panel" id="panel-review" aria-labelledby="stage-review"><span class="stage-word">Review.</span><div><p class="eyebrow">KEEP THE HUMAN IN THE LOOP</p><h3>You decide when it is ready.</h3><p>Check every recognized field before explicitly saving. Find committed visits in the registry and export them as CSV or JSON. Serverless demo storage is temporary.</p><a class="quiet-link" href="#workspace">Review a visit ↗</a></div></div>
+    </section>
+    <section class="faq-section container" id="questions" aria-labelledby="faq-title"><div><p class="eyebrow">GOOD TO KNOW</p><h2 id="faq-title">Clarity, before<br>you begin.</h2><p>Made for exploration.<br>Honest about its limits.</p></div><div class="faq-list">
+      <details><summary>Can I use this for real patient records?</summary><p>No. Sureword is a challenge research prototype using fictional role-play data. It is not approved for diagnosis, triage, or live medical records. This demo has no user authentication; never enter personal or patient information.</p></details>
+      <details><summary>Which languages can I speak?</summary><p>The app offers Hindi, Indian English, Marathi, Bengali, Gujarati, Punjabi, Tamil, Telugu, Kannada, Malayalam, and Odia. The workspace controls are localized; this overview is in English. Live speech requires configured Gnani credentials.</p></details>
+      <details><summary>What happens to my audio and records?</summary><p>The server processes temporary audio and removes it after processing. Committed records use the server’s SQLite database. On Vercel, the temporary filesystem is not durable or shared storage. CSV and JSON exports are available in the registry.</p></details>
+      <details><summary>Do the samples call a speech provider?</summary><p>No. Sample buttons supply labeled simulated transcripts to the parsing workflow. They let you explore structured extraction without recording audio or calling a paid provider.</p></details>
+      <details><summary>Where can I explore the project?</summary><p>Sureword is MIT licensed. Explore the <a href="https://github.com/krishujeniya/Sureword">source repository</a> or the running server’s <a href="/docs">API documentation</a>. No paid plans or subscription are offered here.</p></details>
+    </div></section>
     <!-- Footer -->
     <footer class="app-footer" role="contentinfo">
       <div class="container footer-container">
@@ -422,16 +411,17 @@
         <div class="footer-links">
           <a href="https://github.com/krishujeniya/Sureword" target="_blank" rel="noopener noreferrer">GitHub</a>
           <span class="sep">•</span>
-          <a href="https://sureword.vercel.app/" target="_blank" rel="noopener noreferrer">Production</a>
+          <a href="/docs">API reference</a>
         </div>
       </div>
     </footer>
   </div>
 
   <!-- Hidden TTS Audio Player -->
-  <audio id="tts-audio-player" class="hidden" preload="auto"></audio>
+  <audio id="tts-audio-player" controls preload="none" aria-label="Spoken clarification playback" hidden></audio>
 
   <!-- Client Application Logic -->
   <script src="/static/app.js"></script>
+  <script src="/static/experience.js" defer></script>
 </body>
 </html>

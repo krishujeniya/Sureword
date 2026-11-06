@@ -50,6 +50,34 @@ def convert_and_normalize_audio(
     """
     validate_raw_bytes(raw_data)
 
+    # Already canonical PCM needs validation, not a lossy or expensive round trip.
+    try:
+        with wave.open(io.BytesIO(raw_data), "rb") as native:
+            if (
+                native.getnchannels() == 1
+                and native.getframerate() == target_sample_rate
+                and native.getsampwidth() == 2
+                and native.getcomptype() == "NONE"
+            ):
+                frames = native.getnframes()
+                payload = native.readframes(frames)
+                if len(payload) != frames * 2:
+                    raise AudioValidationError("WAV payload is truncated")
+                duration = frames / float(target_sample_rate)
+                if duration < 0.2:
+                    raise AudioValidationError(
+                        f"Audio duration ({duration:.2f}s) is too short or silent"
+                    )
+                if duration > max_seconds:
+                    raise AudioValidationError(
+                        f"Audio duration ({duration:.2f}s) exceeds maximum allowed limit ({max_seconds}s)"
+                    )
+                return AudioInfo(
+                    raw_data, round(duration, 3), compute_sha256(raw_data), target_sample_rate, 1
+                )
+    except (wave.Error, EOFError):
+        pass  # Other browser formats still use the existing converter.
+
     # Serverless fallback when FFmpeg binary is absent (e.g. Vercel Python runtime)
     if shutil.which("ffmpeg") is None:
         try:

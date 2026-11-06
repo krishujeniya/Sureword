@@ -1,0 +1,34 @@
+{
+  "sample": "Kamla Devi",
+  "no_automatic_audio": true,
+  "saved_registry": true,
+  "#export-csv-btn": "sureword_committed_records_1793937052598.csv",
+  "#export-json-btn": "sureword_committed_records_1793937052668.json",
+  "workspace_keyboard": true,
+  "stage_keyboard": true,
+  "stage_end": true,
+  "particle_pause": true,
+  "faq_keyboard": true,
+  "reset": true,
+  "permission_feedback": "Microphone access denied or unsupported. (Permission denied)",
+  "error_feedback": "Failed to initialize draft session: Server could not create a session. Please retry.",
+  "reduced_motion": true,
+  "widths_no_overflow": {
+    "320": true,
+    "360": true,
+    "390": true,
+    "768": true,
+    "1024": true,
+    "1280": true,
+    "1440": true,
+    "1920": true
+  },
+  "short_landscape": true,
+  "text_zoom_no_overflow": true,
+  "no_js": true,
+  "slow_network_readable": true,
+  "page_errors": [],
+  "http_failures": [
+    "http://127.0.0.1:8000/api/drafts"
+  ]
+}
