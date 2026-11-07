@@ -1,14 +1,32 @@
+# Dependencies & Environment
 .venv
 .git
 .github
+.codex
+.agents
+.aws
+
+# Testing & Quality
 .pytest_cache
 .ruff_cache
 .mypy_cache
+.coverage
+htmlcov
 tests
-data/
-artifacts/ci_eval
-artifacts/evaluation_dev
-sureword.db
+
+# Training, Evaluation & Benchmarking Data
+data
+artifacts
+dist
+dist-static
+docs
+scripts
+
+# Database & Runtime Temporary Files
+sureword.db*
+*.db
+*.sqlite
+*.sqlite3
 *.pyc
 __pycache__
-*.db
+temp_audio
