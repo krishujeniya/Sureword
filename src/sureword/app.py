@@ -110,7 +110,7 @@ async def add_security_headers(request: Request, call_next: Callable[[Request], 
     return response
 
 
-@app.get("/healthz")
+@app.api_route("/healthz", methods=["GET", "HEAD"])
 async def health_check() -> dict[str, str | bool]:
     """Health check endpoint without expensive third-party calls."""
     db_status = "postgres_ready" if storage.backend_name == "postgres" else "sqlite_ready"
