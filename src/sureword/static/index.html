@@ -10,14 +10,14 @@
   <meta name="keywords" content="Sureword, Sovereign AI, Gnani.ai, Frontline Healthcare, ASHA worker voice assistant, Prisma STT, Timbre TTS, Indic ASR, selective clarification, voice to form">
   <meta name="author" content="Krish Ujeniya">
   <meta name="robots" content="noindex, nofollow">
-  <link rel="canonical" href="https://sureword.vercel.app/">
+  <link rel="canonical" href="https://krishujeniya.github.io/Sureword/">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://sureword.vercel.app/">
+  <meta property="og:url" content="https://krishujeniya.github.io/Sureword/">
   <meta property="og:title" content="Sureword — Frontline Healthcare Voice Documentation">
   <meta property="og:description" content="Frontline voice-to-form documentation with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
-  <meta property="og:image" content="https://sureword.vercel.app/static/logo.svg">
+  <meta property="og:image" content="https://krishujeniya.github.io/Sureword/logo.svg">
   <meta property="og:site_name" content="Sureword">
   <meta property="og:locale" content="en_IN">
 
@@ -25,16 +25,25 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Sureword — Frontline Healthcare Voice Documentation">
   <meta name="twitter:description" content="Frontline voice-to-form documentation with selective spoken clarification. Powered by Gnani Prisma STT and Timbre TTS.">
-  <meta name="twitter:image" content="https://sureword.vercel.app/static/logo.svg">
+  <meta name="twitter:image" content="https://krishujeniya.github.io/Sureword/logo.svg">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-  <link rel="apple-touch-icon" href="/static/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="apple-touch-icon" href="./favicon.svg">
   <meta name="theme-color" content="#0A2540">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="/static/styles.css">
-  <link rel="stylesheet" href="/static/design.css">
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./design.css">
+
+  <!-- Production Client Runtime Configuration -->
+  <script>
+    window.SUREWORD_CONFIG = {
+      apiBaseUrl: (window.location.hostname.endsWith(".github.io") || window.location.hostname === "krishujeniya.github.io")
+        ? "https://sureword.vercel.app"
+        : ""
+    };
+  </script>
 
 </head>
 <body>
@@ -47,7 +56,7 @@
       <div class="container header-container">
         <div class="brand">
           <div class="logo-wrapper" aria-hidden="true">
-            <img src="/static/logo.svg" alt="" width="42" height="42" class="brand-logo-img">
+            <img src="./logo.svg" alt="" width="42" height="42" class="brand-logo-img">
           </div>
           <div>
             <div class="brand-title-row">
@@ -411,7 +420,7 @@
         <div class="footer-links">
           <a href="https://github.com/krishujeniya/Sureword" target="_blank" rel="noopener noreferrer">GitHub</a>
           <span class="sep">•</span>
-          <a href="/docs">API reference</a>
+          <a id="footer-api-link" href="/docs">API reference</a>
         </div>
       </div>
     </footer>
@@ -421,7 +430,7 @@
   <audio id="tts-audio-player" controls preload="none" aria-label="Spoken clarification playback" hidden></audio>
 
   <!-- Client Application Logic -->
-  <script src="/static/app.js"></script>
-  <script src="/static/experience.js" defer></script>
+  <script src="./app.js"></script>
+  <script src="./experience.js" defer></script>
 </body>
 </html>

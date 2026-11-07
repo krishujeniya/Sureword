@@ -1,0 +1,59 @@
+name: Deploy Frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/sureword/static/**"
+      - "scripts/build_frontend.py"
+      - ".github/workflows/deploy-frontend.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate Frontend Source Files
+        run: |
+          node --check src/sureword/static/app.js
+          node --check src/sureword/static/experience.js
+
+      - name: Build Standalone Static Distribution
+        run: |
+          python scripts/build_frontend.py --source src/sureword/static --output dist-static --api-base https://sureword.vercel.app --base-href /Sureword/
+
+      - name: Validate Distribution Artifacts and Security Invariants
+        run: |
+          python scripts/build_frontend.py --output dist-static --check-only
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload GitHub Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-static
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

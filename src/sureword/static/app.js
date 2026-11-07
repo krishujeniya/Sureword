@@ -704,10 +704,85 @@ function setLanguage(lang) {
   document.querySelector(".main-content").lang = lang;
 }
 
+// Centralized API Configuration & Cross-Origin Client
+const API_CONFIG = {
+  productionApiBase: "https://sureword.vercel.app",
+  timeoutMs: 30000,
+  getBaseUrl() {
+    // 1. Explicit runtime query parameter (?api_base=...)
+    try {
+      if (typeof window !== "undefined" && window.location && window.location.search) {
+        const param = new URLSearchParams(window.location.search).get("api_base");
+        if (param) return param.replace(/\/+$/, "");
+      }
+    } catch (e) {}
+
+    // 2. Explicit localStorage override for testing/staging
+    try {
+      if (typeof localStorage !== "undefined") {
+        const stored = localStorage.getItem("sureword_api_base");
+        if (stored) return stored.replace(/\/+$/, "");
+      }
+    } catch (e) {}
+
+    // 3. Global runtime configuration injected via HTML
+    if (typeof window !== "undefined" && window.SUREWORD_CONFIG && window.SUREWORD_CONFIG.apiBaseUrl) {
+      return window.SUREWORD_CONFIG.apiBaseUrl.replace(/\/+$/, "");
+    }
+
+    // 4. GitHub Pages detection: krishujeniya.github.io or any *.github.io domain
+    if (typeof window !== "undefined" && window.location && window.location.hostname && (
+      window.location.hostname.endsWith(".github.io") ||
+      window.location.hostname === "krishujeniya.github.io"
+    )) {
+      return this.productionApiBase;
+    }
+
+    // 5. Default to same-origin (for local uvicorn review or direct Vercel hosting)
+    return "";
+  },
+  url(path) {
+    const base = this.getBaseUrl();
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    return base ? `${base}${cleanPath}` : cleanPath;
+  }
+};
+
+async function apiFetch(path, options = {}) {
+  const targetUrl = API_CONFIG.url(path);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.timeoutMs);
+  const signal = options.signal || controller.signal;
+
+  try {
+    const res = await fetch(targetUrl, {
+      ...options,
+      signal,
+    });
+    clearTimeout(timeoutId);
+    return res;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === "AbortError") {
+      throw new Error(`Request timed out after ${API_CONFIG.timeoutMs / 1000}s`);
+    }
+    throw err;
+  }
+}
+
 // System Health Check
 async function checkHealth() {
   try {
-    const res = await fetch("/healthz");
+    const footerApiLink = document.getElementById("footer-api-link");
+    if (footerApiLink) {
+      footerApiLink.href = API_CONFIG.url("/docs");
+      if (API_CONFIG.getBaseUrl()) {
+        footerApiLink.target = "_blank";
+        footerApiLink.rel = "noopener noreferrer";
+      }
+    }
+
+    const res = await apiFetch("/healthz");
     const data = await res.json();
     if (data.gnani_configured) {
       providerBadge.textContent = "● Live Speech Online";
@@ -727,7 +802,7 @@ async function initNewDraft() {
   const initDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   showStatus(initDict.status_init || "Initializing frontline visit session...", "info");
   try {
-    const res = await fetch("/api/drafts", {
+    const res = await apiFetch("/api/drafts", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: `language=${encodeURIComponent(currentLanguage)}`
@@ -747,7 +822,7 @@ async function initNewDraft() {
 async function loadExistingDraft(draftId) {
   showStatus(`Loading visit draft ${draftId}...`, "info");
   try {
-    const res = await fetch(`/api/drafts/${draftId}`);
+    const res = await apiFetch(`/api/drafts/${draftId}`);
     if (res.ok) {
       const data = await res.json();
       currentDraftId = data.draft_id;
@@ -1001,7 +1076,7 @@ async function submitFullAudio(blobOrFile) {
   formData.append("audio_file", blobOrFile, "recording.webm");
 
   try {
-    const res = await fetch(`/api/drafts/${currentDraftId}/audio`, {
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/audio`, {
       method: "POST",
       body: formData,
     });
@@ -1035,7 +1110,7 @@ async function runPresetScript(presetKey) {
   formData.append("simulated_transcript", script);
 
   try {
-    const res = await fetch(`/api/drafts/${currentDraftId}/audio`, {
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/audio`, {
       method: "POST",
       body: formData,
     });
@@ -1065,7 +1140,7 @@ async function submitClarificationAudio(fieldKey, audioBlob) {
   formData.append("audio_file", audioBlob, "clarify.webm");
 
   try {
-    const res = await fetch(`/api/drafts/${currentDraftId}/clarify`, {
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/clarify`, {
       method: "POST",
       body: formData,
     });
@@ -1096,7 +1171,7 @@ async function saveFieldManualEdit(fieldKey, val) {
   formData.append("manual_value", val.trim());
 
   try {
-    const res = await fetch(`/api/drafts/${currentDraftId}/clarify`, {
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/clarify`, {
       method: "POST",
       body: formData,
     });
@@ -1118,7 +1193,7 @@ async function playSpokenClarification() {
     playTtsBtn.disabled = true;
     playTtsBtn.textContent = "🔊 Synthesizing...";
 
-    const res = await fetch(`/api/drafts/${currentDraftId}/speech`, { method: "POST" });
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/speech`, { method: "POST" });
     if (!res.ok) throw new Error("TTS generation failed");
 
     const audioBlob = await res.blob();
@@ -1146,7 +1221,7 @@ async function commitCurrentDraft() {
   const idempotencyKey = `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
   try {
-    const res = await fetch(`/api/drafts/${currentDraftId}/commit`, {
+    const res = await apiFetch(`/api/drafts/${currentDraftId}/commit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1177,7 +1252,7 @@ async function commitCurrentDraft() {
 // Committed Records Registry
 async function loadCommittedRecords() {
   try {
-    const res = await fetch("/api/records");
+    const res = await apiFetch("/api/records");
     if (!res.ok) return;
     const records = await res.json();
     committedRecordsCache = records;

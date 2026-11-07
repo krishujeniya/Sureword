@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -36,7 +37,7 @@ from sureword.providers.gnani import GnaniClient, GnaniProviderError
 from sureword.state import DraftStateMachine, StateTransitionError
 from sureword.storage import Storage
 
-# Paths
+# Paths & Configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 default_db = (
@@ -44,19 +45,22 @@ default_db = (
     if (os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
     else "sureword.db"
 )
+DATABASE_URL = os.getenv("DATABASE_URL")
 DB_PATH = os.getenv("DATABASE_PATH", default_db)
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", "10485760"))
 
 # Components
-storage = Storage(db_path=DB_PATH)
+storage = Storage(db_path=DB_PATH, database_url=DATABASE_URL)
 state_machine = DraftStateMachine(storage=storage)
 gnani_client = GnaniClient()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    """Initialize database tables on startup."""
+    """Initialize database tables on startup and release connections on shutdown."""
     await storage.init_db()
     yield
+    await storage.close()
 
 
 app = FastAPI(
@@ -66,6 +70,34 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+# CORS Middleware (GitHub Pages + Local Development Support)
+cors_origins_env = os.getenv("CORS_ORIGINS", "")
+allowed_origins = [
+    "https://krishujeniya.github.io",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+]
+if cors_origins_env:
+    for origin in cors_origins_env.split(","):
+        cleaned = origin.strip()
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"^https://([a-zA-Z0-9-]+\.)*github\.io$",
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+    allow_headers=["*"],
+    expose_headers=["Content-Length", "X-Draft-Version", "Content-Type"],
+    max_age=86400,
+)
+
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next: Callable[[Request], Any]) -> Response:
@@ -73,15 +105,19 @@ async def add_security_headers(request: Request, call_next: Callable[[Request], 
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     return response
 
 
 @app.get("/healthz")
 async def health_check() -> dict[str, str | bool]:
     """Health check endpoint without expensive third-party calls."""
+    db_status = "postgres_ready" if storage.backend_name == "postgres" else "sqlite_ready"
     return {
         "status": "healthy",
-        "database": "sqlite_ready",
+        "database": db_status,
+        "storage_backend": storage.backend_name,
         "gnani_configured": gnani_client.has_credentials(),
         "allow_fixture_fallback": gnani_client.allow_fixture_fallback,
     }
@@ -165,6 +201,11 @@ async def process_draft_audio(
                 status_code=400, detail="Must provide either audio_file or simulated_transcript"
             )
         raw_bytes = await audio_file.read()
+        if len(raw_bytes) > MAX_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Audio payload exceeds limit of {MAX_UPLOAD_BYTES // (1024 * 1024)}MB",
+            )
         try:
             audio_info = convert_and_normalize_audio(raw_bytes)
         except AudioValidationError as ave:
@@ -235,6 +276,11 @@ async def clarify_field(
         # Audio repeat of single field
         assert audio_file is not None
         raw_bytes = await audio_file.read()
+        if len(raw_bytes) > MAX_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Audio payload exceeds limit of {MAX_UPLOAD_BYTES // (1024 * 1024)}MB",
+            )
         try:
             audio_info = convert_and_normalize_audio(raw_bytes)
         except AudioValidationError as ave:
@@ -353,8 +399,18 @@ async def get_supported_languages() -> list[dict[str, str]]:
 
 
 # Mount static assets
+STATIC_ASSETS = {
+    "styles.css": "text/css",
+    "design.css": "text/css",
+    "app.js": "application/javascript",
+    "experience.js": "application/javascript",
+    "logo.svg": "image/svg+xml",
+    "favicon.svg": "image/svg+xml",
+}
+
 if os.path.isdir(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+    app.mount("/Sureword", StaticFiles(directory=STATIC_DIR, html=True), name="sureword_preview")
 
 
 @app.get("/")
@@ -364,3 +420,13 @@ async def serve_index() -> FileResponse:
     if os.path.exists(index_file):
         return FileResponse(index_file)
     raise HTTPException(status_code=404, detail="UI index.html not found")
+
+
+@app.api_route("/{asset_name}", methods=["GET", "HEAD"])
+async def serve_root_asset(asset_name: str) -> FileResponse:
+    """Serve root-relative static assets for decoupled frontend hosting compatibility."""
+    if asset_name in STATIC_ASSETS:
+        asset_path = os.path.join(STATIC_DIR, asset_name)
+        if os.path.isfile(asset_path):
+            return FileResponse(asset_path, media_type=STATIC_ASSETS[asset_name])
+    raise HTTPException(status_code=404, detail="Not Found")

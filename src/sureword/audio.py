@@ -130,13 +130,16 @@ def convert_and_normalize_audio(
             "wav",
             out_path,
         ]
-        result = subprocess.run(
-            cmd,
-            stdin=subprocess.DEVNULL,
-            capture_output=True,
-            timeout=15,
-            check=False,
-        )
+        try:
+            result = subprocess.run(
+                cmd,
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                timeout=15,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as te:
+            raise AudioValidationError("Audio conversion timed out") from te
         if result.returncode != 0:
             stderr_snippet = result.stderr.decode("utf-8", errors="replace")[-300:]
             raise AudioValidationError(f"Audio conversion failed: {stderr_snippet}")

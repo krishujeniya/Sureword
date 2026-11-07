@@ -1,4 +1,8 @@
-"""SQLite asynchronous storage and event auditing for Sureword."""
+"""Persistent storage layer for Sureword.
+
+Supports asynchronous SQLite (for local development, testing, and offline fixtures)
+and managed PostgreSQL via asyncpg (for production serverless deployments on Vercel/Neon/Supabase).
+"""
 
 from __future__ import annotations
 
@@ -11,10 +15,18 @@ import aiosqlite
 
 from sureword.contracts import Draft, DraftState, FieldValue
 
+try:
+    import asyncpg
+except ImportError:
+    asyncpg = None  # type: ignore[assignment]
 
-class Storage:
+
+class SQLiteStorage:
+    """SQLite asynchronous storage implementation."""
+
     def __init__(self, db_path: str = "sureword.db") -> None:
         self.db_path = db_path
+        self.backend_name = "sqlite"
 
     async def init_db(self) -> None:
         """Create tables for drafts, fields, audit events, and committed records."""
@@ -196,7 +208,6 @@ class Storage:
         """
         now = datetime.now(UTC).isoformat()
         async with aiosqlite.connect(self.db_path) as db:
-            # Check existing idempotency key
             async with db.execute(
                 "SELECT record_id FROM committed_records WHERE idempotency_key = ?",
                 (idempotency_key,),
@@ -259,3 +270,317 @@ class Storage:
                         }
                     )
                 return results
+
+    async def close(self) -> None:
+        """No-op for connection-per-query SQLite."""
+        pass
+
+
+class PostgresStorage:
+    """Managed PostgreSQL storage implementation with async connection pooling."""
+
+    def __init__(self, db_url: str) -> None:
+        if asyncpg is None:
+            raise RuntimeError(
+                "asyncpg is not installed. Install it with `pip install asyncpg` to use PostgreSQL."
+            )
+        # Normalize postgres:// to postgresql:// for asyncpg
+        if db_url.startswith("postgres://"):
+            db_url = "postgresql://" + db_url[len("postgres://") :]
+        self.db_url = db_url
+        self.backend_name = "postgres"
+        self._pool: Any = None
+
+    async def get_pool(self) -> Any:
+        if self._pool is None:
+            self._pool = await asyncpg.create_pool(
+                self.db_url,
+                min_size=1,
+                max_size=10,
+                command_timeout=15,
+            )
+        return self._pool
+
+    async def init_db(self) -> None:
+        """Create PostgreSQL tables if they do not exist."""
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS drafts (
+                    draft_id VARCHAR(64) PRIMARY KEY,
+                    version INTEGER NOT NULL,
+                    state VARCHAR(32) NOT NULL,
+                    language VARCHAR(16) NOT NULL,
+                    created_at VARCHAR(64) NOT NULL,
+                    updated_at VARCHAR(64) NOT NULL,
+                    attempts_json TEXT NOT NULL,
+                    active_prompt_json TEXT,
+                    latest_transcript_json TEXT
+                );
+                CREATE TABLE IF NOT EXISTS fields (
+                    draft_id VARCHAR(64) NOT NULL,
+                    field_key VARCHAR(64) NOT NULL,
+                    raw_span TEXT,
+                    canonical_value TEXT,
+                    status VARCHAR(32) NOT NULL,
+                    reasons_json TEXT NOT NULL,
+                    source_turn_id INTEGER NOT NULL,
+                    PRIMARY KEY (draft_id, field_key)
+                );
+                CREATE TABLE IF NOT EXISTS audit_events (
+                    id BIGSERIAL PRIMARY KEY,
+                    draft_id VARCHAR(64) NOT NULL,
+                    event_type VARCHAR(64) NOT NULL,
+                    version INTEGER NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at VARCHAR(64) NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS committed_records (
+                    record_id VARCHAR(64) PRIMARY KEY,
+                    draft_id VARCHAR(64) NOT NULL,
+                    idempotency_key VARCHAR(128) NOT NULL UNIQUE,
+                    snapshot_json TEXT NOT NULL,
+                    committed_at VARCHAR(64) NOT NULL
+                );
+            """)
+
+    async def save_draft(self, draft: Draft, event_type: str = "DRAFT_UPDATE") -> None:
+        """Save or update draft and fields in a PostgreSQL transaction."""
+        now = datetime.now(UTC).isoformat()
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute(
+                    """
+                    INSERT INTO drafts (
+                        draft_id, version, state, language, created_at, updated_at,
+                        attempts_json, active_prompt_json, latest_transcript_json
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    ON CONFLICT(draft_id) DO UPDATE SET
+                        version = EXCLUDED.version,
+                        state = EXCLUDED.state,
+                        updated_at = EXCLUDED.updated_at,
+                        attempts_json = EXCLUDED.attempts_json,
+                        active_prompt_json = EXCLUDED.active_prompt_json,
+                        latest_transcript_json = EXCLUDED.latest_transcript_json
+                    """,
+                    draft.draft_id,
+                    draft.version,
+                    draft.state.value,
+                    draft.language,
+                    draft.created_at,
+                    now,
+                    json.dumps(draft.attempts_by_field),
+                    draft.active_prompt.model_dump_json() if draft.active_prompt else None,
+                    draft.latest_transcript.model_dump_json() if draft.latest_transcript else None,
+                )
+
+                for k, f in draft.fields.items():
+                    await conn.execute(
+                        """
+                        INSERT INTO fields (
+                            draft_id, field_key, raw_span, canonical_value,
+                            status, reasons_json, source_turn_id
+                        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+                        ON CONFLICT(draft_id, field_key) DO UPDATE SET
+                            raw_span = EXCLUDED.raw_span,
+                            canonical_value = EXCLUDED.canonical_value,
+                            status = EXCLUDED.status,
+                            reasons_json = EXCLUDED.reasons_json,
+                            source_turn_id = EXCLUDED.source_turn_id
+                        """,
+                        draft.draft_id,
+                        k,
+                        f.raw_span,
+                        f.canonical_value,
+                        f.status.value,
+                        json.dumps(f.reasons),
+                        f.source_turn_id,
+                    )
+
+                await conn.execute(
+                    """
+                    INSERT INTO audit_events (draft_id, event_type, version, payload_json, created_at)
+                    VALUES ($1, $2, $3, $4, $5)
+                    """,
+                    draft.draft_id,
+                    event_type,
+                    draft.version,
+                    draft.model_dump_json(),
+                    now,
+                )
+
+    async def get_draft(self, draft_id: str) -> Draft | None:
+        """Fetch draft and reconstitute all fields from PostgreSQL."""
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            d_row = await conn.fetchrow("SELECT * FROM drafts WHERE draft_id = $1", draft_id)
+            if not d_row:
+                return None
+
+            f_rows = await conn.fetch("SELECT * FROM fields WHERE draft_id = $1", draft_id)
+            fields: dict[str, FieldValue] = {}
+            for f_row in f_rows:
+                fields[f_row["field_key"]] = FieldValue(
+                    key=f_row["field_key"],
+                    raw_span=f_row["raw_span"],
+                    canonical_value=f_row["canonical_value"],
+                    status=f_row["status"],
+                    reasons=json.loads(f_row["reasons_json"]),
+                    source_turn_id=f_row["source_turn_id"],
+                )
+
+            active_prompt = None
+            if d_row["active_prompt_json"]:
+                active_prompt = json.loads(d_row["active_prompt_json"])
+
+            latest_transcript = None
+            if d_row["latest_transcript_json"]:
+                latest_transcript = json.loads(d_row["latest_transcript_json"])
+
+            return Draft(
+                draft_id=d_row["draft_id"],
+                version=d_row["version"],
+                created_at=d_row["created_at"],
+                language=d_row["language"],
+                fields=fields,
+                state=DraftState(d_row["state"]),
+                attempts_by_field=json.loads(d_row["attempts_json"]),
+                active_prompt=active_prompt,
+                latest_transcript=latest_transcript,
+            )
+
+    async def record_committed(self, record_id: str, draft: Draft, idempotency_key: str) -> bool:
+        """Atomically commit draft with idempotency key in PostgreSQL."""
+        now = datetime.now(UTC).isoformat()
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                row = await conn.fetchrow(
+                    "SELECT record_id FROM committed_records WHERE idempotency_key = $1",
+                    idempotency_key,
+                )
+                if row:
+                    return False
+
+                await conn.execute(
+                    """
+                    INSERT INTO committed_records (
+                        record_id, draft_id, idempotency_key, snapshot_json, committed_at
+                    ) VALUES ($1, $2, $3, $4, $5)
+                    """,
+                    record_id,
+                    draft.draft_id,
+                    idempotency_key,
+                    draft.model_dump_json(),
+                    now,
+                )
+                return True
+
+    async def delete_draft(self, draft_id: str) -> None:
+        """Delete draft and associated session fields."""
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            async with conn.transaction():
+                await conn.execute("DELETE FROM fields WHERE draft_id = $1", draft_id)
+                await conn.execute("DELETE FROM drafts WHERE draft_id = $1", draft_id)
+
+    async def list_committed_records(self, limit: int = 50) -> list[dict[str, Any]]:
+        """List recently committed visit records from PostgreSQL."""
+        pool = await self.get_pool()
+        async with pool.acquire() as conn:
+            rows = await conn.fetch(
+                """
+                SELECT record_id, draft_id, idempotency_key, snapshot_json, committed_at
+                FROM committed_records
+                ORDER BY committed_at DESC
+                LIMIT $1
+                """,
+                limit,
+            )
+            results: list[dict[str, Any]] = []
+            for r in rows:
+                try:
+                    snapshot = json.loads(r["snapshot_json"])
+                except Exception:
+                    snapshot = {}
+                results.append(
+                    {
+                        "record_id": r["record_id"],
+                        "draft_id": r["draft_id"],
+                        "idempotency_key": r["idempotency_key"],
+                        "snapshot": snapshot,
+                        "committed_at": r["committed_at"],
+                    }
+                )
+            return results
+
+    async def close(self) -> None:
+        """Close connection pool."""
+        if self._pool is not None:
+            await self._pool.close()
+            self._pool = None
+
+
+class Storage:
+    """Unified storage interface routing dynamically between PostgreSQL and SQLite."""
+
+    def __init__(
+        self,
+        db_path: str = "sureword.db",
+        database_url: str | None = None,
+    ) -> None:
+        target = (
+            database_url
+            or os.getenv("DATABASE_URL")
+            or db_path
+            or os.getenv("DATABASE_PATH")
+            or "sureword.db"
+        )
+        self._target_url: str = target
+        self._backend = self._create_backend(self._target_url)
+
+    def _create_backend(self, url: str) -> SQLiteStorage | PostgresStorage:
+        if url.startswith("postgres://") or url.startswith("postgresql://"):
+            return PostgresStorage(db_url=url)
+        return SQLiteStorage(db_path=url)
+
+    @property
+    def db_path(self) -> str:
+        if isinstance(self._backend, SQLiteStorage):
+            return self._backend.db_path
+        if isinstance(self._backend, PostgresStorage):
+            return self._backend.db_url
+        return self._target_url
+
+    @db_path.setter
+    def db_path(self, val: str) -> None:
+        self._target_url = val
+        self._backend = self._create_backend(val)
+
+    @property
+    def backend_name(self) -> str:
+        return self._backend.backend_name
+
+    async def init_db(self) -> None:
+        await self._backend.init_db()
+
+    async def save_draft(self, draft: Draft, event_type: str = "DRAFT_UPDATE") -> None:
+        await self._backend.save_draft(draft=draft, event_type=event_type)
+
+    async def get_draft(self, draft_id: str) -> Draft | None:
+        return await self._backend.get_draft(draft_id=draft_id)
+
+    async def record_committed(self, record_id: str, draft: Draft, idempotency_key: str) -> bool:
+        return await self._backend.record_committed(
+            record_id=record_id, draft=draft, idempotency_key=idempotency_key
+        )
+
+    async def delete_draft(self, draft_id: str) -> None:
+        await self._backend.delete_draft(draft_id=draft_id)
+
+    async def list_committed_records(self, limit: int = 50) -> list[dict[str, Any]]:
+        return await self._backend.list_committed_records(limit=limit)
+
+    async def close(self) -> None:
+        await self._backend.close()

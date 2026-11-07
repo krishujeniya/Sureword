@@ -474,3 +474,73 @@ async def test_multilingual_draft_lifecycle_and_clarification() -> None:
         # Prompt should be localized in Tamil for missing age
         assert data["draft"]["state"] == "NEEDS_CLARIFICATION"
         assert "வயதை" in data["draft"]["active_prompt"]["prompt_text"]
+
+
+@pytest.mark.asyncio
+async def test_cors_preflight_and_origin() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Preflight OPTIONS request from GitHub Pages origin
+        headers = {
+            "Origin": "https://krishujeniya.github.io",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "Content-Type",
+        }
+        res_options = await client.options("/api/drafts", headers=headers)
+        assert res_options.status_code == 200
+        assert (
+            res_options.headers["access-control-allow-origin"] == "https://krishujeniya.github.io"
+        )
+        assert "POST" in res_options.headers["access-control-allow-methods"]
+
+        # Simple GET with origin header
+        res_get = await client.get("/healthz", headers={"Origin": "https://krishujeniya.github.io"})
+        assert res_get.status_code == 200
+        assert res_get.headers["access-control-allow-origin"] == "https://krishujeniya.github.io"
+
+
+@pytest.mark.asyncio
+async def test_security_headers_and_cache_control() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # API route must have no-cache headers
+        res = await client.get("/api/records")
+        assert res.status_code == 200
+        assert res.headers["x-content-type-options"] == "nosniff"
+        assert res.headers["x-frame-options"] == "DENY"
+        assert "no-store" in res.headers["cache-control"]
+
+
+@pytest.mark.asyncio
+async def test_audio_upload_size_limit() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Create draft
+        res = await client.post("/api/drafts")
+        assert res.status_code == 200
+        draft_id = res.json()["draft_id"]
+
+        # 11MB dummy payload exceeds 10MB limit
+        large_bytes = b"0" * (11 * 1024 * 1024)
+        files = {"audio_file": ("large.wav", large_bytes, "audio/wav")}
+        data = {"expected_version": 1}
+
+        res_upload = await client.post(f"/api/drafts/{draft_id}/audio", data=data, files=files)
+        assert res_upload.status_code == 413
+        assert "limit" in res_upload.json()["detail"].lower()
+
+
+@pytest.mark.asyncio
+async def test_root_static_asset_serving() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        for asset in [
+            "styles.css",
+            "design.css",
+            "app.js",
+            "experience.js",
+            "logo.svg",
+            "favicon.svg",
+        ]:
+            res = await client.get(f"/{asset}")
+            assert res.status_code == 200, f"Expected 200 for root asset /{asset}"

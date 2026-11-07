@@ -96,3 +96,115 @@ async def test_save_draft_rollback_on_failure(temp_storage: Storage) -> None:
     with patch("aiosqlite.Connection.commit", side_effect=RuntimeError("Simulated DB failure")):
         with pytest.raises(RuntimeError):
             await temp_storage.save_draft(draft, event_type="TEST")
+
+
+def test_storage_routing() -> None:
+    sqlite_store = Storage(db_path="/tmp/test_custom.db")
+    assert sqlite_store.backend_name == "sqlite"
+    assert sqlite_store.db_path == "/tmp/test_custom.db"
+
+    pg_url = "postgres://user:secret@ep-test.neon.tech/neondb?sslmode=require"
+    pg_store = Storage(database_url=pg_url)
+    assert pg_store.backend_name == "postgres"
+    assert pg_store.db_path == "postgresql://user:secret@ep-test.neon.tech/neondb?sslmode=require"
+
+
+@pytest.mark.asyncio
+async def test_postgres_storage_mocked_methods() -> None:
+    from unittest.mock import AsyncMock, MagicMock
+
+    from sureword.storage import PostgresStorage
+
+    pg_url = "postgresql://user:pass@localhost:5432/testdb"
+    store = PostgresStorage(db_url=pg_url)
+
+    mock_pool = MagicMock()
+    mock_conn = MagicMock()
+    mock_conn.execute = AsyncMock()
+    mock_conn.fetch = AsyncMock()
+    mock_conn.fetchrow = AsyncMock()
+
+    class MockTransactionContext:
+        async def __aenter__(self) -> MagicMock:
+            return mock_conn
+
+        async def __aexit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
+            pass
+
+    mock_conn.transaction.return_value = MockTransactionContext()
+
+    class MockAcquireContext:
+        async def __aenter__(self) -> MagicMock:
+            return mock_conn
+
+        async def __aexit__(self, exc_type: object, exc_val: object, exc_tb: object) -> None:
+            pass
+
+    mock_pool.acquire.return_value = MockAcquireContext()
+    mock_pool.close = AsyncMock()
+    store._pool = mock_pool
+
+    # Test init_db
+    await store.init_db()
+    assert mock_conn.execute.called
+
+    # Test save_draft
+    draft = Draft(
+        draft_id="d_pg_1",
+        version=1,
+        created_at="2026-11-07T00:00:00Z",
+        language="hi-IN",
+        fields={
+            FieldKey.PERSON_NAME.value: FieldValue(
+                key=FieldKey.PERSON_NAME.value,
+                canonical_value="Kamla Devi",
+                status=FieldStatus.USER_CONFIRMED,
+            ),
+        },
+        state=DraftState.READY_FOR_REVIEW,
+    )
+    await store.save_draft(draft)
+    assert mock_conn.execute.call_count >= 3
+
+    # Test get_draft found
+    mock_conn.fetchrow.return_value = {
+        "draft_id": "d_pg_1",
+        "version": 1,
+        "state": DraftState.READY_FOR_REVIEW.value,
+        "language": "hi-IN",
+        "created_at": "2026-11-07T00:00:00Z",
+        "attempts_json": "{}",
+        "active_prompt_json": None,
+        "latest_transcript_json": None,
+    }
+    mock_conn.fetch.return_value = [
+        {
+            "field_key": FieldKey.PERSON_NAME.value,
+            "raw_span": "Kamla Devi",
+            "canonical_value": "Kamla Devi",
+            "status": FieldStatus.USER_CONFIRMED.value,
+            "reasons_json": "[]",
+            "source_turn_id": 1,
+        }
+    ]
+    fetched = await store.get_draft("d_pg_1")
+    assert fetched is not None
+    assert fetched.draft_id == "d_pg_1"
+    assert FieldKey.PERSON_NAME.value in fetched.fields
+
+    # Test record_committed idempotency
+    mock_conn.fetchrow.return_value = None  # Not previously committed
+    committed = await store.record_committed("REC-PG-1", draft, "key_pg_1")
+    assert committed is True
+
+    mock_conn.fetchrow.return_value = {"record_id": "REC-PG-1"}  # Already committed
+    committed_dup = await store.record_committed("REC-PG-2", draft, "key_pg_1")
+    assert committed_dup is False
+
+    # Test delete_draft
+    await store.delete_draft("d_pg_1")
+    assert mock_conn.execute.called
+
+    # Test close
+    await store.close()
+    assert mock_pool.close.called
