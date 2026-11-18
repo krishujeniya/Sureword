@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/sureword-logo.png" alt="Sureword Logo" width="180" />
+</p>
+
 # Sureword
 
 > **Voice-to-Form Frontline Visit Entry with Selective Clarification**  
