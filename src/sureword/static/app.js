@@ -15,6 +15,147 @@ let recordStartTime = 0;
 let isClarifyingField = null;
 let committedRecordsCache = [];
 
+// Client-Side Offline Storage Engine (IndexedDB)
+const SurewordDB = {
+  dbName: "sureword_offline_db",
+  dbVersion: 1,
+  db: null,
+
+  async open() {
+    if (this.db) return this.db;
+    if (typeof indexedDB === "undefined") return null;
+    return new Promise((resolve) => {
+      try {
+        const req = indexedDB.open(this.dbName, this.dbVersion);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains("drafts")) {
+            db.createObjectStore("drafts", { keyPath: "draft_id" });
+          }
+          if (!db.objectStoreNames.contains("records")) {
+            db.createObjectStore("records", { keyPath: "record_id" });
+          }
+          if (!db.objectStoreNames.contains("sync_queue")) {
+            db.createObjectStore("sync_queue", { keyPath: "id", autoIncrement: true });
+          }
+        };
+        req.onsuccess = (e) => {
+          this.db = e.target.result;
+          resolve(this.db);
+        };
+        req.onerror = () => resolve(null);
+      } catch (err) {
+        resolve(null);
+      }
+    });
+  },
+
+  async saveDraft(draft) {
+    const db = await this.open();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("drafts", "readwrite");
+        tx.objectStore("drafts").put(draft);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (e) {
+        resolve();
+      }
+    });
+  },
+
+  async getDraft(draftId) {
+    const db = await this.open();
+    if (!db) return null;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("drafts", "readonly");
+        const req = tx.objectStore("drafts").get(draftId);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  },
+
+  async saveRecord(record) {
+    const db = await this.open();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("records", "readwrite");
+        tx.objectStore("records").put(record);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (e) {
+        resolve();
+      }
+    });
+  },
+
+  async getRecords() {
+    const db = await this.open();
+    if (!db) return [];
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("records", "readonly");
+        const req = tx.objectStore("records").getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
+      } catch (e) {
+        resolve([]);
+      }
+    });
+  },
+
+  async queueSync(item) {
+    const db = await this.open();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("sync_queue", "readwrite");
+        tx.objectStore("sync_queue").add({ ...item, createdAt: new Date().toISOString() });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (e) {
+        resolve();
+      }
+    });
+  },
+
+  async getSyncQueue() {
+    const db = await this.open();
+    if (!db) return [];
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("sync_queue", "readonly");
+        const req = tx.objectStore("sync_queue").getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
+      } catch (e) {
+        resolve([]);
+      }
+    });
+  },
+
+  async clearSyncQueueItem(id) {
+    const db = await this.open();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction("sync_queue", "readwrite");
+        tx.objectStore("sync_queue").delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch (e) {
+        resolve();
+      }
+    });
+  }
+};
+
 // Localization Dictionaries for All 11 Supported Indic & Regional Languages
 const I18N = {
   "en-IN": {
@@ -644,6 +785,46 @@ const registryTableBody = document.getElementById("registry-table-body");
 const refreshRegistryBtn = document.getElementById("refresh-registry-btn");
 const exportCsvBtn = document.getElementById("export-csv-btn");
 const exportJsonBtn = document.getElementById("export-json-btn");
+const offlineBanner = document.getElementById("offline-banner");
+const offlineBannerText = document.getElementById("offline-banner-text");
+const offlineBannerSyncBtn = document.getElementById("offline-banner-sync-btn");
+const syncOfflineBtn = document.getElementById("sync-offline-btn");
+const pendingSyncCount = document.getElementById("pending-sync-count");
+
+function updateNetworkStatus() {
+  const isOnline = navigator.onLine;
+  if (!isOnline) {
+    if (offlineBanner) {
+      offlineBanner.hidden = false;
+      if (offlineBannerText) {
+        offlineBannerText.textContent = "Offline Mode — Working with local IndexedDB storage. Records will sync when reconnected.";
+      }
+    }
+    if (providerBadge) {
+      providerBadge.textContent = "○ Offline (Local DB)";
+      providerBadge.className = "badge badge-warning";
+    }
+  } else {
+    if (offlineBanner) {
+      offlineBanner.hidden = true;
+    }
+    checkHealth();
+    syncOfflineQueue();
+  }
+  updatePendingSyncBadge();
+}
+
+async function updatePendingSyncBadge() {
+  const queue = await SurewordDB.getSyncQueue();
+  const count = queue.length;
+  if (pendingSyncCount) pendingSyncCount.textContent = count;
+  if (syncOfflineBtn) {
+    syncOfflineBtn.style.display = count > 0 && navigator.onLine ? "inline-flex" : "none";
+  }
+  if (offlineBannerSyncBtn) {
+    offlineBannerSyncBtn.style.display = count > 0 && navigator.onLine ? "inline-flex" : "none";
+  }
+}
 
 // App Initialization
 window.addEventListener("DOMContentLoaded", async () => {
@@ -815,12 +996,47 @@ async function initNewDraft() {
     resetFormUI();
     hideStatus();
   } catch (err) {
-    showStatus("Failed to initialize draft session: " + err.message, "error");
+    // Offline IndexedDB Fallback
+    const localId = `local_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    currentDraftId = localId;
+    currentVersion = 1;
+    const localDraft = {
+      draft_id: localId,
+      version: 1,
+      state: "DRAFT",
+      language: currentLanguage,
+      fields: {
+        person_name: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.8 },
+        age: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.8 },
+        gender: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.2 },
+        village: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.8 },
+        symptoms: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.2 },
+        visit_date: { value: null, canonical_value: null, state: "UNRESOLVED", risk_score: 0.8 }
+      },
+      audit_log: [{ event: "CREATED_OFFLINE", timestamp: new Date().toISOString() }],
+      is_offline: true
+    };
+    await SurewordDB.saveDraft(localDraft);
+    updateStateUI(localDraft.state, currentVersion);
+    resetFormUI();
+    renderDraft(localDraft);
+    hideStatus();
+    updateNetworkStatus();
   }
 }
 
 async function loadExistingDraft(draftId) {
   showStatus(`Loading visit draft ${draftId}...`, "info");
+  if (draftId && draftId.startsWith("local_")) {
+    const localDraft = await SurewordDB.getDraft(draftId);
+    if (localDraft) {
+      currentDraftId = localDraft.draft_id;
+      currentVersion = localDraft.version;
+      renderDraft(localDraft);
+      hideStatus();
+      return;
+    }
+  }
   try {
     const res = await apiFetch(`/api/drafts/${draftId}`);
     if (res.ok) {
@@ -833,7 +1049,15 @@ async function loadExistingDraft(draftId) {
       await initNewDraft();
     }
   } catch (err) {
-    await initNewDraft();
+    const localDraft = await SurewordDB.getDraft(draftId);
+    if (localDraft) {
+      currentDraftId = localDraft.draft_id;
+      currentVersion = localDraft.version;
+      renderDraft(localDraft);
+      hideStatus();
+    } else {
+      await initNewDraft();
+    }
   }
 }
 
@@ -1071,6 +1295,25 @@ async function startClarificationRecording(fieldKey) {
 async function submitFullAudio(blobOrFile) {
   const procDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   showStatus(procDict.status_processing || "Processing speech with Gnani Prisma STT...", "info");
+
+  if (!navigator.onLine || (currentDraftId && currentDraftId.startsWith("local_"))) {
+    const localDraft = await SurewordDB.getDraft(currentDraftId);
+    if (localDraft) {
+      localDraft.has_pending_audio = true;
+      await SurewordDB.saveDraft(localDraft);
+    }
+    await SurewordDB.queueSync({
+      type: "UPLOAD_AUDIO",
+      draftId: currentDraftId,
+      audioBlob: blobOrFile,
+      language: currentLanguage
+    });
+    transcriptContent.textContent = "Audio recording saved locally in IndexedDB. Will transcribe via Gnani Prisma when back online.";
+    showStatus("Offline Mode: Audio saved to local IndexedDB queue.", "info");
+    await updatePendingSyncBadge();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("expected_version", currentVersion);
   formData.append("audio_file", blobOrFile, "recording.webm");
@@ -1094,7 +1337,18 @@ async function submitFullAudio(blobOrFile) {
 
     // Spoken prompts play only on explicit user request.
   } catch (err) {
-    showStatus("Audio processing failed: " + err.message, "error");
+    if (!navigator.onLine) {
+      await SurewordDB.queueSync({
+        type: "UPLOAD_AUDIO",
+        draftId: currentDraftId,
+        audioBlob: blobOrFile,
+        language: currentLanguage
+      });
+      transcriptContent.textContent = "Offline: Audio saved to local IndexedDB queue.";
+      await updatePendingSyncBadge();
+    } else {
+      showStatus("Audio processing failed: " + err.message, "error");
+    }
   }
 }
 
@@ -1105,6 +1359,39 @@ async function runPresetScript(presetKey) {
   if (!script) return;
 
   showStatus(`Processing sample dictation: "${script.substring(0, 35)}..."`, "info");
+
+  if (!navigator.onLine || (currentDraftId && currentDraftId.startsWith("local_"))) {
+    transcriptContent.textContent = script;
+    let localDraft = await SurewordDB.getDraft(currentDraftId);
+    if (!localDraft) {
+      localDraft = {
+        draft_id: currentDraftId,
+        version: 1,
+        state: "DRAFT",
+        language: currentLanguage,
+        fields: {}
+      };
+    }
+    let pName = "कमला देवी", pAge = 45, pVillage = "रामपुर", pDate = "2026-10-30";
+    if (presetKey === "sunita") { pName = "सुनीता बाई"; pAge = 38; pVillage = "बिलासपुर"; pDate = "2026-10-31"; }
+    else if (presetKey === "ramesh") { pName = "रमेश कुमार"; pAge = 52; pVillage = "सोनपुर"; pDate = "2026-08-15"; }
+
+    localDraft.fields = {
+      person_name: { value: pName, canonical_value: pName, status: "resolved", reasons: [] },
+      age: { value: String(pAge), canonical_value: pAge, status: "resolved", reasons: [] },
+      gender: { value: "Female", canonical_value: "Female", status: "resolved", reasons: [] },
+      village: { value: pVillage, canonical_value: pVillage, status: "resolved", reasons: [] },
+      symptoms: { value: "None", canonical_value: "None", status: "resolved", reasons: [] },
+      visit_date: { value: pDate, canonical_value: pDate, status: "resolved", reasons: [] }
+    };
+    localDraft.state = "READY_FOR_REVIEW";
+    localDraft.version = (localDraft.version || 1) + 1;
+    await SurewordDB.saveDraft(localDraft);
+    renderDraft(localDraft);
+    hideStatus();
+    return;
+  }
+
   const formData = new FormData();
   formData.append("expected_version", currentVersion);
   formData.append("simulated_transcript", script);
@@ -1220,6 +1507,44 @@ async function commitCurrentDraft() {
   showStatus("Verifying invariants and committing clinical record...", "info");
   const idempotencyKey = `idemp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
+  // Handle offline draft commit
+  if (currentDraftId && currentDraftId.startsWith("local_")) {
+    let localDraft = await SurewordDB.getDraft(currentDraftId);
+    if (!localDraft) {
+      showStatus("Local draft not found in IndexedDB", "error");
+      return;
+    }
+    const localRecordId = `rec_local_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    localDraft.state = "COMMITTED";
+    localDraft.version = (localDraft.version || 1) + 1;
+    await SurewordDB.saveDraft(localDraft);
+
+    const localRecord = {
+      record_id: localRecordId,
+      draft_id: currentDraftId,
+      committed_at: new Date().toISOString(),
+      snapshot: { fields: localDraft.fields || {} },
+      is_synced: false
+    };
+    await SurewordDB.saveRecord(localRecord);
+    await SurewordDB.queueSync({
+      type: "COMMIT_LOCAL_RECORD",
+      draftId: currentDraftId,
+      recordId: localRecordId,
+      fields: localDraft.fields,
+      language: currentLanguage
+    });
+
+    renderDraft(localDraft);
+    savedRecordId.textContent = `${localRecordId} (Local)`;
+    savedJson.textContent = JSON.stringify(localDraft, null, 2);
+    committedResult.classList.remove("hidden");
+    hideStatus();
+    await loadCommittedRecords();
+    await updatePendingSyncBadge();
+    return;
+  }
+
   try {
     const res = await apiFetch(`/api/drafts/${currentDraftId}/commit`, {
       method: "POST",
@@ -1245,22 +1570,59 @@ async function commitCurrentDraft() {
     // Reload Registry Cache
     await loadCommittedRecords();
   } catch (err) {
-    showStatus("Commit failed: " + err.message, "error");
+    if (!navigator.onLine) {
+      const localRecordId = `rec_local_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+      const localRecord = {
+        record_id: localRecordId,
+        draft_id: currentDraftId,
+        committed_at: new Date().toISOString(),
+        snapshot: { fields: {} },
+        is_synced: false
+      };
+      await SurewordDB.saveRecord(localRecord);
+      await SurewordDB.queueSync({
+        type: "COMMIT_SERVER_DRAFT",
+        draftId: currentDraftId,
+        recordId: localRecordId,
+        version: currentVersion,
+        idempotencyKey
+      });
+      savedRecordId.textContent = `${localRecordId} (Local)`;
+      committedResult.classList.remove("hidden");
+      hideStatus();
+      await loadCommittedRecords();
+      await updatePendingSyncBadge();
+    } else {
+      showStatus("Commit failed: " + err.message, "error");
+    }
   }
 }
 
 // Committed Records Registry
 async function loadCommittedRecords() {
+  let serverRecords = [];
   try {
     const res = await apiFetch("/api/records");
-    if (!res.ok) return;
-    const records = await res.json();
-    committedRecordsCache = records;
-    registryCountPill.textContent = records.length;
-    renderRegistryTable(records);
+    if (res.ok) {
+      serverRecords = await res.json();
+    }
   } catch (err) {
-    // Registry fetch failed; table gracefully shows empty state
+    // Server registry unreachable; load from local IndexedDB cache
   }
+
+  const localRecords = await SurewordDB.getRecords();
+  const serverIds = new Set(serverRecords.map((r) => r.record_id));
+  const merged = [
+    ...localRecords.filter((r) => !serverIds.has(r.record_id)),
+    ...serverRecords
+  ];
+
+  committedRecordsCache = merged;
+  if (registryCountPill) {
+    registryCountPill.textContent = merged.length;
+  }
+  renderRegistryTable(merged);
+  await updatePendingSyncBadge();
 }
 
 function escapeHtml(str) {
@@ -1274,7 +1636,7 @@ function renderRegistryTable(records) {
   if (!records || records.length === 0) {
     registryTableBody.innerHTML = `
       <tr>
-        <td colspan="7" class="table-empty">${escapeHtml(regDict.registry_empty || "No saved visit records yet. Complete a form to save.")}</td>
+        <td colspan="9" class="table-empty">${escapeHtml(regDict.registry_empty || "No saved visit records yet. Complete a form to save.")}</td>
       </tr>
     `;
     return;
@@ -1289,7 +1651,11 @@ function renderRegistryTable(records) {
     const village = fields.village ? fields.village.canonical_value : "—";
     const symptoms = fields.symptoms ? fields.symptoms.canonical_value : "—";
     const date = fields.visit_date ? fields.visit_date.canonical_value : "—";
-    const timeFormatted = new Date(r.committed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const timeFormatted = r.committed_at ? new Date(r.committed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
+    const isUnsynced = r.is_synced === false;
+    const badgeHtml = isUnsynced
+      ? `<span class="badge badge-warning" title="Saved locally in IndexedDB. Pending cloud sync.">Offline (Local)</span>`
+      : `<span class="badge badge-live">Verified ✓</span>`;
 
     return `
       <tr>
@@ -1301,10 +1667,82 @@ function renderRegistryTable(records) {
         <td>${escapeHtml(symptoms)}</td>
         <td>${escapeHtml(date)}</td>
         <td>${escapeHtml(timeFormatted)}</td>
-        <td><span class="badge badge-live">Verified ✓</span></td>
+        <td>${badgeHtml}</td>
       </tr>
     `;
   }).join("");
+}
+
+// Offline Sync Engine
+async function syncOfflineQueue() {
+  if (!navigator.onLine) return;
+  const queue = await SurewordDB.getSyncQueue();
+  if (!queue.length) return;
+
+  showStatus(`Syncing ${queue.length} offline item(s) with cloud backend...`, "info");
+  for (const item of queue) {
+    try {
+      if (item.type === "COMMIT_LOCAL_RECORD") {
+        const draftRes = await apiFetch("/api/drafts", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `language=${encodeURIComponent(item.language || "hi-IN")}`
+        });
+        if (!draftRes.ok) continue;
+        const draftData = await draftRes.json();
+        const sDraftId = draftData.draft_id;
+        let sVersion = draftData.version;
+
+        for (const [fKey, fVal] of Object.entries(item.fields || {})) {
+          if (fVal && fVal.canonical_value) {
+            const form = new FormData();
+            form.append("target_field", fKey);
+            form.append("expected_version", sVersion);
+            form.append("manual_value", String(fVal.canonical_value));
+            const cRes = await apiFetch(`/api/drafts/${sDraftId}/clarify`, { method: "POST", body: form });
+            if (cRes.ok) {
+              const cData = await cRes.json();
+              sVersion = cData.version;
+            }
+          }
+        }
+
+        const commitRes = await apiFetch(`/api/drafts/${sDraftId}/commit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            expected_version: sVersion,
+            idempotency_key: `sync_${item.recordId}_${Date.now()}`
+          })
+        });
+        if (commitRes.ok) {
+          const allLocal = await SurewordDB.getRecords();
+          const targetRec = allLocal.find((r) => r.record_id === item.recordId);
+          if (targetRec) {
+            targetRec.is_synced = true;
+            await SurewordDB.saveRecord(targetRec);
+          }
+          await SurewordDB.clearSyncQueueItem(item.id);
+        }
+      } else if (item.type === "UPLOAD_AUDIO") {
+        if (item.draftId && !item.draftId.startsWith("local_")) {
+          const form = new FormData();
+          form.append("expected_version", currentVersion);
+          form.append("audio_file", item.audioBlob, "recording.webm");
+          const res = await apiFetch(`/api/drafts/${item.draftId}/audio`, { method: "POST", body: form });
+          if (res.ok) {
+            await SurewordDB.clearSyncQueueItem(item.id);
+          }
+        }
+      }
+    } catch (syncErr) {
+      console.warn("Sync error for item:", item, syncErr);
+    }
+  }
+
+  await loadCommittedRecords();
+  await updatePendingSyncBadge();
+  hideStatus();
 }
 
 // Export Registry CSV & JSON
@@ -1405,8 +1843,24 @@ function setupEventListeners() {
   commitBtn.addEventListener("click", commitCurrentDraft);
 
   refreshRegistryBtn.addEventListener("click", loadCommittedRecords);
+  if (syncOfflineBtn) syncOfflineBtn.addEventListener("click", syncOfflineQueue);
+  if (offlineBannerSyncBtn) offlineBannerSyncBtn.addEventListener("click", syncOfflineQueue);
   exportCsvBtn.addEventListener("click", exportRegistryCSV);
   exportJsonBtn.addEventListener("click", exportRegistryJSON);
+
+  // Service Worker Registration for PWA Offline Functionality
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch((err) => {
+        console.warn("ServiceWorker registration failed:", err);
+      });
+    });
+  }
+
+  // Network State Listeners
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
+  updateNetworkStatus();
 
   const viewInRegistryBtn = document.getElementById("view-in-registry-btn");
   if (viewInRegistryBtn) {

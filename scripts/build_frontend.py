@@ -23,6 +23,8 @@ REQUIRED_FILES = [
     "experience.js",
     "logo.svg",
     "favicon.svg",
+    "manifest.json",
+    "sw.js",
 ]
 
 FORBIDDEN_EXTENSIONS = {".py", ".pyc", ".db", ".sqlite", ".sqlite3", ".env", ".key", ".pem"}

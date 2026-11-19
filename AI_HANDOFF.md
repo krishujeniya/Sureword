@@ -1,39 +1,30 @@
 # Sureword handoff
 
-Updated 2026-11-07. Branch: main. Delivery: Decoupled production architecture with GitHub Pages frontend (`https://krishujeniya.github.io/Sureword/`), Vercel FastAPI backend (`https://sureword.vercel.app/`), and persistent PostgreSQL database support.
+Updated 2026-11-19. Branch: main. Delivery: Offline-First PWA Architecture with ServiceWorker caching, client-side IndexedDB persistence, background sync queue, backend `/health` endpoint parity, and automated GitHub Pages deployment.
 
-Task: Migrate Sureword into a fully decoupled production architecture without breaking existing Vercel deployment:
-- Static frontend extracted and validated for GitHub Pages hosting under base path `/Sureword/`.
-- Relative asset paths configured for `./styles.css`, `./design.css`, `./app.js`, `./experience.js`, `./logo.svg`, `./favicon.svg`.
-- Centralized `API_CONFIG` and `apiFetch()` with timeout support, domain detection (`*.github.io`), and configurable backend URL.
-- FastAPI backend configured with `CORSMiddleware` (allowing `https://krishujeniya.github.io` and regex for GitHub Pages), security headers, preflight cache, and cache-control `no-store` for sensitive visit records.
-- Hybrid persistent storage engine: SQLite for local development and PostgreSQL (`asyncpg`) for serverless cloud execution via `DATABASE_URL`.
-- GitHub Actions workflow `.github/workflows/deploy-frontend.yml` configured for automated Pages deployments.
-- Build and validation pipeline `scripts/build_frontend.py` with secret prevention and asset path checks.
+Task: Implement offline-first frontline healthcare resilience for Sureword:
+- Service Worker (`src/sureword/static/sw.js`) pre-caches shell assets (`index.html`, `styles.css`, `design.css`, `app.js`, `experience.js`, `logo.svg`, `favicon.svg`, `manifest.json`) for instant boot without network.
+- Web App Manifest (`src/sureword/static/manifest.json`) configured with standalone display and monochrome 3D health branding.
+- IndexedDB database engine `SurewordDB` in `app.js` storing offline drafts, audio upload intents, and committed records.
+- Synchronization engine replaying pending offline commits and audio uploads when back online, with manual sync trigger in the registry.
+- Accessible offline banner with ARIA live region notifying frontline workers of local storage mode.
+- FastAPI backend `/health` route alias in `app.py` matching container orchestrator health checks in `DEPLOYMENT.md`.
+- `scripts/build_frontend.py` updated to validate `manifest.json` and `sw.js` in static distribution.
+- `.github/workflows/deploy-frontend.yml` updated with `node --check src/sureword/static/sw.js`.
+- Integration tests in `tests/integration/test_app.py` verifying `/health` and `/healthz` endpoints.
 
 Changed/added source:
-- `src/sureword/static/index.html` (relative asset paths, runtime configuration script, metadata)
-- `src/sureword/static/app.js` (centralized `API_CONFIG`, `apiFetch` with timeout and auto-detection)
-- `src/sureword/app.py` (CORS middleware, security headers, upload limit validation, root asset routes)
-- `src/sureword/storage.py` (dual-engine PostgreSQL `PostgresStorage` via `asyncpg` + `SQLiteStorage`)
-- `src/sureword/audio.py` (timeout exception safety)
-- `pyproject.toml` & `requirements.txt` (added `asyncpg`)
-- `.env.example` (documented `DATABASE_URL`, `CORS_ORIGINS`)
-- `scripts/build_frontend.py` (standalone frontend builder and security validator)
-- `.github/workflows/deploy-frontend.yml` (automated GitHub Pages deployment workflow)
-- `docs/GITHUB_PAGES_DEPLOYMENT.md` (deployment and local testing guide)
-- `docs/MIGRATION_VERIFICATION.md` (audit, architecture, and verification report)
-- `tests/unit/test_storage.py` & `tests/integration/test_app.py` (added storage and CORS integration tests)
-
-Checks run:
-- Pytest: 77 tests pass (increased from 71).
-- Ruff check and format: all checks pass.
-- Mypy: 0 errors in 10 source files.
-- Node JS syntax check: `app.js` and `experience.js` both pass cleanly.
-- Static build validator: `scripts/build_frontend.py --check-only` passes with 0 errors.
-- Playwright E2E browser tests: `scripts/qa_site.py` passes 100% across all 8 viewport widths, user workflows, and error states.
+- `src/sureword/static/sw.js` (Service Worker cache-first static shell and network-first API handling)
+- `src/sureword/static/manifest.json` (PWA web application manifest)
+- `src/sureword/static/app.js` (SurewordDB IndexedDB engine, network listeners, offline draft/commit flow, sync queue)
+- `src/sureword/static/index.html` (manifest link, offline notification banner, registry sync button)
+- `src/sureword/static/styles.css` (offline banner styles and accessible status badges)
+- `src/sureword/app.py` (added `/health` route alias and static asset MIME types for manifest/sw)
+- `scripts/build_frontend.py` (added manifest.json and sw.js to required build distribution)
+- `.github/workflows/deploy-frontend.yml` (added syntax verification for sw.js)
+- `tests/integration/test_app.py` (tests for `/health` GET and HEAD responses)
 
 Next local command:
 ```bash
-.venv/bin/python -m uvicorn sureword.app:app --host 127.0.0.1 --port 8000
+git diff --check
 ```

@@ -123,6 +123,12 @@ async def health_check() -> dict[str, str | bool]:
     }
 
 
+@app.api_route("/health", methods=["GET", "HEAD"], include_in_schema=False)
+async def health_check_alias() -> dict[str, str | bool]:
+    """Compatibility alias for /healthz matching container deployment probes."""
+    return await health_check()
+
+
 @app.post("/api/drafts", response_model=DraftCreateResponse)
 async def create_draft(
     request: Request,
@@ -406,6 +412,8 @@ STATIC_ASSETS = {
     "experience.js": "application/javascript",
     "logo.svg": "image/svg+xml",
     "favicon.svg": "image/svg+xml",
+    "manifest.json": "application/manifest+json",
+    "sw.js": "application/javascript",
 }
 
 if os.path.isdir(STATIC_DIR):

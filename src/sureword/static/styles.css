@@ -296,6 +296,35 @@ body {
 .badge-fixture { background: var(--accent-light); color: var(--accent); border: 1px solid var(--accent-border); }
 .badge-warning { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger-border); }
 
+/* Offline Status Banner */
+.offline-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: var(--warning-light, rgba(234, 179, 8, 0.12));
+  color: var(--warning-text, #fef08a);
+  border: 1px solid var(--warning-border, rgba(234, 179, 8, 0.35));
+  border-radius: var(--radius-md, 8px);
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.offline-banner[hidden] {
+  display: none !important;
+}
+.offline-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.offline-banner-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+}
+
 /* Main Layout */
 .main-content {
   flex: 1;

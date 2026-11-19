@@ -30,6 +30,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="apple-touch-icon" href="./favicon.svg">
+  <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#0A2540">
 
   <!-- Stylesheet -->
@@ -127,7 +128,15 @@
             <span id="provider-badge" class="badge badge-neutral" role="status" title="Speech Provider Status">Connecting...</span>
           </div>
         </div>
-</div>
+      </div>
+      <!-- Offline Status Banner -->
+      <div id="offline-banner" class="offline-banner" role="status" aria-live="polite" hidden>
+        <div class="offline-banner-content">
+          <span class="offline-banner-icon" aria-hidden="true">⚡</span>
+          <span id="offline-banner-text">Offline Mode — Working with local IndexedDB storage. Records will sync when reconnected.</span>
+        </div>
+        <button id="offline-banner-sync-btn" class="btn btn-sm btn-ghost" type="button" style="display: none;">Sync Now</button>
+      </div>
       <p class="sample-disclosure">Samples are fictional, simulated transcripts. They demonstrate parsing and review, not live speech recognition.</p>
       <!-- VIEW 1: Clinical Dictation & Form Entry -->
       <div id="view-form" class="view-panel active" role="tabpanel" aria-labelledby="tab-form-btn">
@@ -367,6 +376,7 @@
               <p class="subtitle" data-i18n="registry_subtitle">Locally verified household visit documentation.</p>
             </div>
             <div class="registry-actions">
+              <button id="sync-offline-btn" class="btn btn-sm btn-primary" title="Sync pending offline records" style="display: none;">⚡ Sync Now (<span id="pending-sync-count">0</span>)</button>
               <button id="refresh-registry-btn" class="btn btn-sm btn-ghost" title="Reload records">↻ Refresh</button>
               <button id="export-csv-btn" class="btn btn-sm btn-secondary" title="Export as CSV">📥 Export CSV</button>
               <button id="export-json-btn" class="btn btn-sm btn-secondary" title="Export as JSON">📥 Export JSON</button>

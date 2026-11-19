@@ -37,6 +37,7 @@ jobs:
         run: |
           node --check src/sureword/static/app.js
           node --check src/sureword/static/experience.js
+          node --check src/sureword/static/sw.js
 
       - name: Build Standalone Static Distribution
         run: |

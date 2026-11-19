@@ -31,6 +31,15 @@ async def test_health_check() -> None:
         assert data["status"] == "healthy"
         assert data["database"] == "sqlite_ready"
 
+        # Compatibility alias /health
+        res_alias = await client.get("/health")
+        assert res_alias.status_code == 200
+        assert res_alias.json() == data
+
+        # HEAD request support
+        res_head = await client.head("/health")
+        assert res_head.status_code == 200
+
 
 @pytest.mark.asyncio
 async def test_full_draft_lifecycle() -> None:
