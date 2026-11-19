@@ -22,6 +22,9 @@ PROMPT_TEMPLATES: dict[str, str] = {
     FieldKey.VISIT_DATE.value: "कृपया विज़िट की सही तारीख दोबारा बोलिए। (Please repeat the visit date)",
     FieldKey.GENDER.value: "कृपया मरीज़ का लिंग दोबारा बोलिए। (Please repeat the gender)",
     FieldKey.SYMPTOMS.value: "कृपया मुख्य लक्षण या बीमारी दोबारा बोलिए। (Please repeat symptoms)",
+    FieldKey.BLOOD_PRESSURE.value: "कृपया रक्तचाप (बीपी) दोबारा बोलिए। (Please repeat the blood pressure reading)",
+    FieldKey.BLOOD_GLUCOSE.value: "कृपया ब्लड शुगर का मान दोबारा बोलिए। (Please repeat the blood glucose reading)",
+    FieldKey.PREGNANCY_TRIMESTER.value: "कृपया गर्भावस्था का ट्राइमेस्टर दोबारा बोलिए। (Please repeat the pregnancy trimester)",
 }
 
 
@@ -29,13 +32,25 @@ def compute_field_risk(field: FieldValue) -> FieldRiskAssessment:
     """Compute deterministic risk score for a field.
 
     Scores range from 0.0 (safe/confirmed) to 1.0 (missing/invalid).
-    Optional fields (gender, symptoms) have risk 0.0 to reserve clarification budget.
+    Optional screening fields (gender, symptoms, bp, glucose, trimester) have risk 0.0
+    unless a spoken reading explicitly violates physiological bounds (NEEDS_REPEAT).
     """
     reasons = list(field.reasons)
 
-    if field.key in {FieldKey.GENDER.value, FieldKey.SYMPTOMS.value}:
+    optional_screening_keys = {
+        FieldKey.GENDER.value,
+        FieldKey.SYMPTOMS.value,
+        FieldKey.BLOOD_PRESSURE.value,
+        FieldKey.BLOOD_GLUCOSE.value,
+        FieldKey.PREGNANCY_TRIMESTER.value,
+    }
+
+    if field.key in optional_screening_keys:
+        if field.status == FieldStatus.NEEDS_REPEAT:
+            reasons.append("Clinical screening reading violates physiological safety bounds")
+            return FieldRiskAssessment(field.key, 0.85, reasons)
         return FieldRiskAssessment(
-            field.key, 0.0, ["Optional field; exempt from clarification budget"]
+            field.key, 0.0, ["Optional screening field; exempt from clarification budget"]
         )
 
     if field.status in {FieldStatus.USER_CONFIRMED, FieldStatus.MANUALLY_EDITED}:

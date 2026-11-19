@@ -336,6 +336,57 @@
                 </div>
               </div>
 
+              <!-- 7. Blood Pressure (Optional NCD Screening) -->
+              <div class="form-group" id="group-blood_pressure">
+                <div class="field-label-row">
+                  <label for="field-blood_pressure">
+                    <span data-i18n="label_blood_pressure">Blood Pressure (BP)</span> <span class="opt-tag" data-i18n="opt_label">(Optional)</span>
+                  </label>
+                  <span class="status-tag tag-missing" id="tag-blood_pressure">Not Recorded</span>
+                </div>
+                <div class="input-with-reasons">
+                  <input type="text" id="field-blood_pressure" name="blood_pressure" placeholder="e.g. 120/80 mmHg" readonly class="input-readonly-voice" aria-describedby="reasons-blood_pressure">
+                  <div class="reasons-list" id="reasons-blood_pressure" role="alert" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- 8. Blood Glucose (Optional NCD Screening) -->
+              <div class="form-group" id="group-blood_glucose">
+                <div class="field-label-row">
+                  <label for="field-blood_glucose">
+                    <span data-i18n="label_blood_glucose">Blood Glucose / Sugar</span> <span class="opt-tag" data-i18n="opt_label">(Optional)</span>
+                  </label>
+                  <span class="status-tag tag-missing" id="tag-blood_glucose">Not Recorded</span>
+                </div>
+                <div class="input-with-reasons">
+                  <input type="text" id="field-blood_glucose" name="blood_glucose" placeholder="e.g. 110 mg/dL (Random)" readonly class="input-readonly-voice" aria-describedby="reasons-blood_glucose">
+                  <div class="reasons-list" id="reasons-blood_glucose" role="alert" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- 9. Pregnancy Trimester (Optional ANC Screening) -->
+              <div class="form-group" id="group-pregnancy_trimester">
+                <div class="field-label-row">
+                  <label for="field-pregnancy_trimester">
+                    <span data-i18n="label_pregnancy_trimester">Pregnancy Trimester</span> <span class="opt-tag" data-i18n="opt_label">(Optional)</span>
+                  </label>
+                  <span class="status-tag tag-missing" id="tag-pregnancy_trimester">Not Recorded</span>
+                </div>
+                <div class="input-with-reasons">
+                  <input type="text" id="field-pregnancy_trimester" name="pregnancy_trimester" placeholder="e.g. Trimester 1 / 2 / 3" readonly class="input-readonly-voice" aria-describedby="reasons-pregnancy_trimester">
+                  <div class="reasons-list" id="reasons-pregnancy_trimester" role="alert" aria-live="polite"></div>
+                </div>
+              </div>
+
+              <!-- Original Dictation Audio Review Player -->
+              <div id="dictation-audio-container" class="dictation-audio-container" hidden>
+                <div class="dictation-audio-header">
+                  <span class="dictation-audio-icon" aria-hidden="true">🎧</span>
+                  <label for="dictation-audio-player" class="dictation-audio-label">Original Spoken Dictation Review</label>
+                </div>
+                <audio id="dictation-audio-player" controls preload="metadata" class="audio-player"></audio>
+              </div>
+
               <!-- Commit Action Bar -->
               <div class="commit-bar">
                 <div class="commit-info" id="commit-validation-info" data-i18n="commit_info_incomplete" role="status" aria-live="polite">
@@ -394,6 +445,8 @@
                   <th scope="col">Gender</th>
                   <th scope="col">Village</th>
                   <th scope="col">Symptoms</th>
+                  <th scope="col">BP (mmHg)</th>
+                  <th scope="col">Glucose</th>
                   <th scope="col">Visit Date</th>
                   <th scope="col">Saved At</th>
                   <th scope="col">Status</th>
@@ -401,7 +454,7 @@
               </thead>
               <tbody id="registry-table-body">
                 <tr>
-                  <td colspan="9" class="table-empty" data-i18n="registry_empty">No saved visit records yet. Complete a form to save.</td>
+                  <td colspan="11" class="table-empty" data-i18n="registry_empty">No saved visit records yet. Complete a form to save.</td>
                 </tr>
               </tbody>
             </table>

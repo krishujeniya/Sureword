@@ -145,3 +145,41 @@ def test_select_clarification_b2_no_eligible_fields() -> None:
     }
     prompt = select_clarification_field_b2(fields, {}, max_attempts=1)
     assert prompt is None
+
+
+def test_clinical_vitals_risk_and_clarification() -> None:
+    # Optional clinical vitals when missing or normal have 0.0 risk
+    f_bp_missing = FieldValue(key="blood_pressure", status=FieldStatus.MISSING)
+    assert compute_field_risk(f_bp_missing).risk_score == 0.0
+
+    f_glu_valid = FieldValue(
+        key="blood_glucose", canonical_value="110 mg/dL (Random)", status=FieldStatus.PROPOSED
+    )
+    assert compute_field_risk(f_glu_valid).risk_score == 0.0
+
+    # Contradictory clinical vital (NEEDS_REPEAT) has 0.85 risk to trigger clarification
+    f_bp_invalid = FieldValue(
+        key="blood_pressure",
+        canonical_value="80/120 mmHg",
+        status=FieldStatus.NEEDS_REPEAT,
+        reasons=["Systolic blood pressure (80) must be greater than diastolic (120)"],
+    )
+    assert compute_field_risk(f_bp_invalid).risk_score == 0.85
+
+    # Policy P should prompt for the contradictory vital if core fields are valid
+    fields = {
+        "person_name": FieldValue(
+            key="person_name", canonical_value="Kamla Devi", status=FieldStatus.USER_CONFIRMED
+        ),
+        "age": FieldValue(key="age", canonical_value="45", status=FieldStatus.USER_CONFIRMED),
+        "village": FieldValue(
+            key="village", canonical_value="Rampur", status=FieldStatus.USER_CONFIRMED
+        ),
+        "visit_date": FieldValue(
+            key="visit_date", canonical_value="2026-10-30", status=FieldStatus.USER_CONFIRMED
+        ),
+        "blood_pressure": f_bp_invalid,
+    }
+    prompt = select_clarification_field_p(fields, {}, max_attempts=2)
+    assert prompt is not None
+    assert prompt.target_field == "blood_pressure"

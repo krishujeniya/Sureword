@@ -325,6 +325,37 @@ body {
   font-size: 1rem;
 }
 
+/* Dictation Audio Review Container */
+.dictation-audio-container {
+  margin-top: 1.25rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-surface, #1e293b);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+}
+.dictation-audio-container[hidden] {
+  display: none !important;
+}
+.dictation-audio-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.dictation-audio-icon {
+  font-size: 1.1rem;
+}
+.dictation-audio-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main, #f8fafc);
+}
+.audio-player {
+  width: 100%;
+  height: 36px;
+  border-radius: var(--radius-sm, 6px);
+}
+
 /* Main Layout */
 .main-content {
   flex: 1;

@@ -740,12 +740,24 @@ const CHIP_LABELS = {
   "or-IN": { kamla: "କମଳା ଦେବୀ (45)", sunita: "ସୁନୀତା ବାଇ (38)", ramesh: "ରମେଶ କୁମାର (52)" }
 };
 
-const FIELD_KEYS = ["person_name", "age", "gender", "village", "symptoms", "visit_date"];
+const FIELD_KEYS = [
+  "person_name",
+  "age",
+  "gender",
+  "village",
+  "symptoms",
+  "visit_date",
+  "blood_pressure",
+  "blood_glucose",
+  "pregnancy_trimester"
+];
 const REQUIRED_FIELD_KEYS = ["person_name", "age", "village", "visit_date"];
 
 // DOM References
 const providerBadge = document.getElementById("provider-badge");
 const langSelect = document.getElementById("lang-select");
+const dictationAudioContainer = document.getElementById("dictation-audio-container");
+const dictationAudioPlayer = document.getElementById("dictation-audio-player");
 const recordBtn = document.getElementById("record-btn");
 const recordText = document.getElementById("record-text");
 const recordingTimer = document.getElementById("recording-timer");
@@ -1075,6 +1087,13 @@ function resetFormUI() {
   document.getElementById("sample-answer-btn").hidden = true;
   ttsAudioPlayer.pause();
   ttsAudioPlayer.hidden = true;
+  if (dictationAudioContainer) {
+    dictationAudioContainer.hidden = true;
+  }
+  if (dictationAudioPlayer) {
+    dictationAudioPlayer.pause();
+    dictationAudioPlayer.src = "";
+  }
   committedResult.classList.add("hidden");
   clarificationBanner.classList.add("hidden");
   if (recordingStateIndicator) recordingStateIndicator.classList.add("hidden");
@@ -1205,6 +1224,9 @@ function formatFieldName(key) {
     case "village": return dict.label_village || "Village";
     case "symptoms": return dict.label_symptoms || "Symptoms";
     case "visit_date": return dict.label_date || "Visit Date";
+    case "blood_pressure": return dict.label_blood_pressure || "Blood Pressure";
+    case "blood_glucose": return dict.label_blood_glucose || "Blood Glucose";
+    case "pregnancy_trimester": return dict.label_pregnancy_trimester || "Pregnancy Trimester";
     default: return key;
   }
 }
@@ -1295,6 +1317,11 @@ async function startClarificationRecording(fieldKey) {
 async function submitFullAudio(blobOrFile) {
   const procDict = I18N[currentLanguage] || I18N["hi-IN"] || I18N["en-IN"];
   showStatus(procDict.status_processing || "Processing speech with Gnani Prisma STT...", "info");
+
+  if (blobOrFile instanceof Blob && dictationAudioPlayer && dictationAudioContainer) {
+    dictationAudioPlayer.src = URL.createObjectURL(blobOrFile);
+    dictationAudioContainer.hidden = false;
+  }
 
   if (!navigator.onLine || (currentDraftId && currentDraftId.startsWith("local_"))) {
     const localDraft = await SurewordDB.getDraft(currentDraftId);
@@ -1636,7 +1663,7 @@ function renderRegistryTable(records) {
   if (!records || records.length === 0) {
     registryTableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="table-empty">${escapeHtml(regDict.registry_empty || "No saved visit records yet. Complete a form to save.")}</td>
+        <td colspan="11" class="table-empty">${escapeHtml(regDict.registry_empty || "No saved visit records yet. Complete a form to save.")}</td>
       </tr>
     `;
     return;
@@ -1650,6 +1677,8 @@ function renderRegistryTable(records) {
     const gender = fields.gender ? fields.gender.canonical_value : "—";
     const village = fields.village ? fields.village.canonical_value : "—";
     const symptoms = fields.symptoms ? fields.symptoms.canonical_value : "—";
+    const bp = fields.blood_pressure ? fields.blood_pressure.canonical_value : "—";
+    const glucose = fields.blood_glucose ? fields.blood_glucose.canonical_value : "—";
     const date = fields.visit_date ? fields.visit_date.canonical_value : "—";
     const timeFormatted = r.committed_at ? new Date(r.committed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
     const isUnsynced = r.is_synced === false;
@@ -1665,6 +1694,8 @@ function renderRegistryTable(records) {
         <td>${escapeHtml(gender)}</td>
         <td>${escapeHtml(village)}</td>
         <td>${escapeHtml(symptoms)}</td>
+        <td>${escapeHtml(bp)}</td>
+        <td>${escapeHtml(glucose)}</td>
         <td>${escapeHtml(date)}</td>
         <td>${escapeHtml(timeFormatted)}</td>
         <td>${badgeHtml}</td>
@@ -1752,7 +1783,7 @@ function exportRegistryCSV() {
     return;
   }
 
-  const headers = ["RecordID", "DraftID", "PatientName", "Age", "Gender", "Village", "Symptoms", "VisitDate", "CommittedAt"];
+  const headers = ["RecordID", "DraftID", "PatientName", "Age", "Gender", "Village", "Symptoms", "BloodPressure", "BloodGlucose", "PregnancyTrimester", "VisitDate", "CommittedAt"];
   const rows = committedRecordsCache.map((r) => {
     const f = r.snapshot.fields || {};
     return [
@@ -1763,8 +1794,11 @@ function exportRegistryCSV() {
       `"${f.gender?.canonical_value || ""}"`,
       `"${f.village?.canonical_value || ""}"`,
       `"${f.symptoms?.canonical_value || ""}"`,
+      `"${f.blood_pressure?.canonical_value || ""}"`,
+      `"${f.blood_glucose?.canonical_value || ""}"`,
+      `"${f.pregnancy_trimester?.canonical_value || ""}"`,
       f.visit_date?.canonical_value || "",
-      r.committed_at
+      r.committed_at || ""
     ].join(",");
   });
 

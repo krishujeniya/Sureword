@@ -1,28 +1,29 @@
 # Sureword handoff
 
-Updated 2026-11-19. Branch: main. Delivery: Offline-First PWA Architecture with ServiceWorker caching, client-side IndexedDB persistence, background sync queue, backend `/health` endpoint parity, and automated GitHub Pages deployment.
+Updated 2026-11-19. Branch: main. Delivery: Clinical Vitals Expansion (Blood Pressure, Blood Glucose, Pregnancy Trimester) + Dictation Audio Review Playback, Offline-First PWA, and CI/CD Automation.
 
-Task: Implement offline-first frontline healthcare resilience for Sureword:
-- Service Worker (`src/sureword/static/sw.js`) pre-caches shell assets (`index.html`, `styles.css`, `design.css`, `app.js`, `experience.js`, `logo.svg`, `favicon.svg`, `manifest.json`) for instant boot without network.
-- Web App Manifest (`src/sureword/static/manifest.json`) configured with standalone display and monochrome 3D health branding.
-- IndexedDB database engine `SurewordDB` in `app.js` storing offline drafts, audio upload intents, and committed records.
-- Synchronization engine replaying pending offline commits and audio uploads when back online, with manual sync trigger in the registry.
-- Accessible offline banner with ARIA live region notifying frontline workers of local storage mode.
-- FastAPI backend `/health` route alias in `app.py` matching container orchestrator health checks in `DEPLOYMENT.md`.
-- `scripts/build_frontend.py` updated to validate `manifest.json` and `sw.js` in static distribution.
-- `.github/workflows/deploy-frontend.yml` updated with `node --check src/sureword/static/sw.js`.
-- Integration tests in `tests/integration/test_app.py` verifying `/health` and `/healthz` endpoints.
+Task: Implement clinical NCD screening vitals and dictation audio playback:
+- Extended contracts with `blood_pressure`, `blood_glucose`, and `pregnancy_trimester` in `src/sureword/contracts.py`.
+- Deterministic extraction and physiological boundary validation in `src/sureword/parser.py`:
+  - Blood Pressure: systolic (60–260) / diastolic (40–150), systolic > diastolic, NHM/WHO stage categorization.
+  - Blood Glucose: fasting, random, post-prandial context detection and 30–600 mg/dL physiological limits.
+  - Pregnancy Trimester: extraction of trimesters 1, 2, and 3 from ordinal and gestational month mentions.
+- Risk ranking and prompt synthesis in `src/sureword/policy.py`: optional clinical fields remain risk 0.0 unless contradictory (NEEDS_REPEAT triggers risk 0.85).
+- Frontline UI in `index.html` and `styles.css`: dedicated vitals fields with status tags, in-browser dictation audio review player (`#dictation-audio-player`).
+- Saved registry in `app.js`: table headers, rows, and CSV/JSON exports include BP and Glucose data.
+- Unit and integration tests in `tests/unit/test_contracts.py`, `tests/unit/test_parser.py`, `tests/unit/test_policy.py`, and `tests/integration/test_app.py`.
 
 Changed/added source:
-- `src/sureword/static/sw.js` (Service Worker cache-first static shell and network-first API handling)
-- `src/sureword/static/manifest.json` (PWA web application manifest)
-- `src/sureword/static/app.js` (SurewordDB IndexedDB engine, network listeners, offline draft/commit flow, sync queue)
-- `src/sureword/static/index.html` (manifest link, offline notification banner, registry sync button)
-- `src/sureword/static/styles.css` (offline banner styles and accessible status badges)
-- `src/sureword/app.py` (added `/health` route alias and static asset MIME types for manifest/sw)
-- `scripts/build_frontend.py` (added manifest.json and sw.js to required build distribution)
-- `.github/workflows/deploy-frontend.yml` (added syntax verification for sw.js)
-- `tests/integration/test_app.py` (tests for `/health` GET and HEAD responses)
+- `src/sureword/contracts.py` (added clinical field keys)
+- `src/sureword/parser.py` (added parse_blood_pressure, parse_blood_glucose, parse_pregnancy_trimester)
+- `src/sureword/policy.py` (prompt templates and clinical risk rules)
+- `src/sureword/static/index.html` (clinical inputs, audio player, registry headers)
+- `src/sureword/static/styles.css` (audio player review styling)
+- `src/sureword/static/app.js` (clinical keys, audio player binding, registry columns, CSV/JSON export)
+- `tests/unit/test_contracts.py` (contract tests for clinical keys)
+- `tests/unit/test_parser.py` (unit tests for BP, glucose, trimester parsing and bounds)
+- `tests/unit/test_policy.py` (policy tests for clinical risk ranking)
+- `tests/integration/test_app.py` (end-to-end integration lifecycle with clinical vitals)
 
 Next local command:
 ```bash

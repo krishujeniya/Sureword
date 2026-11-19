@@ -34,6 +34,9 @@ class FieldKey(StrEnum):
     VISIT_DATE = "visit_date"
     GENDER = "gender"
     SYMPTOMS = "symptoms"
+    BLOOD_PRESSURE = "blood_pressure"
+    BLOOD_GLUCOSE = "blood_glucose"
+    PREGNANCY_TRIMESTER = "pregnancy_trimester"
 
 
 class FieldValue(BaseModel):

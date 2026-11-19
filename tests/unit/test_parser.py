@@ -280,3 +280,86 @@ def test_parse_visit_form_with_clinical_expansion() -> None:
     symptoms_val = fields[FieldKey.SYMPTOMS].canonical_value
     assert symptoms_val is not None
     assert "Fever" in symptoms_val
+
+
+def test_parse_blood_pressure() -> None:
+    from sureword.parser import parse_blood_pressure
+
+    # Valid Hindi formats
+    res_hi = parse_blood_pressure("मरीज का बीपी 120 80 है")
+    assert res_hi.canonical_value == "120/80 mmHg"
+    assert res_hi.status == FieldStatus.PROPOSED
+
+    res_bata = parse_blood_pressure("रक्तचाप 140 बटा 90")
+    assert res_bata.canonical_value == "140/90 mmHg"
+    assert res_bata.status == FieldStatus.PROPOSED
+
+    # Valid English formats
+    res_en = parse_blood_pressure("blood pressure is 130 over 85")
+    assert res_en.canonical_value == "130/85 mmHg"
+    assert res_en.status == FieldStatus.PROPOSED
+
+    res_slash = parse_blood_pressure("BP 118/76 mmHg")
+    assert res_slash.canonical_value == "118/76 mmHg"
+
+    # Inverted systolic/diastolic -> NEEDS_REPEAT
+    res_inverted = parse_blood_pressure("बीपी 80 बटा 120")
+    assert res_inverted.status == FieldStatus.NEEDS_REPEAT
+    assert "greater than diastolic" in " ".join(res_inverted.reasons)
+
+    # Out of bounds -> NEEDS_REPEAT
+    res_oob = parse_blood_pressure("बीपी 280 बटा 90")
+    assert res_oob.status == FieldStatus.NEEDS_REPEAT
+
+    # Missing
+    assert parse_blood_pressure("मरीज का नाम कमला देवी").status == FieldStatus.MISSING
+
+
+def test_parse_blood_glucose() -> None:
+    from sureword.parser import parse_blood_glucose
+
+    # Random glucose
+    res_rbs = parse_blood_glucose("मरीज का ब्लड शुगर 110 है")
+    assert res_rbs.canonical_value == "110 mg/dL (Random)"
+    assert res_rbs.status == FieldStatus.PROPOSED
+
+    # Fasting glucose
+    res_fbs = parse_blood_glucose("फास्टिंग शुगर 95 mg/dl")
+    assert res_fbs.canonical_value == "95 mg/dL (Fasting)"
+    assert res_fbs.status == FieldStatus.PROPOSED
+
+    # Post-prandial
+    res_pp = parse_blood_glucose("sugar 145 post prandial")
+    assert res_pp.canonical_value == "145 mg/dL (Post-prandial)"
+
+    # Out of bounds
+    res_high = parse_blood_glucose("शुगर 650")
+    assert res_high.status == FieldStatus.NEEDS_REPEAT
+
+    # Missing
+    assert parse_blood_glucose("मरीज रामपुर गाँव").status == FieldStatus.MISSING
+
+
+def test_parse_pregnancy_trimester() -> None:
+    from sureword.parser import parse_pregnancy_trimester
+
+    assert parse_pregnancy_trimester("मरीज का पहला ट्राइमेस्टर है").canonical_value == "Trimester 1"
+    assert parse_pregnancy_trimester("गर्भावस्था 5 महीने").canonical_value == "Trimester 2"
+    assert parse_pregnancy_trimester("third trimester antenatal checkup").canonical_value == "Trimester 3"
+    assert parse_pregnancy_trimester("पुरुष उम्र 40").status == FieldStatus.MISSING
+
+
+def test_parse_visit_form_with_all_clinical_vitals() -> None:
+    transcript = (
+        "मरीज का नाम कमला देवी, महिला, उम्र 45 साल, बीपी 130 बटा 85, ब्लड शुगर 110, "
+        "पहला ट्राइमेस्टर, तेज बुखार, रामपुर गाँव, विजिट डेट 30 अक्टूबर 2026"
+    )
+    fields = parse_visit_form(transcript)
+    assert fields[FieldKey.PERSON_NAME].canonical_value == "Kamla Devi"
+    assert fields[FieldKey.AGE].canonical_value == "45"
+    assert fields[FieldKey.VILLAGE].canonical_value == "Rampur"
+    assert fields[FieldKey.VISIT_DATE].canonical_value == "2026-10-30"
+    assert fields[FieldKey.GENDER].canonical_value == "Female"
+    assert fields[FieldKey.BLOOD_PRESSURE].canonical_value == "130/85 mmHg"
+    assert fields[FieldKey.BLOOD_GLUCOSE].canonical_value == "110 mg/dL (Random)"
+    assert fields[FieldKey.PREGNANCY_TRIMESTER].canonical_value == "Trimester 1"

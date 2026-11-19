@@ -883,6 +883,185 @@ def parse_symptoms(transcript: str) -> FieldValue:
     )
 
 
+def parse_blood_pressure(transcript: str) -> FieldValue:
+    """Extract and physiologically validate blood pressure (systolic/diastolic in mmHg)."""
+    text = convert_indic_digits(transcript.strip())
+
+    # 1. Look for explicit BP keyword followed by two numbers
+    # e.g., "बीपी 120 80", "BP 130/85", "रक्तचाप 140 बटा 90", "blood pressure 120 over 80"
+    bp_kw_pattern = re.compile(
+        r"(?:blood\s*pressure|bp|रक्तचाप|ब्लड\s*प्रेशर|बीपी)[^\d\w]{0,12}"
+        r"(\d{2,3})\s*(?:/|over|by|बटा|-|\s+)\s*(\d{2,3})",
+        re.IGNORECASE,
+    )
+    # 2. Look for explicit fraction format e.g. "120/80 mmHg" or "130/85"
+    bp_slash_pattern = re.compile(
+        r"\b(\d{2,3})\s*/\s*(\d{2,3})\s*(?:mm\s*hg|रक्तचाप|बीपी|bp)?\b",
+        re.IGNORECASE,
+    )
+
+    m = bp_kw_pattern.search(text) or bp_slash_pattern.search(text)
+    if not m:
+        return FieldValue(
+            key=FieldKey.BLOOD_PRESSURE.value,
+            status=FieldStatus.MISSING,
+            reasons=["No blood pressure mentioned in visit dictation"],
+        )
+
+    raw_span = m.group(0)
+    systolic = int(m.group(1))
+    diastolic = int(m.group(2))
+
+    reasons: list[str] = []
+
+    # Physiological range check
+    if systolic < 60 or systolic > 260:
+        reasons.append(f"Systolic blood pressure ({systolic}) outside physiological bounds (60-260 mmHg)")
+    if diastolic < 40 or diastolic > 150:
+        reasons.append(f"Diastolic blood pressure ({diastolic}) outside physiological bounds (40-150 mmHg)")
+    if systolic <= diastolic:
+        reasons.append(f"Systolic blood pressure ({systolic}) must be greater than diastolic ({diastolic})")
+
+    if reasons:
+        return FieldValue(
+            key=FieldKey.BLOOD_PRESSURE.value,
+            raw_span=raw_span,
+            canonical_value=f"{systolic}/{diastolic} mmHg",
+            status=FieldStatus.NEEDS_REPEAT,
+            reasons=reasons,
+        )
+
+    # Classify clinical reading per standard NHM/WHO guidelines
+    if systolic < 120 and diastolic < 80:
+        clinical_stage = "Normal Blood Pressure"
+    elif systolic < 130 and diastolic < 80:
+        clinical_stage = "Elevated Blood Pressure"
+    elif systolic < 140 or diastolic < 90:
+        clinical_stage = "Stage 1 Hypertension"
+    else:
+        clinical_stage = "Stage 2 Hypertension"
+
+    return FieldValue(
+        key=FieldKey.BLOOD_PRESSURE.value,
+        raw_span=raw_span,
+        canonical_value=f"{systolic}/{diastolic} mmHg",
+        status=FieldStatus.PROPOSED,
+        reasons=[f"Valid physiological reading: {clinical_stage}"],
+    )
+
+
+def parse_blood_glucose(transcript: str) -> FieldValue:
+    """Extract and validate blood glucose (in mg/dL)."""
+    text = convert_indic_digits(transcript.strip())
+
+    # Detect context (Fasting, Post-prandial, or Random)
+    context = "Random"
+    if re.search(r"(?:fasting|खाली\s*पेट|फास्टिंग)", text, re.IGNORECASE):
+        context = "Fasting"
+    elif re.search(r"(?:post\s*prandial|pp|खाने\s*के\s*बाद|भोजन\s*के\s*बाद)", text, re.IGNORECASE):
+        context = "Post-prandial"
+
+    # Match glucose values e.g. "शुगर 110", "blood sugar 145", "RBS 160", "sugar 95 mg/dl"
+    pattern = re.compile(
+        r"(?:blood\s*glucose|blood\s*sugar|glucose|sugar|शुगर|ग्लूकोज|ब्लड\s*शुगर|rbs|fbs|ppbs)[^\d\w]{0,10}"
+        r"(\d{2,3})\s*(?:mg\s*/\s*dl)?\b",
+        re.IGNORECASE,
+    )
+    pattern_suffix = re.compile(
+        r"\b(\d{2,3})\s*(?:mg\s*/\s*dl)\s*(?:sugar|glucose|शुगर|ग्लूकोज)?\b",
+        re.IGNORECASE,
+    )
+
+    m = pattern.search(text) or pattern_suffix.search(text)
+    if not m:
+        return FieldValue(
+            key=FieldKey.BLOOD_GLUCOSE.value,
+            status=FieldStatus.MISSING,
+            reasons=["No blood glucose mentioned in visit dictation"],
+        )
+
+    raw_span = m.group(0)
+    val = int(m.group(1))
+
+    # Physiological range check (30-600 mg/dL)
+    if val < 30 or val > 600:
+        return FieldValue(
+            key=FieldKey.BLOOD_GLUCOSE.value,
+            raw_span=raw_span,
+            canonical_value=f"{val} mg/dL ({context})",
+            status=FieldStatus.NEEDS_REPEAT,
+            reasons=[f"Blood glucose reading ({val} mg/dL) outside physiological bounds (30-600 mg/dL)"],
+        )
+
+    clinical_note = "Normal Glucose"
+    if val < 70:
+        clinical_note = "Hypoglycemia Alert"
+    elif (context == "Fasting" and val >= 126) or (context != "Fasting" and val >= 200):
+        clinical_note = "Hyperglycemia Alert"
+
+    return FieldValue(
+        key=FieldKey.BLOOD_GLUCOSE.value,
+        raw_span=raw_span,
+        canonical_value=f"{val} mg/dL ({context})",
+        status=FieldStatus.PROPOSED,
+        reasons=[f"Valid physiological reading: {clinical_note}"],
+    )
+
+
+def parse_pregnancy_trimester(transcript: str) -> FieldValue:
+    """Extract gestational milestone or pregnancy trimester."""
+    text = convert_indic_digits(transcript.strip())
+
+    t1_pattern = re.compile(
+        r"(?:first|1st|पहला|प्रथम)\s*(?:trimester|ट्राइमेस्टर)|(?:1|2|3|एक|दो|तीन)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        re.IGNORECASE,
+    )
+    t2_pattern = re.compile(
+        r"(?:second|2nd|दूसरा|दूसरी|द्वितीय)\s*(?:trimester|ट्राइमेस्टर)|(?:4|5|6|चार|पांच|पाँच|छह)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        re.IGNORECASE,
+    )
+    t3_pattern = re.compile(
+        r"(?:third|3rd|तीसरा|तीसरी|तृतीय)\s*(?:trimester|ट्राइमेस्टर)|(?:7|8|9|सात|आठ|नौ)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        re.IGNORECASE,
+    )
+
+    m1 = t1_pattern.search(text)
+    if m1:
+        return FieldValue(
+            key=FieldKey.PREGNANCY_TRIMESTER.value,
+            raw_span=m1.group(0),
+            canonical_value="Trimester 1",
+            status=FieldStatus.PROPOSED,
+            reasons=["Early pregnancy antenatal care checkup (Months 1-3)"],
+        )
+
+    m2 = t2_pattern.search(text)
+    if m2:
+        return FieldValue(
+            key=FieldKey.PREGNANCY_TRIMESTER.value,
+            raw_span=m2.group(0),
+            canonical_value="Trimester 2",
+            status=FieldStatus.PROPOSED,
+            reasons=["Second trimester antenatal care checkup (Months 4-6)"],
+        )
+
+    m3 = t3_pattern.search(text)
+    if m3:
+        return FieldValue(
+            key=FieldKey.PREGNANCY_TRIMESTER.value,
+            raw_span=m3.group(0),
+            canonical_value="Trimester 3",
+            status=FieldStatus.PROPOSED,
+            reasons=["Late pregnancy antenatal care checkup (Months 7-9)"],
+        )
+
+    return FieldValue(
+        key=FieldKey.PREGNANCY_TRIMESTER.value,
+        status=FieldStatus.MISSING,
+        reasons=["No pregnancy trimester mentioned in visit dictation"],
+    )
+
+
 def parse_visit_form(transcript: str, reference_date: date | None = None) -> dict[str, FieldValue]:
     """Parse core and optional clinical fields deterministically from transcript."""
     return {
@@ -892,4 +1071,7 @@ def parse_visit_form(transcript: str, reference_date: date | None = None) -> dic
         FieldKey.VISIT_DATE.value: parse_date(transcript, reference_date),
         FieldKey.GENDER.value: parse_gender(transcript),
         FieldKey.SYMPTOMS.value: parse_symptoms(transcript),
+        FieldKey.BLOOD_PRESSURE.value: parse_blood_pressure(transcript),
+        FieldKey.BLOOD_GLUCOSE.value: parse_blood_glucose(transcript),
+        FieldKey.PREGNANCY_TRIMESTER.value: parse_pregnancy_trimester(transcript),
     }

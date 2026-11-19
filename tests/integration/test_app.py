@@ -550,6 +550,63 @@ async def test_root_static_asset_serving() -> None:
             "experience.js",
             "logo.svg",
             "favicon.svg",
+            "manifest.json",
+            "sw.js",
         ]:
             res = await client.get(f"/{asset}")
             assert res.status_code == 200, f"Expected 200 for root asset /{asset}"
+
+
+@pytest.mark.asyncio
+async def test_clinical_vitals_lifecycle() -> None:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        # Create draft
+        res = await client.post("/api/drafts")
+        assert res.status_code == 200
+        draft_id = res.json()["draft_id"]
+
+        # Submit simulated transcript with clinical vitals
+        transcript = (
+            "मरीज का नाम सुनीता बाई उम्र 38 साल रामपुर गाँव विजिट डेट आज "
+            "बीपी 120 80 ब्लड शुगर 110 पहला ट्राइमेस्टर"
+        )
+        res_audio = await client.post(
+            f"/api/drafts/{draft_id}/audio",
+            data={"expected_version": 1, "simulated_transcript": transcript},
+        )
+        assert res_audio.status_code == 200
+        draft = res_audio.json()["draft"]
+        fields = draft["fields"]
+
+        assert fields["blood_pressure"]["canonical_value"] == "120/80 mmHg"
+        assert fields["blood_glucose"]["canonical_value"] == "110 mg/dL (Random)"
+        assert fields["pregnancy_trimester"]["canonical_value"] == "Trimester 1"
+
+        # Resolve any clarification if needed
+        curr_v = draft["version"]
+        while draft["state"] == "NEEDS_CLARIFICATION" and draft.get("active_prompt"):
+            target = draft["active_prompt"]["target_field"]
+            val = draft["fields"][target]["canonical_value"] or "Test Val"
+            res_c = await client.post(
+                f"/api/drafts/{draft_id}/clarify",
+                data={"target_field": target, "expected_version": curr_v, "manual_value": val},
+            )
+            assert res_c.status_code == 200
+            draft = res_c.json()
+            curr_v = draft["version"]
+
+        # Commit draft
+        res_commit = await client.post(
+            f"/api/drafts/{draft_id}/commit",
+            json={"expected_version": curr_v, "idempotency_key": "idemp_clinical_vitals"},
+        )
+        assert res_commit.status_code == 200
+        record_id = res_commit.json()["record_id"]
+
+        # Verify record exists in /api/records
+        res_records = await client.get("/api/records")
+        assert res_records.status_code == 200
+        records = res_records.json()
+        saved = next(r for r in records if r["record_id"] == record_id)
+        assert saved["snapshot"]["fields"]["blood_pressure"]["canonical_value"] == "120/80 mmHg"

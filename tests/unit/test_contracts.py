@@ -53,3 +53,9 @@ def test_commit_request_validation() -> None:
     cr = CommitRequest(expected_version=2, idempotency_key="idemp_123")
     assert cr.expected_version == 2
     assert cr.idempotency_key == "idemp_123"
+
+
+def test_clinical_field_keys() -> None:
+    assert FieldKey.BLOOD_PRESSURE.value == "blood_pressure"
+    assert FieldKey.BLOOD_GLUCOSE.value == "blood_glucose"
+    assert FieldKey.PREGNANCY_TRIMESTER.value == "pregnancy_trimester"
