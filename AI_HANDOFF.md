@@ -24,6 +24,8 @@ Changed/added source:
 - `tests/unit/test_parser.py` (unit tests for BP, glucose, trimester parsing and bounds)
 - `tests/unit/test_policy.py` (policy tests for clinical risk ranking)
 - `tests/integration/test_app.py` (end-to-end integration lifecycle with clinical vitals)
+- `scripts/evaluate.py` (scoped evaluation policies to critical benchmark keys)
+- `.github/workflows/ci.yml` (optimized ffmpeg runner check to eliminate apt mirror latency)
 
 Next local command:
 ```bash
