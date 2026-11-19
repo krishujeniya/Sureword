@@ -888,15 +888,15 @@ def parse_blood_pressure(transcript: str) -> FieldValue:
     text = convert_indic_digits(transcript.strip())
 
     # 1. Look for explicit BP keyword followed by two numbers
-    # e.g., "बीपी 120 80", "BP 130/85", "रक्तचाप 140 बटा 90", "blood pressure 120 over 80"
+    # e.g., "बीपी 120 80", "BP 130/85", "रक्तचाप 140 बटा 90", "blood pressure is 130 over 85"
     bp_kw_pattern = re.compile(
-        r"(?:blood\s*pressure|bp|रक्तचाप|ब्लड\s*प्रेशर|बीपी)[^\d\w]{0,12}"
+        r"(?:blood\s*pressure|bp|रक्तचाप|ब्लड\s*प्रेशर|बीपी)[^\d]{0,25}"
         r"(\d{2,3})\s*(?:/|over|by|बटा|-|\s+)\s*(\d{2,3})",
         re.IGNORECASE,
     )
     # 2. Look for explicit fraction format e.g. "120/80 mmHg" or "130/85"
     bp_slash_pattern = re.compile(
-        r"\b(\d{2,3})\s*/\s*(\d{2,3})\s*(?:mm\s*hg|रक्तचाप|बीपी|bp)?\b",
+        r"\b(\d{2,3})\s*/\s*(\d{2,3})(?!\s*/)\s*(?:mm\s*hg|रक्तचाप|बीपी|bp)?\b",
         re.IGNORECASE,
     )
 
@@ -963,7 +963,7 @@ def parse_blood_glucose(transcript: str) -> FieldValue:
 
     # Match glucose values e.g. "शुगर 110", "blood sugar 145", "RBS 160", "sugar 95 mg/dl"
     pattern = re.compile(
-        r"(?:blood\s*glucose|blood\s*sugar|glucose|sugar|शुगर|ग्लूकोज|ब्लड\s*शुगर|rbs|fbs|ppbs)[^\d\w]{0,10}"
+        r"(?:blood\s*glucose|blood\s*sugar|glucose|sugar|शुगर|ग्लूकोज|ब्लड\s*शुगर|rbs|fbs|ppbs)[^\d]{0,25}"
         r"(\d{2,3})\s*(?:mg\s*/\s*dl)?\b",
         re.IGNORECASE,
     )
@@ -1013,15 +1013,21 @@ def parse_pregnancy_trimester(transcript: str) -> FieldValue:
     text = convert_indic_digits(transcript.strip())
 
     t1_pattern = re.compile(
-        r"(?:first|1st|पहला|प्रथम)\s*(?:trimester|ट्राइमेस्टर)|(?:1|2|3|एक|दो|तीन)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        r"(?:first|1st|पहला|प्रथम)\s*(?:trimester|ट्राइमेस्टर)"
+        r"|(?:1|2|3|एक|दो|तीन)(?:st|nd|rd|th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)\s*(?:की\s*)?(?:गर्भावस्था|pregnant|pregnancy|गर्भ)"
+        r"|(?:गर्भावस्था|pregnant|pregnancy|गर्भ)[^\d]{0,15}(?:1|2|3|एक|दो|तीन)(?:st|nd|rd|th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)",
         re.IGNORECASE,
     )
     t2_pattern = re.compile(
-        r"(?:second|2nd|दूसरा|दूसरी|द्वितीय)\s*(?:trimester|ट्राइमेस्टर)|(?:4|5|6|चार|पांच|पाँच|छह)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        r"(?:second|2nd|दूसरा|दूसरी|द्वितीय)\s*(?:trimester|ट्राइमेस्टर)"
+        r"|(?:4|5|6|चार|पांच|पाँच|छह)(?:th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)\s*(?:की\s*)?(?:गर्भावस्था|pregnant|pregnancy|गर्भ)"
+        r"|(?:गर्भावस्था|pregnant|pregnancy|गर्भ)[^\d]{0,15}(?:4|5|6|चार|पांच|पाँच|छह)(?:th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)",
         re.IGNORECASE,
     )
     t3_pattern = re.compile(
-        r"(?:third|3rd|तीसरा|तीसरी|तृतीय)\s*(?:trimester|ट्राइमेस्टर)|(?:7|8|9|सात|आठ|नौ)\s*(?:महीने|months)\s*(?:गर्भावस्था|pregnant|pregnancy)",
+        r"(?:third|3rd|तीसरा|तीसरी|तृतीय)\s*(?:trimester|ट्राइमेस्टर)"
+        r"|(?:7|8|9|सात|आठ|नौ)(?:th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)\s*(?:की\s*)?(?:गर्भावस्था|pregnant|pregnancy|गर्भ)"
+        r"|(?:गर्भावस्था|pregnant|pregnancy|गर्भ)[^\d]{0,15}(?:7|8|9|सात|आठ|नौ)(?:th|वां|वें|वीं)?\s*(?:महीने|महीना|माह|months?)",
         re.IGNORECASE,
     )
 
