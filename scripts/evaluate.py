@@ -89,57 +89,62 @@ def evaluate_policy(
 
         attempts_by_field: dict[str, int] = {}
         prompts_this_sample = 0
+        eval_parsed = {k: parsed[k] for k in critical_keys if k in parsed}
 
         # Run clarification turn if policy allows prompts
         if policy_name == "B0":
             # No prompts allowed
             pass
         elif policy_name == "B1":
-            prompt = select_clarification_field_b1(parsed, attempts_by_field, max_attempts=1)
+            prompt = select_clarification_field_b1(eval_parsed, attempts_by_field, max_attempts=1)
             if prompt:
                 prompts_this_sample += 1
                 # Simulated clarification: user repeats gold label for that field
                 k = prompt.target_field
+                val = gold.get(k, "")
                 parsed[k] = FieldValue(
                     key=k,
-                    raw_span=gold[k],
-                    canonical_value=gold[k],
+                    raw_span=val,
+                    canonical_value=val,
                     status=FieldStatus.USER_CONFIRMED,
                 )
         elif policy_name == "B2":
             prompt = select_clarification_field_b2(
-                parsed, attempts_by_field, seed=seed, max_attempts=1
+                eval_parsed, attempts_by_field, seed=seed, max_attempts=1
             )
             if prompt:
                 prompts_this_sample += 1
                 k = prompt.target_field
+                val = gold.get(k, "")
                 parsed[k] = FieldValue(
                     key=k,
-                    raw_span=gold[k],
-                    canonical_value=gold[k],
+                    raw_span=val,
+                    canonical_value=val,
                     status=FieldStatus.USER_CONFIRMED,
                 )
         elif policy_name == "B3":
             # Confirm every field (upper bound reference)
             for k in critical_keys:
                 prompts_this_sample += 1
+                val = gold.get(k, "")
                 parsed[k] = FieldValue(
                     key=k,
-                    raw_span=gold[k],
-                    canonical_value=gold[k],
+                    raw_span=val,
+                    canonical_value=val,
                     status=FieldStatus.USER_CONFIRMED,
                 )
         elif policy_name == "P":
             prompt = select_clarification_field_p(
-                parsed, attempts_by_field, max_attempts=budget_max_prompts, risk_threshold=0.3
+                eval_parsed, attempts_by_field, max_attempts=budget_max_prompts, risk_threshold=0.3
             )
             if prompt:
                 prompts_this_sample += 1
                 k = prompt.target_field
+                val = gold.get(k, "")
                 parsed[k] = FieldValue(
                     key=k,
-                    raw_span=gold[k],
-                    canonical_value=gold[k],
+                    raw_span=val,
+                    canonical_value=val,
                     status=FieldStatus.USER_CONFIRMED,
                 )
 
