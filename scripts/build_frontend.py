@@ -33,7 +33,7 @@ FORBIDDEN_EXTENSIONS = {".py", ".pyc", ".db", ".sqlite", ".sqlite3", ".env", ".k
 def build_frontend(
     source_dir: Path,
     output_dir: Path,
-    api_base_url: str = "https://sureword-api.curavex.workers.dev",
+    api_base_url: str = "https://api.sureword.workers.dev",
     base_href: str = "/",
 ) -> None:
     """Build decoupled static distribution."""

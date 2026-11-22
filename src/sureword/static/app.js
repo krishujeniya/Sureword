@@ -899,7 +899,7 @@ function setLanguage(lang) {
 
 // Centralized API Configuration & Cross-Origin Client
 const API_CONFIG = {
-  productionApiBase: "https://sureword-api.curavex.workers.dev",
+  productionApiBase: "https://api.sureword.workers.dev",
   timeoutMs: 30000,
   getBaseUrl() {
     // 1. Explicit runtime query parameter (?api_base=...)
