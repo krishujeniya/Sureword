@@ -899,7 +899,7 @@ function setLanguage(lang) {
 
 // Centralized API Configuration & Cross-Origin Client
 const API_CONFIG = {
-  productionApiBase: "https://sureword.vercel.app",
+  productionApiBase: "https://sureword-api.curavex.workers.dev",
   timeoutMs: 30000,
   getBaseUrl() {
     // 1. Explicit runtime query parameter (?api_base=...)
@@ -923,10 +923,10 @@ const API_CONFIG = {
       return window.SUREWORD_CONFIG.apiBaseUrl.replace(/\/+$/, "");
     }
 
-    // 4. GitHub Pages detection: krishujeniya.github.io or any *.github.io domain
+    // 4. Cloudflare Pages detection: sureword.pages.dev or any *.pages.dev domain
     if (typeof window !== "undefined" && window.location && window.location.hostname && (
-      window.location.hostname.endsWith(".github.io") ||
-      window.location.hostname === "krishujeniya.github.io"
+      window.location.hostname.endsWith(".pages.dev") ||
+      window.location.hostname === "sureword.pages.dev"
     )) {
       return this.productionApiBase;
     }

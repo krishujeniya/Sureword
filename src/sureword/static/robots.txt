@@ -17,4 +17,4 @@ Allow: /
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://krishujeniya.github.io/Sureword/sitemap.xml
+Sitemap: https://sureword.pages.dev/sitemap.xml

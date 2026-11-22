@@ -33,8 +33,8 @@ FORBIDDEN_EXTENSIONS = {".py", ".pyc", ".db", ".sqlite", ".sqlite3", ".env", ".k
 def build_frontend(
     source_dir: Path,
     output_dir: Path,
-    api_base_url: str = "https://sureword.vercel.app",
-    base_href: str = "/Sureword/",
+    api_base_url: str = "https://sureword-api.curavex.workers.dev",
+    base_href: str = "/",
 ) -> None:
     """Build decoupled static distribution."""
     if not source_dir.is_dir():
@@ -58,26 +58,26 @@ def build_frontend(
     content = content.replace('href="/static/', 'href="./')
     content = content.replace('src="/static/', 'src="./')
 
-    # Ensure canonical and OpenGraph point to GitHub Pages target
-    gh_pages_url = f"https://krishujeniya.github.io{base_href}"
+    # Ensure canonical and OpenGraph point to Cloudflare Pages target
+    pages_url = f"https://sureword.pages.dev{base_href}"
     content = re.sub(
         r'<link rel="canonical" href="[^"]*">',
-        f'<link rel="canonical" href="{gh_pages_url}">',
+        f'<link rel="canonical" href="{pages_url}">',
         content,
     )
     content = re.sub(
         r'<meta property="og:url" content="[^"]*">',
-        f'<meta property="og:url" content="{gh_pages_url}">',
+        f'<meta property="og:url" content="{pages_url}">',
         content,
     )
     content = re.sub(
         r'<meta property="og:image" content="[^"]*">',
-        f'<meta property="og:image" content="{gh_pages_url}logo.svg">',
+        f'<meta property="og:image" content="{pages_url}logo.svg">',
         content,
     )
     content = re.sub(
         r'<meta name="twitter:image" content="[^"]*">',
-        f'<meta name="twitter:image" content="{gh_pages_url}logo.svg">',
+        f'<meta name="twitter:image" content="{pages_url}logo.svg">',
         content,
     )
 

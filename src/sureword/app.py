@@ -73,6 +73,8 @@ app = FastAPI(
 # CORS Middleware (GitHub Pages + Local Development Support)
 cors_origins_env = os.getenv("CORS_ORIGINS", "")
 allowed_origins = [
+    "https://sureword.pages.dev",
+    "https://krishujeniya.dev",
     "https://krishujeniya.github.io",
     "http://127.0.0.1:8000",
     "http://localhost:8000",
