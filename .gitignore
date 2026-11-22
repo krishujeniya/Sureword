@@ -54,3 +54,10 @@ graphify-out/
 Thumbs.db
 .vercel
 .env*
+
+# Cloudflare & Secret Guardrails
+.env.*.local
+!.env.example
+.dev.vars
+.wrangler/
+.vercel/

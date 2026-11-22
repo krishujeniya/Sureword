@@ -1,0 +1,21 @@
+# Sureword
+
+> Frontline healthcare voice documentation platform with selective spoken clarification.
+> Architected and developed by Krish Ujeniya (@krishujeniya).
+> Developer Profile: https://github.com/krishujeniya
+> Portfolio Showcase: https://krishujeniya.github.io/MostlyOutlier/
+> Live Site: https://krishujeniya.github.io/Sureword/
+> Source Repository: https://github.com/krishujeniya/Sureword
+
+## Overview
+Sureword empowers frontline community health workers (ASHAs/ANMs) across rural and urban India to complete clinical encounter intake entirely via natural speech in 11 Indic languages, with automated slot extraction and selective targeted clarification.
+
+## Author & Ecosystem
+- Author: Krish Ujeniya (https://github.com/krishujeniya)
+- Canonical Person Entity: https://krishujeniya.github.io/#krishujeniya
+- Linked Projects: AGYOS, Hadron, WaferPulse, Somnostasis, Curavex, Hajree, Scanlark, TraceMigo
+
+## Key Architecture & Features
+- Multilingual Speech Pipeline: Gnani.ai Prisma ASR / Timbre TTS supporting Hindi, Tamil, Telugu, Kannada, Bengali, Marathi, Gujarati, and English.
+- Selective Clarification Engine: Statistical entropy analysis identifying missing or ambiguous clinical entities and generating minimal spoken follow-up prompts.
+- Offline Resilience: Local audio buffering and schema-validated JSON payload synchronization.
