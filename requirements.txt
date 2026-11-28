@@ -52,7 +52,7 @@ python-dotenv==1.2.4
     # via
     #   pydantic-settings
     #   uvicorn
-python-multipart==0.0.33
+python-multipart==0.0.34
     # via sureword (pyproject.toml)
 pyyaml==6.0.3
     # via uvicorn
