@@ -39,7 +39,7 @@ numpy==2.5.4
     # via sureword (pyproject.toml)
 opentelemetry-api==1.45.2
     # via fastapi
-pydantic==2.14.2
+pydantic==2.14.4
     # via
     #   sureword (pyproject.toml)
     #   fastapi
