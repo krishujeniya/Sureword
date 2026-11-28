@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:61e01f72680f86a5279ad510818ab7b2ee9f049822589d4e34e33e044360356c
 
 # Install system dependencies (ffmpeg is essential for audio normalization)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -25,6 +25,14 @@ ENV PATH="/opt/venv/bin:$PATH"
 ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV DATABASE_PATH=/app/data/sureword.db
+
+# Non-root user
+RUN groupadd -r sureword -g 1001 && \
+    useradd -r -u 1001 -g sureword -d /app -m sureword && \
+    mkdir -p /app/data && \
+    chown -R sureword:sureword /app
+
+USER sureword
 
 # Expose port
 EXPOSE 8000

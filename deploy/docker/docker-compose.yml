@@ -1,9 +1,13 @@
 services:
   sureword:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
     container_name: sureword-app
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "8000:8000"
     environment:
